@@ -1,0 +1,8 @@
+# Make directories in $HOME accessible from everywhere
+export CDPATH=$CDPATH:.:$HOME
+
+VIM=/usr/bin/vim
+if [ -e $VIM ]; then
+ export EDITOR=$VIM
+ export VISUAL=$VIM
+fi
