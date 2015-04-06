@@ -1,0 +1,18 @@
+[ -n "${BASH_VERSION}${KSH_VERSION}${ZSH_VERSION}" ] || return 0
+
+# This disables Ctrl-S as an option to suspend the terminal
+# and enables incremental history search when using Ctrl-R
+stty -ixon
+
+# Keep current location after exiting mc
+MC_WRAPPER='/usr/lib/mc/mc-wrapper.sh'
+if [ -x $MC_WRAPPER ]; then
+     alias mc=". $MC_WRAPPER";
+fi
+
+# Start autojump
+# Command: j to jump to a directory
+AUTOJUMP=/usr/share/autojump/autojump.sh
+if [ -x $AUTOJUMP ]; then
+ . $AUTOJUMP
+fi
