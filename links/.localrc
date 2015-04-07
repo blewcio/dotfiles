@@ -13,6 +13,12 @@ fi
 # Start autojump
 # Command: j to jump to a directory
 AUTOJUMP=/usr/share/autojump/autojump.sh
-if [ -x $AUTOJUMP ]; then
- . $AUTOJUMP
+if [ -e $AUTOJUMP ]; then
+  # . $AUTOJUMP
+fi
+
+# Dirty fix to enable 256 colors in xterm
+# Actually, it should be set outside of a terminal
+if [ "$TERM" = "xterm" ]; then
+  export TERM='xterm-256color'
 fi
