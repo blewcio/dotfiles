@@ -41,10 +41,9 @@ for file in .bashrc .zshrc; do
     continue
   fi
 
-  if [ -n "$(grep "for file in {.aliases,.exports,.functions,.localrc}; do" ${SHELL_RC})" ]; then
+  if [ -n "$(grep "for f in .aliases .exports .functions .localrc; do" ${SHELL_RC})" ]; then
     continue
   fi
-
   echo "Adding auto-load lines to $SHELL_RC"
 
 cat << EOT >> $SHELL_RC
