@@ -7,7 +7,7 @@ NO_COLOR='\033[0m'
 # STEP 1: Link all files to $HOME and keep the directory structure
 
 # Use find to easily list all files in sub-directories
-for file in $(find $PWD -type f -name ".*"); do
+for file in $(find $PWD -type f | grep -v '.sh'); do
 
   FILENAME=${file#$PWD}
   TARGET="${HOME}${FILENAME}"
