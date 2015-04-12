@@ -14,7 +14,7 @@ fi
 # Command: j to jump to a directory
 AUTOJUMP=/usr/share/autojump/autojump.sh
 if [ -e $AUTOJUMP ]; then
-  # . $AUTOJUMP
+  . $AUTOJUMP
 fi
 
 # Dirty fix to enable 256 colors in xterm
