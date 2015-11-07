@@ -12,13 +12,19 @@ fi
 
 # Start autojump
 # Command: j to jump to a directory
-AUTOJUMP=/usr/share/autojump/autojump.sh
-if [ -e $AUTOJUMP ]; then
-  . $AUTOJUMP
-fi
+#AUTOJUMP=/usr/share/autojump/autojump.sh
+#if [ -e $AUTOJUMP ]; then
+#  . $AUTOJUMP
+#fi
 
 # Dirty fix to enable 256 colors in xterm
 # Actually, it should be set outside of a terminal
 if [ "$TERM" = "xterm" ]; then
   export TERM='xterm-256color'
+fi
+
+# Start fasd
+FASD=fasd
+if command -v $FASD > /dev/null 2>&1; then
+  eval "$($FASD --init auto)"
 fi
