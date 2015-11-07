@@ -20,3 +20,6 @@ alias tn='tmux new'
 # Simple calculator
 # ? () { echo "$*" | bc -l; }
 alias installed-packages="comm -23 <(apt-mark showmanual | sort -u) <(gzip -dc /var/log/installer/initial-status.gz | sed -n 's/^Package: //p' | sort -u)"
+# fasd shortcuts
+alias v='f -e vim'
+alias m='f -e mplayer'
