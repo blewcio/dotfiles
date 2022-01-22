@@ -53,6 +53,7 @@ brew install \
   ffmpeg
 
 # TODO: Config fzf & fasd
+
 # TODO: Config zsh
 # Plugins
 # Powerline
