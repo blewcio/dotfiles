@@ -38,6 +38,17 @@
 CUSTOM_FILES=".aliases.sh .exports.sh .functions.sh"
 CUSTOM_PREFIX=~/.dotfiles/
 
+# Install plugin manager for zsh
+curl -L git.io/antigen > ~/.dotfiles/antigen.zsh
+
+# TODO: To install useful key bindings and fuzzy completion:
+# $(brew --prefix)/opt/fzf/install
+
+# Download item integration script
+# TODO: curl -L https://iterm2.com/misc/install_shell_integration.sh > ~/.install_shell_integration.sh
+
+# TODO: Download tmux config
+
 for file in .bashrc .zshrc; do
 
   SHELL_RC="$HOME/$file"
@@ -46,17 +57,32 @@ for file in .bashrc .zshrc; do
     continue
   fi
 
+# Add list of prefered plugins to .zshrc
+
   #Check if already included
   if [ -n "$(grep "for f in $CUSTOM_FILES; do" ${SHELL_RC})" ]; then
     echo "Auto-load lines already found in $SHELL_RC"
     continue
   fi
 
-  echo "Adding auto-load lines to $SHELL_RC"
+  echo "Adding custom lines to $SHELL_RC"
 
   cat << EOT >> $SHELL_RC
 
 # Load Blazej's customizations
+
+# Shell integration with iTerm2
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+# Load fuzzy finder (Ctrl-T files, Ctrl-R comands, Alt-C cd to DIR)
+#[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Initialize fasd 
+echo 'eval "$(fasd --init auto)"' >> $SHELL_RC
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
 
 # If remote session, start ssh as tmux
 if [[ -n "$PS1" ]] && [[ -z "$TMUX" ]] && [[ -n "$SSH_CONNECTION" ]]; then
@@ -75,6 +101,37 @@ for f in $CUSTOM_FILES; do
   else
     echo "Can't open $CUSTOM_PREFIX\$f"
   fi
+
 done
+# Load zsh plugin manager
+source ~/.dotfiles/antigen.zsh
+
+# Load the oh-my-zsh's library.
+antigen use oh-my-zsh
+
+# Bundles from the default repo (robbyrussell's oh-my-zsh).
+antigen bundle git
+antigen bundle command-not-found
+antigen bundle copybuffer
+antigen bundle iterm2
+antigen bundle fasd
+antigen bundle brew
+antigen bundle colorize
+antigen bundle macos
+antigen bundle wakeonlan
+antigen bundle fzf
+
+antigen bundle zsh-users/zsh-syntax-highlighting #highlighting in CLI, grey/green command
+antigen bundle zsh-users/zsh-autosuggestions #suggestinons in greyp based on history and completio
+#antigen bundle zsh-users/zsh-apple-touchbar
+antigen bundle unixorn/fzf-zsh-plugin
+antigen bundle aloxaf/fzf-tab
+antigen bundle marzocchi/zsh-notify # send notification to macOS
+
+# Load the theme.
+antigen bundle romkatv/powerlevel10k
+
+# Tell Antigen that you're done.
+antigen apply
 EOT
 done
