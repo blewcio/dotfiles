@@ -9,5 +9,10 @@ fi
 # Install all packages from Brewfile
 brew bundle install
 
+if [ ! $? -eq 0 ]; then
+  echo "Budnle installation failed. Aborting..."
+  return -1
+fi
+
 # Configure powerline
 p10k configure
