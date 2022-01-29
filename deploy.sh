@@ -36,16 +36,16 @@
 # Append lines to .bashrc and .zshrc to autoload custom extension files
 
 CUSTOM_FILES=".aliases.sh .exports.sh .functions.sh"
-CUSTOM_PREFIX=~/.dotfiles/
+CUSTOM_PREFIX=~/dotfiles/
 
 # Install plugin manager for zsh
-curl -L git.io/antigen > ~/.dotfiles/antigen.zsh
-
-# TODO: To install useful key bindings and fuzzy completion:
-# $(brew --prefix)/opt/fzf/install
+curl -L git.io/antigen > ~/antigen.zsh
 
 # Download item integration script
-# TODO: curl -L https://iterm2.com/misc/install_shell_integration.sh > ~/.install_shell_integration.sh
+curl -L https://iterm2.com/misc/install_shell_integration.sh > ~/.install_shell_integration.sh
+
+# TODO: To install useful key bindings and fuzzy completion:
+$(brew --prefix)/opt/fzf/install
 
 # TODO: Download tmux config
 
@@ -71,18 +71,17 @@ for file in .bashrc .zshrc; do
 
 # Load Blazej's customizations
 
+# Enforce English for Terminal
+LANG=en_US
+
 # Shell integration with iTerm2
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
-# Load fuzzy finder (Ctrl-T files, Ctrl-R comands, Alt-C cd to DIR)
-#[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # Initialize fasd 
 echo 'eval "$(fasd --init auto)"' >> $SHELL_RC
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
 
 # If remote session, start ssh as tmux
 if [[ -n "$PS1" ]] && [[ -z "$TMUX" ]] && [[ -n "$SSH_CONNECTION" ]]; then
@@ -103,8 +102,9 @@ for f in $CUSTOM_FILES; do
   fi
 
 done
+
 # Load zsh plugin manager
-source ~/.dotfiles/antigen.zsh
+source ~/antigen.zsh
 
 # Load the oh-my-zsh's library.
 antigen use oh-my-zsh
@@ -121,11 +121,11 @@ antigen bundle macos
 antigen bundle wakeonlan
 antigen bundle fzf
 
+antigen bundle aloxaf/fzf-tab
 antigen bundle zsh-users/zsh-syntax-highlighting #highlighting in CLI, grey/green command
 antigen bundle zsh-users/zsh-autosuggestions #suggestinons in greyp based on history and completio
 #antigen bundle zsh-users/zsh-apple-touchbar
 antigen bundle unixorn/fzf-zsh-plugin
-antigen bundle aloxaf/fzf-tab
 antigen bundle marzocchi/zsh-notify # send notification to macOS
 
 # Load the theme.
