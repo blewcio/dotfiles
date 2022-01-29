@@ -93,6 +93,12 @@ bindkey -e
 bindkey '\e\e[C' forward-word
 bindkey '\e\e[D' backward-word
 
+# Load zsh plugin manager
+source ~/antigen.zsh
+
+# Load antigen configuration
+antigen init ~/dotfiles/.antigenrc
+
 # Autoload custom config files
 for f in $CUSTOM_FILES; do
   if [ -r "$CUSTOM_PREFIX\$f" ]; then
@@ -100,13 +106,7 @@ for f in $CUSTOM_FILES; do
   else
     echo "Can't open $CUSTOM_PREFIX\$f"
   fi
-
 done
 
-# Load zsh plugin manager
-source ~/antigen.zsh
-
-# Load antigen configuration
-antigen init ~/dotfiles/.antigenrc
 EOT
 done
