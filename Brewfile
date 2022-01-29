@@ -74,5 +74,6 @@ cask "android-file-transfer"
 cask "anydo"
 cask "spotify"
 cask "spotmenu" # Spotify menu
+cask "vlc" # 
 
 brew "gnumeric"
