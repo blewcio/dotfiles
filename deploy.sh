@@ -106,32 +106,7 @@ done
 # Load zsh plugin manager
 source ~/antigen.zsh
 
-# Load the oh-my-zsh's library.
-antigen use oh-my-zsh
-
-# Bundles from the default repo (robbyrussell's oh-my-zsh).
-antigen bundle git
-antigen bundle command-not-found
-antigen bundle copybuffer
-antigen bundle iterm2
-antigen bundle fasd
-antigen bundle brew
-antigen bundle colorize
-antigen bundle macos
-antigen bundle wakeonlan
-antigen bundle fzf
-
-antigen bundle aloxaf/fzf-tab
-antigen bundle zsh-users/zsh-syntax-highlighting #highlighting in CLI, grey/green command
-antigen bundle zsh-users/zsh-autosuggestions #suggestinons in greyp based on history and completio
-#antigen bundle zsh-users/zsh-apple-touchbar
-antigen bundle unixorn/fzf-zsh-plugin
-antigen bundle marzocchi/zsh-notify # send notification to macOS
-
-# Load the theme.
-antigen bundle romkatv/powerlevel10k
-
-# Tell Antigen that you're done.
-antigen apply
+# Load antigen configuration
+antigen init ~/dotfiles/.antigenrc
 EOT
 done
