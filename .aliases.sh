@@ -46,6 +46,9 @@ alias myip="curl http://ipecho.net/plain; echo"
 #Serve current directory tree at http://$HOSTNAME:8000/
 alias lsw="python -m SimpleHTTPServer"
 
+# Don't remove files directly, but move to trash
+alias rm="rmr"
+
 # Keep current location after exiting mc
 MC_WRAPPER='/usr/lib/mc/mc-wrapper.sh'
 if [ -x $MC_WRAPPER ]; then
