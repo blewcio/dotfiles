@@ -9,7 +9,7 @@ rmr() {
      echo "$1 does not exist"
      return 1
   fi
-  TRASH=~/.local/share/Trash/
+  TRASH=~/.Trash/
   echo "Moving $1 to $TRASH" 
   mv $1 $TRASH
 }
@@ -132,21 +132,24 @@ mts-to-540() {
 mts-list() {
   local DIR SUFIX LIST
   echo "Info: You can specify the default directory and default file  extension 'mts-list MTS MP4'"
-  DIR=MTS #Default
-  SUFIX=MP4
   LIST=all.list
-  if [ -n "$1" ]; then
-     DIR=$1
-  fi
-  if [ ! -d "$DIR" ]; then
-    echo "$DIR does not exist."
-    return 1
-  fi
+  SUFIX=MP4
+  # DIR=MTS #Default
   if [ -n "$2" ]; then
-     SUFIX=$2
+    SUFIX=$2
   fi
-  for f in $DIR/* ; do
-    echo file \'$f\' | tee -a $LIST
+  # if [ -n "$1" ]; then
+  # DIR=$1
+  # fi
+  # Loop through all subdirectories
+  # if [ ! -d "$DIR" ]; then
+  # echo "$DIR does not exist."
+  # return 1
+  # fi
+  for d in */ ; do
+    for f in $d/* ; do
+      echo file \'$f\' | tee -a $LIST
+    done
   done
   echo "List of videos created as $LIST"
 }
@@ -194,6 +197,24 @@ mts-concat() {
 # Combine all actions to concatenate video
 mts-do-all() {
   mts-move && mts-list && mts-concat
+}
+
+# Add timestamp to metadata using ffmpeg
+mts-add-timestamp() {
+  if [ ! -n "$1" ]; then
+     echo "Usage: mts-add-timestamp filename"
+     return -1
+  fi
+  if [ ! -f "$1" ]; then
+    echo "$1 does not exist. Aborting..."
+    return -1
+  fi
+  DATE_FFMPEG=$(stat -f "%Sm" -t "%Y%m%dT%H%M%SZ" $1)
+  DATE_TOUCH=$(date -r $1 +'%Y%m%d%H%M.%S')
+  ffmpeg -i $1 -c copy -map 0 -metadata creation_time="$DATE_FFMPEG" $1.mp4
+  # echo "ffmpeg date = $DATE_FFMPEG"
+  echo "Timestamp: $DATE_TOUCH"
+  touch -t $DATE_TOUCH $1.mp4
 }
 
 # Diplay most interesting zsh key mappings
