@@ -43,6 +43,7 @@ brew "mas"                # Install from Appstore via Terrminal)
 brew "speedtest-cli"    # Network speed test
 brew "terminal-notifier" # Notify via notification center
 brew "ffmpeg"
+brew "exiftool"
 
 # Install quick look plugins
 cask "qlcolorcode"
