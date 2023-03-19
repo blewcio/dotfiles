@@ -16,6 +16,10 @@ alias la="ls --long --all --group"
 alias l='ls -F'
 alias l.='ls -d .*'
 
+# Directory shortcuts
+alias dl="cd ~/Downloads"
+alias dt="cd ~/Desktop"
+
 # fasd shortcuts
 if [ -x "$(command -v fasd)" ]; then
   alias v='f -e vim' # Quickly open recent file
