@@ -3,7 +3,7 @@ alias vi="vim"
 
 # Replace cat with bat
 if [ -x "$(command -v bat)" ]; then
-  alias cat="bat"
+  alias cat="bat -p"
 fi 
 
 # Replace ls with exa
