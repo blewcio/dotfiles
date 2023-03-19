@@ -65,3 +65,10 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 else
   alias installed-packages="comm -23 <(apt-mark showmanual | sort -u) <(gzip -dc /var/log/installer/initial-status.gz | sed -n 's/^Package: //p' | sort -u)"
 fi
+
+# Bulk update action
+alias update='sudo softwareupdate -i -a; brew update; brew upgrade; brew cleanup'
+
+# Hide/show all desktop icons (useful when presenting) from https://github.com/mathiasbynens/dotfiles
+alias hidedesktop="defaults write com.apple.finder CreateDesktop -bool false && killall Finder"
+alias showdesktop="defaults write com.apple.finder CreateDesktop -bool true && killall Finder"
