@@ -10,3 +10,6 @@ fi
 
 # Add sbin and bin in $HOME `$PATH`
 export PATH="$HOME/bin:$HOME/sbin:$PATH";
+
+# Make Python use UTF-8 encoding for output to stdin, stdout, and stderr.
+export PYTHONIOENCODING='UTF-8';
