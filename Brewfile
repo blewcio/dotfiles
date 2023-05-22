@@ -68,13 +68,13 @@ cask "caffeine"  # Dont let mac sleep
 cask "android-file-transfer"
 cask "anydo"
 cask "spotify"
-cask "spotmenu" # Spotify menu
-cask "vlc" # 
+cask "vlc"
+# cask "spotmenu" # Spotify menu
 cask "iina" # Modern video player 
 cask "gemini" #duplicate finder 
 cask "geotag" # Edit geodata of pictures
 cask "notion" # Notes taking
-cask 1password-cli
+cask "1password-cli"
 cask "hiddenbar" # Hide icons in topbar
 cask "spacelauncher" # App launcher with Space key
 cask "dropzone" # Productivity drag/drop
