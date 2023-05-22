@@ -44,11 +44,13 @@ brew "speedtest-cli"    # Network speed test
 brew "terminal-notifier" # Notify via notification center
 brew "ffmpeg"
 brew "exiftool"
+brew "gnumeric" # Command line calculations
 
 # Install quick look plugins
 cask "qlcolorcode"
 cask "qlstephen"
 cask "qlmarkdown"
+cask "qlimagesize"
 cask "qlvideo"
 cask "quicklook-json"
 cask "qlprettypatch"
@@ -56,6 +58,31 @@ cask "quicklook-csv"
 cask "suspicious-package"
 cask "betterzip"
 cask "webpquicklook"
+cask "apparency"
+
+# Install additional tools
+cask "raycast" # Productivity launchbar
+cask "appcleaner"
+cask "brave-browser"
+cask "caffeine"  # Dont let mac sleep
+cask "android-file-transfer"
+cask "anydo"
+cask "spotify"
+cask "spotmenu" # Spotify menu
+cask "vlc" # 
+cask "iina" # Modern video player 
+cask "gemini" #duplicate finder 
+cask "geotag" # Edit geodata of pictures
+cask "notion" # Notes taking
+cask 1password-cli
+cask "hiddenbar" # Hide icons in topbar
+cask "spacelauncher" # App launcher with Space key
+cask "dropzone" # Productivity drag/drop
+cask "stats" # Productivity system status
+cask "webex" # Video communication and virtual meeting platform
+cask "imagemagick" # Command line image editing
+cask "pigz" # parallel gzip (add alias)
+cask "sublime" # More efficient text editor, but not vim
 
 # Apps from Appstore
 mas "HomeAtmo : Der Netatmo client", id: 1359795390  # HomeAtmo Lite
@@ -65,16 +92,10 @@ mas "Brother P-touch Editor", id: 1453365242  # Brothere P Touch
 mas "We Love Lights für Philips Hue", id: 1479422551  # Brothere P Touch
 # mas "Hue in the Menu", id: 1534707384  # Hue App or we love lights
 mas "JustStream", id: 1474804779  # Juststream for file to Chromecast streaming
+mas "Meeter for Zoom, Teams & Co", id: 1510445899   # Meeter to join meetings from menubar
+mas "Memory Diag", id: 748212890 # Memory diag widget
 
-# Install additional tools
-cask "appcleaner"
-cask "mysides"  # Simple CLI based sidebar configuration
-cask "brave-browser"
-cask "caffeine"  # Dont let mac sleep
-cask "android-file-transfer"
-cask "anydo"
-cask "spotify"
-cask "spotmenu" # Spotify menu
-cask "vlc" # 
-
-brew "gnumeric"
+# TODO
+# cask monitorcontrol vs betterdisplay # External monitor control
+# cask "sweet-home32" # Interior design and plan
+# cask foremost/testdisk/fd recovery # Data recovery tool
