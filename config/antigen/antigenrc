@@ -1,0 +1,26 @@
+# Load the oh-my-zsh's library.
+antigen use oh-my-zsh
+
+# Bundles from the default repo (robbyrussell's oh-my-zsh).
+antigen bundle git
+antigen bundle command-not-found
+antigen bundle copybuffer
+antigen bundle iterm2
+antigen bundle fasd
+antigen bundle brew
+antigen bundle colorize
+antigen bundle macos
+antigen bundle wakeonlan
+antigen bundle fzf
+
+antigen bundle aloxaf/fzf-tab
+antigen bundle marzocchi/zsh-notify # send notification to macOS
+antigen bundle zsh-users/zsh-syntax-highlighting #highlighting in CLI, grey/green command
+antigen bundle zsh-users/zsh-autosuggestions #suggestinons in greyp based on history and completio
+antigen bundle unixorn/fzf-zsh-plugin@main
+
+# Load the theme.
+antigen theme romkatv/powerlevel10k
+
+# Tell Antigen that you're done.
+antigen apply
