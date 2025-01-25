@@ -83,3 +83,15 @@ mkdir -p ~/.config/fd
 ln -sf $DOTFILES_DIR/config/fd/ignore ~/.config/fd/ignore 
 mkdir -p ~/.config/bat
 ln -sf $DOTFILES_DIR/config/bat/config ~/.config/bat/config 
+
+# Install vim
+git clone https://github.com/blewcio/vim-config.git $HOME/vim-config
+ln -sf $HOME/vim-config/.vimrc ~/.vimrc
+# Create tmp dirs. vim cannot do it on its own.
+mkdir -p mkdir $HOME/.vim/var/view
+mkdir -p mkdir $HOME/.vim/var/swp
+mkdir -p mkdir $HOME/.vim/var/undo
+mkdir -p mkdir $HOME/.vim/var/backtup
+# Pull Vundle packet manager and install dependencies
+git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+vim +PluginInstall +qall
