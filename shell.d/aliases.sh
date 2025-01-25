@@ -1,9 +1,7 @@
 # Directory shortcuts
-alias gh="cd $HOME" # tilde does not work properly in Germany
+alias h="cd $HOME" # tilde does not work properly in Germany
 if [[ "$(uname)" == "Darwin"  ]]; then
-  alias gl="cd ~/Downloads"
-  alias gt="cd ~/Desktop"
-  alias gv="cd /Volumes"
+  alias dl="cd ~/Downloads"
 fi
 
 # Use vim by default
@@ -27,9 +25,9 @@ fi
 
 # Add more ls commands with lsd (for symbols)
 if [ -x "$(command -v lsd)" ]; then
-  alias lssize="lsd -1l -S -a"
-  alias lsmod="lsd -1l -t -a"
-  alias lsgit="lsd -1l -Gg -a"
+  alias ls-size="lsd -1l -S -a"
+  alias ls-mod="lsd -1l -t -a"
+  alias ls-git="lsd -1l -Gg -a"
 fi
   
 # Reverse dust by default, like tree
