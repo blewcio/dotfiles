@@ -6,6 +6,7 @@ esac
 
 # Add sbin and bin in $HOME `$PATH`
 export PATH="$HOME/bin:$HOME/sbin:$PATH"
+export PATH="$HOME/.cargo/bin":$PATH
 
 # Source all config files from shell config folder
 SHELL_CONFIG_DIR=$HOME/dotfiles/shell.d
