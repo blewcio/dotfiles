@@ -1,3 +1,4 @@
 .antigenrc*
 antigen.zsh
+private.sh
 
