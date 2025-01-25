@@ -17,7 +17,7 @@ if [[ "$SHELL" == *"/sh" ]] || [[ "$SHELL" == *"bash" ]]; then
   # Custom mappings
   # Filesystem operations
   bind '"\eh": "cd $HOME\C-j"' # Home Dir
-  bind '"\ea": "cd -\C-j"' # Alternate dir
+  bind '"\e-": "cd -\C-j"' # Alternate dir
   bind '"\el": "ls -la\C-j"' # Rebind to la, instead ls
   bind '"\e.": "cd ..\C-j"' # Rebind to la, instead ls
   # Note: fzf cd on Alt-c and fzf file on Alt-i
@@ -49,7 +49,7 @@ else
   # Custom mappings
   # Filesystem operations
   bindkey -s "^[h" "cd $HOME^J" # Home Dir
-  bindkey -s "^[a" "cd -^J" # Alternate dir
+  bindkey -s "^[-" "cd -^J" # Alternate dir
   bindkey -s "^[l" "la^J" # Rebind to la, instead ls
   bindkey -s "^[." "cd ..^J" # Rebind to la, instead ls
   # Note: fzf cd on Alt-c and fzf file on Alt-i
