@@ -87,7 +87,7 @@ brew "hdparm"              # HDD performance
 # TODO brew "pigz"         # Parallel gzip (add alias) / Not used daily
 # TODO cask foremost/testdisk recovery # Data recovery tool
 
-# Network
+# Network & performance
 brew "wakeonlan"           # Wake on lan
 brew "bandwhich"           # Network utilization by process
 brew "iperf"               # Measure max TCP/UDP bandwidth
@@ -95,10 +95,12 @@ brew "iperf3"              # Measure max TCP/UDP bandwidth
 brew "nmap"                # Network scanner
 brew "speedtest-cli"       # Network speed test
 brew "gping"               # Plot ping in terminal
+brew "hyperfine"           # Process performance measurement
 
 # System status
 brew "duf"                 # Disk space utilization
 brew "htop"                # Improved top
+brew "btop"                # Much cooler top
 brew "bottom"              # System activity monitoring, memory, network, PCU, temp (btm)
 
 # Multinedia editing
@@ -114,6 +116,7 @@ brew "pandoc"         # Text/Markup rter
 brew "up"          # Command for writing and testing pipelines
 brew "entr"        # File monitoring and auto eecution
 brew "jq"          # Commandline JSON processor
+brew "jless"       # JSON command line viewer
 brew "saulpw/vd/visidata"  # Install saulpw/vd/visidata # Editing spreadsheets in Terminal
 brew "datamash"    # Commandline data analysis
 brew "csvkit"      # Command line csv processing
