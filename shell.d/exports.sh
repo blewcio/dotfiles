@@ -1,6 +1,9 @@
 # Make directories in $HOME accessible from everywhere
 export CDPATH=$CDPATH:.:$HOME
 
+# Ensure English is primary terminal language
+export LANG=en_US.UTF-8
+
 # Editor variables
 VIM=/usr/bin/vim
 if [ -e $VIM ]; then
