@@ -83,6 +83,7 @@ brew "mc"                  # Midnight comander
 brew "tree"
 brew "age"                 # File encryption
 brew "hdparm"              # HDD performance
+brew "knqyf263/pet/pet"    # CLI snippet manager
 # TODO vimv - vim style mass renamer of files
 # TODO brew "pigz"         # Parallel gzip (add alias) / Not used daily
 # TODO cask foremost/testdisk recovery # Data recovery tool
