@@ -77,7 +77,8 @@ fi
 # Bash specific config
 if [[ "$SHELL" == *"bash" ]] || [[ "$SHELL" == *"/sh" ]]; then
 
-  [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+  # [ -f ~/.fzf.bash ] && source ~/.fzf.bash # Problem if via packet manager
+  eval "$(fzf --bash)"
 
   if [[ -x "$(command -v fasd)" ]]; then
     eval "$(fasd --init auto)"
