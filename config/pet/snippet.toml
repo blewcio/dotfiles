@@ -1,0 +1,12 @@
+
+[[Snippets]]
+  Description = "Static build in GO"
+  Output = ""
+  Tag = []
+  command = "go build -ldflags '-extldflags \"-fno-PIC -static\"' -buildmode pie -tags 'osusergo netgo static_build'"
+
+[[Snippets]]
+  Description = "Static build in Rust / cargo"
+  Output = ""
+  Tag = []
+  command = "RUSTFLAGS=\"-Ctarget-feature=+crt-static\" cargo build --target=x86_64-unknown-linux-gnu --release"
