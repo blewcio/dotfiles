@@ -70,6 +70,7 @@ if [[ "$choice" == "y" || "$choice" == "Y" ]]; then
   fi
 fi
 
+# TODO: Switch linking to stow (link farm management)
 # Link configuration files
 ln -sf $DOTFILES_DIR/config/tmux/tmux.conf ~/.tmux.conf
 ln -sf $DOTFILES_DIR/config/ripgrep/ignore ~/.ignore
