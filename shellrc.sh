@@ -68,6 +68,7 @@ if [[ "$SHELL" == *"zsh" ]]; then
   fi
 
   # Initialize zoxide. To use it in yazi.
+  alias z >/dev/null && unalias z # Vim recent file
   if [[ -x "$(command -v zoxide)" ]]; then
     eval "$(zoxide init zsh)"
   fi
