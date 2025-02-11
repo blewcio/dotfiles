@@ -97,6 +97,7 @@ brew "nmap"                # Network scanner
 brew "speedtest-cli"       # Network speed test
 brew "gping"               # Plot ping in terminal
 brew "hyperfine"           # Process performance measurement
+brew "httpie"              # Human friendly HTTP client for API era
 
 # System status
 brew "duf"                 # Disk space utilization
