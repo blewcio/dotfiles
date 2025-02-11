@@ -101,6 +101,7 @@ if [[ -x "$(command -v fasd)" ]]; then
    alias v >/dev/null && unalias v # Vim recent file
    alias f >/dev/null && unalias f # Jump to directory of recent file
    alias j >/dev/null && unalias j # Jump to directory
+   alias o >/dev/null && unalias o # Jump to directory
 
   # edit given file or search in recently used files
   function v {
@@ -111,8 +112,17 @@ if [[ -x "$(command -v fasd)" ]]; then
     file="$(fasd -Rfl "$*" | fzf -1 -0 --no-sort +m)" && $EDITOR "${file}" || $EDITOR "$@"
   }
 
+  # edit given file or search in recently used files
+  function o {
+    local file
+    # if arg1 is a path to existing file then simply open it in the editor
+    test -e "$1" && open "$@" && return
+    # else use fasd and fzf to search for recent files
+    file="$(fasd -Rfl "$*" | fzf -1 -0 --no-sort +m)" && open "${file}" || open "$@"
+  }
+
   # cd into the directory containing a recently used file
-  function f {
+  function fcd {
     local dir
     local file
     file="$(fasd -Rfl "$*" | fzf -1 -0 --no-sort +m)" && dir=$(dirname "$file") && cd "$dir"
