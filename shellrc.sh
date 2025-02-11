@@ -105,36 +105,40 @@ if [[ -x "$(command -v fasd)" ]]; then
    alias o >/dev/null && unalias o # Jump to directory
 
   # edit given file or search in recently used files
-  function v {
+  function fzf_fasd_edit {
     local file
     # if arg1 is a path to existing file then simply open it in the editor
     test -e "$1" && $EDITOR "$@" && return
     # else use fasd and fzf to search for recent files
     file="$(fasd -Rfl "$*" | fzf -1 -0 --no-sort +m)" && $EDITOR "${file}" || $EDITOR "$@"
   }
+  alias v=fzf_fasd_edit
 
   # edit given file or search in recently used files
-  function o {
+  function fzf_fasd_open {
     local file
     # if arg1 is a path to existing file then simply open it in the editor
     test -e "$1" && open "$@" && return
     # else use fasd and fzf to search for recent files
     file="$(fasd -Rfl "$*" | fzf -1 -0 --no-sort +m)" && open "${file}" || open "$@"
   }
+  alias o=fzf_fasd_open
 
   # cd into the directory containing a recently used file
-  function fcd {
+  function fzf_fasd_last_file_dir {
     local dir
     local file
     file="$(fasd -Rfl "$*" | fzf -1 -0 --no-sort +m)" && dir=$(dirname "$file") && cd "$dir"
   }
+  alias jf=fzf_fasd_last_file_dir
 
   # cd into given dir or search in recently used dirs
-  function j {
+  function fzf_fasd_recent_dir {
     [ $# -eq 1 ] && test -d "$1" && cd "$1" && return
     local dir
     dir="$(fasd -Rdl "$*" | fzf -1 -0 --no-sort +m)" && cd "${dir}" || return 1
   }
+  alias j=fzf_fasd_recent_dir
  fi
 fi
 
