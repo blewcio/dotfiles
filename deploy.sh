@@ -82,12 +82,17 @@ git config --global core.excludesfile '~/.gitignore_global'
 
 mkdir -p ~/.config/fd
 ln -sf $DOTFILES_DIR/config/fd/ignore ~/.config/fd/ignore 
+
 mkdir -p ~/.config/bat
 ln -sf $DOTFILES_DIR/config/bat/config ~/.config/bat/config 
+
+mkdir -p ~/.config/fastfetch
+ln -sf $DOTFILES_DIR/config/fastfetch/config ~/.config/fastfetch/config 
 
 # Install vim
 git clone https://github.com/blewcio/vim-config.git $HOME/vim-config
 ln -sf $HOME/vim-config/.vimrc ~/.vimrc
+
 # Create tmp dirs. vim cannot do it on its own.
 mkdir -p mkdir $HOME/.vim/var/view
 mkdir -p mkdir $HOME/.vim/var/swp
