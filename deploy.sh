@@ -87,7 +87,7 @@ mkdir -p ~/.config/bat
 ln -sf $DOTFILES_DIR/config/bat/config ~/.config/bat/config 
 
 mkdir -p ~/.config/fastfetch
-ln -sf $DOTFILES_DIR/config/fastfetch/config ~/.config/fastfetch/config 
+ln -sf $DOTFILES_DIR/config/fastfetch/config.jsonc ~/.config/fastfetch/
 
 # Install vim
 git clone https://github.com/blewcio/vim-config.git $HOME/vim-config
