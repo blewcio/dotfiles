@@ -40,7 +40,10 @@ alias df='df -h && echo "Dont forget duf!"'
 
 # Shotcuts for ls
 alias la="ls --long --all --group" # -lAh
-alias lt="ls --tree --level=3"
+if [ -x "$(command -v tree)" ]; then
+  # alias lt="ls --tree --level=3"
+  alias lt="tree"
+fi
 alias l='ls -F'
 alias l.='ls -d .*'
 
@@ -82,7 +85,7 @@ alias mkdir="mkdir -pv"
 alias cp2="rsync -P"
 # Don't remove files directly, but move to trash
 alias del="/bin/rm" # Keep the ultimate rm option as del
-alias rm="copy-to-trash"
+alias rm=copy_to_trash # Call a function instead
 
 # Network related shortcuts
 # My external IP
