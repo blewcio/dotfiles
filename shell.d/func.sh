@@ -137,7 +137,7 @@ if [ -x "$(command -v nnn)" ]; then
     [ "${NNNLVL:-0}" -eq 0 ] || {
       echo "nnn is already running"
           return
-        }
+     }
 
     # The behaviour is set to cd on quit (nnn checks if NNN_TMPFILE is set)
     # If NNN_TMPFILE is set to a custom path, it must be exported for nnn to
@@ -168,9 +168,11 @@ if [ -x "$(command -v yazi)" ]; then
   y() {
     local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
     yazi "$@" --cwd-file="$tmp"
-    if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+    cwd=$(cat -- "$tmp") 
+    if [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
       cd "$cwd"
     fi
-    rm $tmp }
+    rm $tmp
+  }
   alias y=y
 fi
