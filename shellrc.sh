@@ -77,6 +77,11 @@ fi
 # Bash specific config
 if [[ "$SHELL" == *"bash" ]] || [[ "$SHELL" == *"/sh" ]]; then
 
+  # History
+  HISTSIZE=50000
+  HISTFILESIZE=2000
+  HISTFILE="$HOME/.bash_history"
+
   # [ -f ~/.fzf.bash ] && source ~/.fzf.bash # Problem if via packet manager
   eval "$(fzf --bash)"
 
