@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 DOTFILES_DIR=~/dotfiles
 SHELLRC_FILE=shellrc.sh
@@ -21,7 +21,7 @@ fi
 curl -L https://iterm2.com/misc/install_shell_integration.sh > ~/.install_shell_integration.sh
 
 # Mac specific configuration
-if [[ "$(uname)" == "Darwin"  ]]; then
+if [ "$(uname)" = "Darwin" ]; then
 
     # Check if packages from Brewfile should be installed
     mac_install=$DOTFILES_DIR/mac/mac-install.sh
@@ -61,7 +61,7 @@ done
 
 # Check if python packages should be installed
 read -p "Install python packages? (y/n): " choice
-if [[ "$choice" == "y" || "$choice" == "Y" ]]; then
+if [ "$choice" = "y" ] || [ "$choice" = "Y" ]; then
   if [[ -x "$(command -v pip3)" ]]; then
     # Install in $HOME (--user)
     eval $("pip3 install --user xlrd openpyxl") # Read Excel spreadsheets in vd
