@@ -70,6 +70,18 @@ if [[ "$choice" == "y" || "$choice" == "Y" ]]; then
   fi
 fi
 
+# Install tmux plugin manager 
+mkdir -p ~/.tmux/plugins/tpm
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
+# Install base Linux packages, if needed
+read -p "Install base linux packages? (y/n): " choice
+if [ "$choice" = "y" ] || [ "$choice" = "Y" ]; then
+  packages="tmux bat vim fzf fasd exa tldr pixz lbzip2 rsync ripgrep zoxide wget qemu-guest-agent fd-find git btop iperf iperf3 nfs-common"
+  # TODO: The next line is Debian specific
+  eval sudo apt install -y $packages
+fi
+
 # TODO: Switch linking to stow (link farm management)
 # Link configuration files
 ln -sf $DOTFILES_DIR/config/tmux/tmux.conf ~/.tmux.conf
