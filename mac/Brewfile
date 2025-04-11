@@ -104,6 +104,7 @@ brew "duf"                 # Disk space utilization
 brew "htop"                # Improved top
 brew "btop"                # Much cooler top
 brew "bottom"              # System activity monitoring, memory, network, PCU, temp (btm)
+brew "glances"             # Holistic system monitoring
 
 # Multinedia editing
 brew "ffmpeg"
