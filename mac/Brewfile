@@ -11,7 +11,7 @@ cask "raycast"        # Productivity launchbar
 cask "caffeine"       # Dont let mac sleep
 cask "spacelauncher"  # App launcher with Space key
 cask "hiddenbar"      # Hide icons in topbar -> TODO: muss aus dem Appstore gezogen werden
-cask "macvim"
+cask "neovim"         # Install neovim instead of macvim
 cask "google-chrome"
 cask "appcleaner"
 cask "lastpass"
@@ -40,7 +40,8 @@ brew "broot"               # Interactive file manager & search, incl. infile sea
 
 # Install more cask tools
 brew "flux" # Monitor color adjustment based on daytime
-cask "logseq" # Notes taking
+cask "logseq" # Notes taking, local files
+cask "obsidian" # Notes taking, local files
 cask "spaceid" # Space ID in the menu bar
 # cask "dropzone" # Productivity drag/drop / not used recently
 cask "monitorcontrol" ("betterdisplay") # External monitor control
