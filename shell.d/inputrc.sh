@@ -16,10 +16,13 @@ if [[ "$SHELL" == *"/sh" ]] || [[ "$SHELL" == *"bash" ]]; then
 
   # Custom mappings
   # Filesystem operations
-  bind '"\eh": "cd $HOME\C-j"' # Home Dir
+  # bind '"\eh": "cd $HOME\C-j"' # Home Dir
+  # bind '"\el": "ls -la\C-j"' # Rebind to la, instead ls
+  bind '"\eh": backward-word' # Home Dir
+  bind '"\el": forward-word' # Rebind to la, instead ls
+  bind '"\e*": "ls\C-j"' # Rebind to la, instead ls
   bind '"\e-": "cd -\C-j"' # Alternate dir
-  bind '"\el": "ls -la\C-j"' # Rebind to la, instead ls
-  bind '"\e.": "cd ..\C-j"' # Rebind to la, instead ls
+  bind '"\e.": "cd ..\C-j"' # Alternate dir
   # Note: fzf cd on Alt-c and fzf file on Alt-i
 
   # Command line
@@ -48,10 +51,15 @@ else
 
   # Custom mappings
   # Filesystem operations
-  bindkey -s "^[h" "cd $HOME^J" # Home Dir
+  echo "Loading critical keys"
+  bindkey -s "^[*" "ls^J" # Rebind to la, instead ls
   bindkey -s "^[-" "cd -^J" # Alternate dir
-  bindkey -s "^[l" "la^J" # Rebind to la, instead ls
-  bindkey -s "^[." "cd ..^J" # Rebind to la, instead ls
+  bindkey -s "^[." "cd ..^J" # Alternate dir
+
+  bindkey -r "^[h"
+  bindkey -r "^[l"
+  bindkey "^[h" backward-word
+  bindkey "^[l" forward-word
   # Note: fzf cd on Alt-c and fzf file on Alt-i
 
   # Command line
