@@ -92,7 +92,7 @@ alias mv="mv -i"
 # mkdir incl. parent dirs if necessary
 alias mkdir="mkdir -pv"
 #Copy files and show progress
-alias cp2="rsync -P"
+alias rcp="rsync -P"
 # Don't remove files directly, but move to trash
 alias del="/bin/rm" # Keep the ultimate rm option as del
 alias rm=copy_to_trash # Call a function instead
