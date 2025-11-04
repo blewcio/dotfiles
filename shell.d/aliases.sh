@@ -71,7 +71,7 @@ alias cb="chrome-bookmark-browser"
 
 # Tmux shortcuts
 if [ -x "$(command -v tmux)" ]; then
-  alias tmux='tmux -T 256'
+  # alias tmux='tmux -T 256'
   alias ta='tmux attach'
   alias tn='tmux new'
 fi
