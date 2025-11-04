@@ -76,6 +76,16 @@ if [ -x "$(command -v tmux)" ]; then
   alias tn='tmux new'
 fi
 
+# Get easy to digest help
+if [ -x "$(command -v tldr)" ] && [ -x "$(command -v fzf)" ]; then
+  alias thelp='tldr --list | fzf | xargs tldr'
+fi
+
+if [ -x "$(command -v tmux)" ] && [ -x "$(command -v tmux-cht.sh)" ]; then
+  alias chelp=tmux-cht.sh
+fi
+
+
 # File system operations
 # Ask before overwriting
 alias mv="mv -i"
