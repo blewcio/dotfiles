@@ -88,6 +88,7 @@ ln -sf $DOTFILES_DIR/config/tmux/tmux.conf ~/.tmux.conf
 ln -sf $DOTFILES_DIR/config/ripgrep/ignore ~/.ignore
 ln -sf $DOTFILES_DIR/config/visidata/visidatarc ~/.visidatarc
 ln -sf $DOTFILES_DIR/config/git/gitconfig ~/.gitconfig
+ln -sf $DOTFILES_DIR/config/nvim/init.vim ~/.config/nvim/init.vim
 
 ln -sf $DOTFILES_DIR/config/git/gitignore_global ~/.gitignore_global
 git config --global core.excludesfile '~/.gitignore_global'
