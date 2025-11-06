@@ -77,7 +77,7 @@ git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 # Install base Linux packages, if needed
 read -p "Install base linux packages? (y/n): " choice
 if [ "$choice" = "y" ] || [ "$choice" = "Y" ]; then
-  packages="tmux bat vim fzf fasd exa tldr pixz lbzip2 rsync ripgrep zoxide wget qemu-guest-agent fd-find git btop iperf iperf3 nfs-common"
+  packages="tmux bat vim fzf fasd eza tldr pixz lbzip2 rsync ripgrep zoxide wget qemu-guest-agent fd-find git btop iperf iperf3 nfs-common"
   # TODO: The next line is Debian specific
   eval sudo apt install -y $packages
 fi
