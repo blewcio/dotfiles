@@ -16,6 +16,7 @@ cask "google-chrome"
 cask "appcleaner"
 cask "lastpass"
 cask "alt-tab"        # Windows like tab
+cask "claude-code"    # Claude code
 
 # Install basic tools for improved terminal
 brew "tmux"                # Improved screen
