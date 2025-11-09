@@ -3,7 +3,7 @@
   email = blazej.lewcio@gmail.com
 
 [credential]
-  helper = cache --timeout=3600
+	helper = store
 
 [core]
   pager = delta
