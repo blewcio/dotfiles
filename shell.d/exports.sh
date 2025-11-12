@@ -6,9 +6,9 @@ export LANG=en_US.UTF-8
 
 # Editor variables
 VIM=/usr/bin/vim
-if [ -e $VIM ]; then
- export EDITOR=$VIM
- export VISUAL=$VIM
+if [ -e "$VIM" ]; then
+ export EDITOR="$VIM"
+ export VISUAL="$VIM"
 fi
 
 # Add sbin and bin in $HOME `$PATH`

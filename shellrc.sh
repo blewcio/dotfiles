@@ -11,7 +11,7 @@ export PATH="$HOME/dotfiles/bin:$PATH"
 
 # Source all config files from shell config folder
 SHELL_CONFIG_DIR=$HOME/dotfiles/shell.d
-if [ -x $SHELL_CONFIG_DIR ]; then
+if [ -d "$SHELL_CONFIG_DIR" ]; then
   for shellfile in ${SHELL_CONFIG_DIR}/*.sh; do
     [ -r "$shellfile" ] && source "$shellfile"
   done
@@ -34,7 +34,7 @@ fi
 if [[ "$SHELL" == *"zsh" ]]; then
 
   # If not remote, check shell integration with iTerm2
-  test -e "~/.iterm2_shell_integration.zsh" && source "/Users/blazej.lewcio/.iterm2_shell_integration.zsh"
+  test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
   # Load P10 for prompt customization
   # To customize prompt, run  or edit ~/.p10k.zsh.

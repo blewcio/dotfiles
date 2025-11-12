@@ -1,6 +1,6 @@
 # My cheat sheet with key bindings
 keys() {
-  echo "\031[0;90m" "C-x C-e   Edit command in VIM"
+  echo "\033[0;90m" "C-x C-e   Edit command in VIM"
   echo "\033[0;90m" "C-x C-o   Override mode"
   echo "\033[0;90m" "C-x C-v   VIM mode"
   echo ""

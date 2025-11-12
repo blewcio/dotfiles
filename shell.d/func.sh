@@ -1,22 +1,22 @@
 ## CSV Editing
 # Display CSV file with proper columns (tabulated)
 csv_cat() {
-  if [ -z $1 ] || [ ! -f $1 ]; then
+  if [ -z "$1" ] || [ ! -f "$1" ]; then
     echo "Incorrect filename. Usage: function FILENAME"
     return -1
   fi
-  cat $1 | sed -e 's/,,/, ,/g' | column -s, -t # | less -#5 -N -S 
+  cat "$1" | sed -e 's/,,/, ,/g' | column -s, -t # | less -#5 -N -S
 }
 alias cat-csv=csv_cat
 
 # Display CSV with csvlook (as a table)
 csv_cat2() {
   if ! [ -x "$(command -v csvlook)" ]; then "csvkit not installed"; return -1; fi
-  if [ -z $1 ] || [ ! -f $1 ]; then
+  if [ -z "$1" ] || [ ! -f "$1" ]; then
     echo "Incorrect filename. Usage: function FILENAME"
     return -1
   fi
-  csvlook --max-column-width=21 $1 | bat -p -l rs
+  csvlook --max-column-width=21 "$1" | bat -p -l rs
 }
 alias cat-csv2=csv_cat2
 
@@ -35,8 +35,8 @@ copy_to_trash() {
       echo "$i does not exist."
       continue
     fi
-    echo "Moving $i to $TRASH" 
-    mv $i $TRASH
+    echo "Moving $i to $TRASH"
+    mv "$i" "$TRASH"
   done
 }
 
@@ -172,7 +172,7 @@ if [ -x "$(command -v yazi)" ]; then
     if [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
       cd "$cwd"
     fi
-    rm $tmp
+    rm -f "$tmp"
   }
   alias y=y
 fi
