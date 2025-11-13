@@ -12,6 +12,9 @@ alias tmux='$HOME/bin/tmux'
 alias gs="cd /volume1/storage"
 alias gp="cd /volume1/photos"
 
-echo "Custom commands on synology:
-echo "gs - go to storage"
-echo "gp - go to photos"
+echo "
+### Custom commands on Synology:
+#   gs - go to storage
+#   gp - go to photos
+###
+"
