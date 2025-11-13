@@ -40,6 +40,16 @@ if [ "$(uname)" = "Darwin" ]; then
   fi
 fi
 
+# Install oh-my-zsh addons
+ZSH_CUSTOM=$HOME/.oh-my-zsh/custom
+git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git $ZSH_CUSTOM/plugins/zsh-autocomplete
+git clone https://github.com/zdharma-continuum/fast-syntax-highlighting.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/fast-syntax-highlighting
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
+git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
+echo "TODO: Add to zshrc:\n
+plugins=(fasd alias-finder virtualenv direnv git zsh-autosuggestions zsh-syntax-highlighting fast-syntax-highlighting zsh-autocomplete)
+"
+
 # Check which shell files exist and add custom scripts
 for f in .bashrc .zshrc; do
 
