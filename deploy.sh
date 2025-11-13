@@ -98,7 +98,6 @@ ln -sf $DOTFILES_DIR/config/tmux/tmux.conf ~/.tmux.conf
 ln -sf $DOTFILES_DIR/config/ripgrep/ignore ~/.ignore
 ln -sf $DOTFILES_DIR/config/visidata/visidatarc ~/.visidatarc
 ln -sf $DOTFILES_DIR/config/git/gitconfig ~/.gitconfig
-ln -sf $DOTFILES_DIR/config/nvim/init.vim ~/.config/nvim/init.vim
 
 ln -sf $DOTFILES_DIR/config/git/gitignore_global ~/.gitignore_global
 git config --global core.excludesfile '~/.gitignore_global'
@@ -112,15 +111,46 @@ ln -sf $DOTFILES_DIR/config/bat/config ~/.config/bat/config
 mkdir -p ~/.config/fastfetch
 ln -sf $DOTFILES_DIR/config/fastfetch/config.jsonc ~/.config/fastfetch/
 
-# Install vim
-git clone https://github.com/blewcio/vim-config.git $HOME/vim-config
-ln -sf $HOME/vim-config/.vimrc ~/.vimrc
+# Install vim and neovim configurations
+if [ ! -d "$HOME/vim-config" ]; then
+  git clone https://github.com/blewcio/vim-config.git $HOME/vim-config
+fi
 
-# Create tmp dirs. vim cannot do it on its own.
+# Symlink classic Vim configuration
+ln -sf $HOME/vim-config/.vimrc ~/.vimrc
+ln -sf $HOME/vim-config/.vim ~/.vim
+
+# Create tmp dirs for Vim (vim cannot create them automatically)
 mkdir -p $HOME/.vim/var/view
 mkdir -p $HOME/.vim/var/swp
 mkdir -p $HOME/.vim/var/undo
 mkdir -p $HOME/.vim/var/backup
-# Pull Vundle packet manager and install dependencies
-git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-vim +PluginInstall +qall
+
+# Pull Vundle package manager and install dependencies for Vim
+if [ ! -d "$HOME/.vim/bundle/Vundle.vim" ]; then
+  git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+  vim +PluginInstall +qall
+fi
+
+# Setup Neovim configuration (modern Lua-based setup)
+if [ -x "$(command -v nvim)" ]; then
+  echo "Setting up Neovim configuration..."
+
+  # Backup existing nvim config if it exists and is not a symlink
+  if [ -d "$HOME/.config/nvim" ] && [ ! -L "$HOME/.config/nvim" ]; then
+    echo "Backing up existing Neovim config to ~/.config/nvim.backup"
+    mv $HOME/.config/nvim $HOME/.config/nvim.backup
+  fi
+
+  # Create .config directory if it doesn't exist
+  mkdir -p $HOME/.config
+
+  # Symlink Neovim configuration
+  ln -sf $HOME/vim-config/nvim $HOME/.config/nvim
+
+  echo "Neovim configuration symlinked. Plugins will auto-install on first launch."
+  echo "After launching nvim, run: :Mason to install LSP servers"
+else
+  echo "Neovim not installed. Skipping Neovim configuration."
+  echo "Install with: brew install neovim (macOS) or apt install neovim (Linux)"
+fi
