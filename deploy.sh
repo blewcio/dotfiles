@@ -14,11 +14,8 @@ if [[ "$SHELL" == *zsh ]]; then
   if [[ -r "$antigenrc" ]]; then
     ln -sf $antigenrc $DOTFILES_DIR/.antigenrc
   fi
-  unset $antigenrc
+  unset antigenrc
 fi
-
-# Download item integration script
-curl -L https://iterm2.com/misc/install_shell_integration.sh > ~/.install_shell_integration.sh
 
 # Mac specific configuration
 if [ "$(uname)" = "Darwin" ]; then
@@ -31,8 +28,11 @@ if [ "$(uname)" = "Darwin" ]; then
         eval $mac_install
       fi
     fi
-    unset $mac_install
-    unset $choice
+    unset mac_install
+    unset choice
+
+    # Download item integration script
+    wget -qO- https://iterm2.com/misc/install_shell_integration.sh | bash
 
   # FZF install, useful key bindings
   if [[ -x "$(command -v fzf)" ]]; then
