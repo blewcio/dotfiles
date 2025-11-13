@@ -74,6 +74,7 @@ if [ -x "$(command -v tmux)" ]; then
   # alias tmux='tmux -T 256'
   alias ta='tmux attach'
   alias tn='tmux new'
+  alias tm-dev='tmux-dev.sh'
 fi
 
 # Get easy to digest help
