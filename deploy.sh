@@ -1,13 +1,33 @@
 #!/bin/bash
+#
+# Dotfiles Deployment Script
+# This script is idempotent and can be safely run multiple times
+#
+# Usage: ./deploy.sh
+#
 
 DOTFILES_DIR=~/dotfiles
 SHELLRC_FILE=shellrc.sh
+
+echo "================================"
+echo "Dotfiles Deployment Starting..."
+echo "================================"
+echo ""
+
+# ============================================
+# Shell Plugin Managers
+# ============================================
 
 # Install zsh plugin manager
 if [[ "$SHELL" == *zsh ]]; then
 
   # Install plugin manager for zsh
-  curl -L git.io/antigen > ${DOTFILES_DIR}/antigen.zsh
+  if [ ! -f "${DOTFILES_DIR}/antigen.zsh" ]; then
+    echo "Installing Antigen plugin manager..."
+    curl -L git.io/antigen > ${DOTFILES_DIR}/antigen.zsh
+  else
+    echo "Antigen already installed - skipping"
+  fi
 
   # Re-link antigenrc to avoid error messages
   antigenrc=$DOTFILES_DIR/config/antigenrc
@@ -16,6 +36,10 @@ if [[ "$SHELL" == *zsh ]]; then
   fi
   unset antigenrc
 fi
+
+# ============================================
+# Platform-Specific Configuration
+# ============================================
 
 # Mac specific configuration
 if [ "$(uname)" = "Darwin" ]; then
@@ -31,24 +55,90 @@ if [ "$(uname)" = "Darwin" ]; then
     unset mac_install
     unset choice
 
-    # Download item integration script
-    wget -qO- https://iterm2.com/misc/install_shell_integration.sh | bash
+    # Download iTerm2 integration script
+    if [ ! -f "$HOME/.iterm2_shell_integration.bash" ] && [ ! -f "$HOME/.iterm2_shell_integration.zsh" ]; then
+      echo "Installing iTerm2 shell integration..."
+      wget -qO- https://iterm2.com/misc/install_shell_integration.sh | bash
+    else
+      echo "iTerm2 shell integration already installed - skipping"
+    fi
 
   # FZF install, useful key bindings
   if [[ -x "$(command -v fzf)" ]]; then
-    $(brew --prefix)/opt/fzf/install
+    # Check if FZF is already configured in shell files
+    if ! grep -q "fzf" "$HOME/.zshrc" 2>/dev/null && ! grep -q "fzf" "$HOME/.bashrc" 2>/dev/null; then
+      echo "Installing FZF key bindings..."
+      $(brew --prefix)/opt/fzf/install --key-bindings --completion --no-update-rc
+    else
+      echo "FZF already configured - skipping"
+    fi
   fi
 fi
 
+# ============================================
+# Oh-My-Zsh Plugins
+# ============================================
+
 # Install oh-my-zsh addons
-ZSH_CUSTOM=$HOME/.oh-my-zsh/custom
-git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git $ZSH_CUSTOM/plugins/zsh-autocomplete
-git clone https://github.com/zdharma-continuum/fast-syntax-highlighting.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/fast-syntax-highlighting
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
-git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
-echo "TODO: Add to zshrc:\n
-plugins=(fasd alias-finder virtualenv direnv git zsh-autosuggestions zsh-syntax-highlighting fast-syntax-highlighting zsh-autocomplete)
-"
+if [ -d "$HOME/.oh-my-zsh" ]; then
+  ZSH_CUSTOM=$HOME/.oh-my-zsh/custom
+
+  # Clone plugins if they don't already exist
+  echo "Installing oh-my-zsh plugins..."
+
+  if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autocomplete" ]; then
+    git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git $ZSH_CUSTOM/plugins/zsh-autocomplete 2>/dev/null || echo "  - zsh-autocomplete already exists or clone failed"
+  fi
+
+  if [ ! -d "$ZSH_CUSTOM/plugins/fast-syntax-highlighting" ]; then
+    git clone --depth 1 https://github.com/zdharma-continuum/fast-syntax-highlighting.git $ZSH_CUSTOM/plugins/fast-syntax-highlighting 2>/dev/null || echo "  - fast-syntax-highlighting already exists or clone failed"
+  fi
+
+  if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
+    git clone --depth 1 https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting 2>/dev/null || echo "  - zsh-syntax-highlighting already exists or clone failed"
+  fi
+
+  if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
+    git clone --depth 1 https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions 2>/dev/null || echo "  - zsh-autosuggestions already exists or clone failed"
+  fi
+
+  echo "  oh-my-zsh plugins installation complete"
+
+  # Automatically add plugins line to .zshrc
+  ZSHRC="$HOME/.zshrc"
+  PLUGINS_LINE="plugins=(fasd alias-finder virtualenv direnv git zsh-autosuggestions zsh-syntax-highlighting fast-syntax-highlighting zsh-autocomplete)"
+
+  if [ -f "$ZSHRC" ]; then
+    # Check if plugins line already exists
+    if grep -q "^plugins=(" "$ZSHRC"; then
+      echo "Plugins line already exists in .zshrc - skipping"
+    else
+      # Find the line with "source \$ZSH/oh-my-zsh.sh" and insert before it
+      if grep -q "source.*oh-my-zsh.sh" "$ZSHRC"; then
+        # Create a backup
+        cp "$ZSHRC" "$ZSHRC.backup"
+
+        # Insert plugins line before the source line
+        sed -i.tmp "/source.*oh-my-zsh.sh/i\\
+$PLUGINS_LINE\\
+" "$ZSHRC"
+        rm -f "$ZSHRC.tmp"
+
+        echo "Added plugins line to .zshrc"
+      else
+        echo "Warning: oh-my-zsh source line not found in .zshrc - please add plugins line manually"
+      fi
+    fi
+  else
+    echo "Warning: .zshrc not found - skipping plugins line addition"
+  fi
+else
+  echo "oh-my-zsh not installed - skipping plugin installation"
+fi
+
+# ============================================
+# Shell RC Files Configuration
+# ============================================
 
 # Check which shell files exist and add custom scripts
 for f in .bashrc .zshrc; do
@@ -69,31 +159,70 @@ for f in .bashrc .zshrc; do
   echo "[[ -r \"$DOTFILES_DIR/$SHELLRC_FILE\" ]] && source $DOTFILES_DIR/$SHELLRC_FILE" >> $rc_file
 done
 
+# ============================================
+# Additional Packages and Tools
+# ============================================
+
 # Check if python packages should be installed
-read -p "Install python packages? (y/n): " choice
-if [ "$choice" = "y" ] || [ "$choice" = "Y" ]; then
-  if [[ -x "$(command -v pip3)" ]]; then
-    # Install in $HOME (--user)
-    eval $("pip3 install --user xlrd openpyxl") # Read Excel spreadsheets in vd
+if [[ -x "$(command -v pip3)" ]]; then
+  # Check if packages are already installed
+  if ! pip3 list --user 2>/dev/null | grep -q "xlrd\|openpyxl"; then
+    read -p "Install python packages for visidata (xlrd, openpyxl)? (y/n): " choice
+    if [ "$choice" = "y" ] || [ "$choice" = "Y" ]; then
+      echo "Installing Python packages..."
+      pip3 install --user xlrd openpyxl
+    fi
   else
-    echo "Aborted. pip3 not installed."
+    echo "Python packages (xlrd, openpyxl) already installed - skipping"
+  fi
+else
+  echo "pip3 not installed - skipping Python packages"
+fi
+
+# Install tmux plugin manager
+if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+  echo "Installing tmux plugin manager (TPM)..."
+  mkdir -p ~/.tmux/plugins
+  git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+else
+  echo "Tmux plugin manager already installed - skipping"
+fi
+
+# Install base Linux packages, if needed
+if [ "$(uname)" = "Linux" ]; then
+  # Check if running Debian/Ubuntu
+  if command -v apt-get >/dev/null 2>&1; then
+    # Check if at least some key packages are missing
+    missing_packages=0
+    for pkg in tmux bat fzf ripgrep; do
+      if ! dpkg -l | grep -q "^ii  $pkg "; then
+        missing_packages=1
+        break
+      fi
+    done
+
+    if [ $missing_packages -eq 1 ]; then
+      read -p "Install base Linux packages via apt? (y/n): " choice
+      if [ "$choice" = "y" ] || [ "$choice" = "Y" ]; then
+        echo "Installing Linux packages..."
+        packages="tmux bat vim fzf fasd eza tldr pixz lbzip2 rsync ripgrep zoxide wget qemu-guest-agent fd-find git btop iperf iperf3 nfs-common"
+        sudo apt install -y $packages
+      fi
+    else
+      echo "Key Linux packages already installed - skipping"
+    fi
+  else
+    echo "Non-Debian system detected - skipping apt package installation"
   fi
 fi
 
-# Install tmux plugin manager 
-mkdir -p ~/.tmux/plugins/tpm
-git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-
-# Install base Linux packages, if needed
-read -p "Install base linux packages? (y/n): " choice
-if [ "$choice" = "y" ] || [ "$choice" = "Y" ]; then
-  packages="tmux bat vim fzf fasd eza tldr pixz lbzip2 rsync ripgrep zoxide wget qemu-guest-agent fd-find git btop iperf iperf3 nfs-common"
-  # TODO: The next line is Debian specific
-  eval sudo apt install -y $packages
-fi
+# ============================================
+# Symlink Configuration Files
+# ============================================
 
 # TODO: Switch linking to stow (link farm management)
 # Link configuration files
+echo "Creating symlinks for configuration files..."
 ln -sf $DOTFILES_DIR/config/tmux/tmux.conf ~/.tmux.conf
 ln -sf $DOTFILES_DIR/config/ripgrep/ignore ~/.ignore
 ln -sf $DOTFILES_DIR/config/visidata/visidatarc ~/.visidatarc
@@ -111,9 +240,19 @@ ln -sf $DOTFILES_DIR/config/bat/config ~/.config/bat/config
 mkdir -p ~/.config/fastfetch
 ln -sf $DOTFILES_DIR/config/fastfetch/config.jsonc ~/.config/fastfetch/
 
+echo "Symlinks created successfully"
+
+# ============================================
+# Vim and Neovim Configuration
+# ============================================
+
 # Install vim and neovim configurations
+echo "Setting up Vim configuration..."
 if [ ! -d "$HOME/vim-config" ]; then
+  echo "  Cloning vim-config repository..."
   git clone https://github.com/blewcio/vim-config.git $HOME/vim-config
+else
+  echo "  vim-config already exists - skipping clone"
 fi
 
 # Symlink classic Vim configuration
@@ -128,8 +267,15 @@ mkdir -p $HOME/.vim/var/backup
 
 # Pull Vundle package manager and install dependencies for Vim
 if [ ! -d "$HOME/.vim/bundle/Vundle.vim" ]; then
+  echo "  Installing Vundle plugin manager..."
   git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-  vim +PluginInstall +qall
+  if command -v vim >/dev/null 2>&1; then
+    vim +PluginInstall +qall
+  else
+    echo "  vim not found - skipping plugin installation (run :PluginInstall manually)"
+  fi
+else
+  echo "  Vundle already installed - skipping"
 fi
 
 # Setup Neovim configuration (modern Lua-based setup)
@@ -148,9 +294,22 @@ if [ -x "$(command -v nvim)" ]; then
   # Symlink Neovim configuration
   ln -sf $HOME/vim-config/nvim $HOME/.config/nvim
 
-  echo "Neovim configuration symlinked. Plugins will auto-install on first launch."
-  echo "After launching nvim, run: :Mason to install LSP servers"
+  echo "  Neovim configuration symlinked. Plugins will auto-install on first launch."
+  echo "  After launching nvim, run: :Mason to install LSP servers"
 else
   echo "Neovim not installed. Skipping Neovim configuration."
-  echo "Install with: brew install neovim (macOS) or apt install neovim (Linux)"
+  echo "  Install with: brew install neovim (macOS) or apt install neovim (Linux)"
 fi
+
+echo ""
+echo "================================"
+echo "Deployment Complete!"
+echo "================================"
+echo ""
+echo "Next steps:"
+echo "  1. Restart your shell or run: source ~/.zshrc (or ~/.bashrc)"
+echo "  2. If using tmux, press prefix+I to install tmux plugins"
+echo "  3. If using Neovim, run :Mason to install LSP servers"
+echo ""
+echo "The script is idempotent - you can safely run it again to update."
+echo ""
