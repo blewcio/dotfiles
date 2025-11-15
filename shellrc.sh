@@ -52,6 +52,15 @@ if [[ "$SHELL" == *"zsh" ]]; then
   # Load zsh plugin manager
   source ~/dotfiles/antigen.zsh
 
+  # Clean up stale Antigen lock file (older than 1 hour)
+  ANTIGEN_LOCK="$HOME/.antigen/.lock"
+  if [ -f "$ANTIGEN_LOCK" ]; then
+    # Check if lock file is older than 1 hour (3600 seconds)
+    if [ $(($(date +%s) - $(stat -f %m "$ANTIGEN_LOCK" 2>/dev/null || stat -c %Y "$ANTIGEN_LOCK" 2>/dev/null))) -gt 3600 ]; then
+      rm -f "$ANTIGEN_LOCK"
+    fi
+  fi
+
   # Load antigen configuration
   antigen init ~/dotfiles/.antigenrc
 
