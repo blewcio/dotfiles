@@ -81,6 +81,11 @@ vid_to_540 () {
   _vid_transcode $in_file $res $fps $crf $preset $max_rate $buf_size
 }
 
+vid_to_aac () {
+  if [ $# -lt 1 ]; then echo "Usage: command ARGUMENT"; return -1; fi
+  ffmpeg -i $1 -c:v copy -c:a aac -ac 2 -b:a 192k $1_192aac.mp4
+}
+
 # Get video file resolution as a string
 vid_get_res () {
   if [ $# -ne 1 ]; then echo "Usage: command ARGUMENT"; return -1; fi
@@ -100,7 +105,7 @@ vid_get_fps () {
 
 # Make a list of MTS files for concatenation with ffmpeg
 vid_make_playlist() {
-  if [ $# -lt 1 ]; then echo "Usage: command DIRECTORY. It will append output to the play.list file."; return -1; fi
+  if [ $# -lt 1 ]; then echo "Usage: command DIR1 DIR2 DIR3. It will append output to the play.list file."; return -1; fi
   local default_file=play.list
   for d in $@ ; do
     for f in $d/* ; do # Pull files from subdirectories
@@ -173,5 +178,3 @@ vid_concat() {
   echo $cmd
   eval $cmd
 }
-
-unset -f _vid_transcode

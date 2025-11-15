@@ -84,7 +84,7 @@ if [[ "$SHELL" == *"bash" ]] || [[ "$SHELL" == *"/sh" ]]; then
   HISTFILE="$HOME/.bash_history"
 
   # [ -f ~/.fzf.bash ] && source ~/.fzf.bash # Problem if via packet manager
-  eval "$(fzf --bash)"
+  [ -f ~/.fzf.bash ] && source ~/.fzf.bash || eval "$(fzf --bash)"
 
   if [[ -x "$(command -v fasd)" ]]; then
     eval "$(fasd --init auto)"
@@ -105,10 +105,10 @@ if [[ -x "$(command -v fasd)" ]]; then
  # if there is fzf available use it to search fasd results
  if [[ -x "$(command -v fzf)" ]]; then
 
-   alias v >/dev/null && unalias v # Vim recent file
-   alias f >/dev/null && unalias f # Jump to directory of recent file
-   alias j >/dev/null && unalias j # Jump to directory
-   alias o >/dev/null && unalias o # Jump to directory
+   alias v >/dev/null 2>&1 && unalias v # Vim recent file
+   alias f >/dev/null 2>&1 && unalias f # Jump to directory of recent file
+   alias j >/dev/null 2>&1 && unalias j # Jump to directory
+   alias o >/dev/null 2>&1 && unalias o # Jump to directory
 
   # edit given file or search in recently used files
   function fzf_fasd_edit {
