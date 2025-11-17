@@ -74,28 +74,18 @@ shopt -s extglob
 
 ## Main entry / process files
 if [ $# -eq 0 ]; then
-    # No arguments: process all supported formats in current directory
-    for file in *.{mp4,avi,mkv,mov,flv,wmv,webm}; do
+    # No arguments: show usage information
+    echo -e "${YELLOW}Usage: $0 <file(s)>${NC}"
+    echo "Examples:"
+    echo "  $0 video.avi           # Convert single file"
+    echo "  $0 *.avi               # Convert all AVI files"
+    echo "  $0 file1.avi file2.mkv # Convert multiple specific files"
+    exit 0
+else
+    # One or more arguments: process all provided files
+    for file in "$@"; do
         convert_video "$file"
     done
-elif [ $# -eq 1 ]; then
-    # Single argument: could be a file or pattern
-    if [[ "$1" == *"*"* ]]; then
-        # It's a pattern (contains wildcard)
-        for file in $1; do
-            convert_video "$file"
-        done
-    else
-        # It's a single file
-        convert_video "$1"
-    fi
-else
-    echo -e "${RED}Usage: $0 [file or pattern]${NC}"
-    echo "Examples:"
-    echo "  $0 video.avi"
-    echo "  $0 *.avi"
-    echo "  $0"
-    exit 1
 fi
 
 # Summary
