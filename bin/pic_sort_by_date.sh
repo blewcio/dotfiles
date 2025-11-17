@@ -2,29 +2,61 @@
 # ------------------------------------------------------------
 # Sort pictures into YEAR/MONTH directories.
 #
-#   ./sort_pics.sh               # → EXIF mode (default)
-#   ./sort_pics.sh --moddate    # → use file modification time (mtime)
+#   ./pic_sort_by_date.sh *.jpg              # → EXIF mode (default)
+#   ./pic_sort_by_date.sh --moddate *.png    # → use file modification time
+#   ./pic_sort_by_date.sh -n *.jpg           # → dry-run (no changes)
 # ------------------------------------------------------------
 
 # ---------- 1️⃣  Configuration ----------
-EXTENSIONS=(jpg jpeg png tif tiff heic avif raw cr2 cr3 nef orf 3gp xcf)
-
 # Choose the source of the date:
 #   * "exif" – use EXIF tags (default)
 #   * "mod"  – use file modification time (mtime)
 DATE_SOURCE="exif"
+DRY_RUN=false
+FILES=()
 
-# Parse optional flag
+# Parse arguments
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --moddate|--mtime) DATE_SOURCE="mod" ;;
-        --exifdate|--exif) DATE_SOURCE="exif" ;;
-        *) echo "Unknown option: $1" >&2; exit 1 ;;
+        --moddate|--mtime)
+            DATE_SOURCE="mod"
+            shift
+            ;;
+        --exifdate|--exif)
+            DATE_SOURCE="exif"
+            shift
+            ;;
+        -n|--dry-run)
+            DRY_RUN=true
+            shift
+            ;;
+        -h|--help)
+            echo "Usage: $0 [OPTIONS] FILE..."
+            echo "  --moddate, --mtime    Use file modification time instead of EXIF"
+            echo "  --exifdate, --exif    Use EXIF date (default)"
+            echo "  -n, --dry-run         Show what would be moved without making changes"
+            echo "  FILE...               One or more image files to process"
+            exit 0
+            ;;
+        -*)
+            echo "Unknown option: $1" >&2
+            exit 1
+            ;;
+        *)
+            FILES+=("$1")
+            shift
+            ;;
     esac
-    shift
 done
 
-shopt -s nullglob   # make patterns expand to nothing if no match
+# Check if files were provided
+if [[ ${#FILES[@]} -eq 0 ]]; then
+    echo "Error: No files specified" >&2
+    echo "Usage: $0 [OPTIONS] FILE..." >&2
+    echo "Example: $0 *.jpg" >&2
+    echo "         $0 -n --moddate *.png" >&2
+    exit 1
+fi
 
 # ---------- 2️⃣  Helper: get YEAR/MONTH ----------
 get_year_month() {
@@ -65,18 +97,27 @@ PY
 }
 
 # ---------- 3️⃣  Main processing ----------
-for ext in "${EXTENSIONS[@]}"; do
-    for f in *."$ext" *."${ext^^}"; do   # also match upper‑case extensions
-        [ -e "$f" ] || continue
+for f in "${FILES[@]}"; do
+    if [[ ! -e "$f" ]]; then
+        echo "⚠️  File not found: \"$f\" – skipping"
+        continue
+    fi
+    if [[ ! -f "$f" ]]; then
+        echo "⚠️  Not a regular file: \"$f\" – skipping"
+        continue
+    fi
 
-        target_dir=$(get_year_month "$f")
-        if [[ -z "$target_dir" ]]; then
-            echo "⚠️  No suitable EXIF timestamp for \"$f\" – skipping"
-            continue
-        fi
+    target_dir=$(get_year_month "$f")
+    if [[ -z "$target_dir" ]]; then
+        echo "⚠️  No suitable timestamp for \"$f\" – skipping"
+        continue
+    fi
 
+    if [[ "$DRY_RUN" == true ]]; then
+        echo "🔍  Would move: \"$f\" → \"$target_dir/\""
+    else
         mkdir -p "$target_dir"
         mv -i -- "$f" "$target_dir/"
         echo "✅  \"$f\" → \"$target_dir/\""
-    done
+    fi
 done
