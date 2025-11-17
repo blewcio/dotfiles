@@ -104,11 +104,6 @@ fi
 # Bash specific config
 if [[ "$SHELL" == *"bash" ]] || [[ "$SHELL" == *"/sh" ]]; then
 
-  # History
-  HISTSIZE=50000
-  HISTFILESIZE=2000
-  HISTFILE="$HOME/.bash_history"
-
   # FZF initialization (only once)
   if [ -z "$FZF_BASH_INITIALIZED" ]; then
     [ -f ~/.fzf.bash ] && source ~/.fzf.bash || eval "$(fzf --bash)"
