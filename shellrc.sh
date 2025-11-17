@@ -4,10 +4,19 @@ case $- in
       *) return;;
 esac
 
-# Add sbin and bin in $HOME `$PATH`
-export PATH="$HOME/bin:$HOME/sbin:$PATH"
-export PATH="$HOME/.cargo/bin:$PATH"
-export PATH="$HOME/dotfiles/bin:$PATH"
+# Add sbin and bin in $HOME to $PATH (only if not already present)
+_add_to_path() {
+  case ":$PATH:" in
+    *":$1:"*) ;;
+    *) export PATH="$1:$PATH" ;;
+  esac
+}
+
+_add_to_path "$HOME/bin"
+_add_to_path "$HOME/sbin"
+_add_to_path "$HOME/.cargo/bin"
+_add_to_path "$HOME/dotfiles/bin"
+unset -f _add_to_path
 
 # Source all config files from shell config folder
 SHELL_CONFIG_DIR=$HOME/dotfiles/shell.d
@@ -25,8 +34,8 @@ if [ -n "$SSH_TTY" ] && [ -z "$TMUX" ]; then
   fi
 fi
 
-# Display cool system info
-if [ -x "$(command -v fastfetch)" ]; then
+# Display cool system info (only on initial shell startup, not on re-source)
+if [ -x "$(command -v fastfetch)" ] && [ -z "$SHELLRC_LOADED" ]; then
   eval fastfetch
 fi
 
@@ -65,22 +74,30 @@ if [[ "$SHELL" == *"zsh" ]]; then
   antigen init ~/dotfiles/.antigenrc
 
   # Initialize fasd (which I use bacause of file history and  v command)
-  eval "$(fasd --init posix-alias zsh-hook zsh-ccomp zsh-ccomp-install \
-    zsh-wcomp zsh-wcomp-install)"
-
-  # Start fzf
-  [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-  if [ $? -eq 0 ]; then
-    bindkey -r '^T'
-    bindkey -r '^[I'
-    bindkey '^[i' fzf-file-widget
-    bindkey '^T' transpose-chars # Hack: Rebind the key to default after fzf loaded
+  if [[ -x "$(command -v fasd)" ]] && [ -z "$FASD_INITIALIZED" ]; then
+    eval "$(fasd --init posix-alias zsh-hook zsh-ccomp zsh-ccomp-install \
+      zsh-wcomp zsh-wcomp-install)"
+    export FASD_INITIALIZED=1
   fi
 
-  # Initialize zoxide. To use it in yazi.
-  alias z >/dev/null && unalias z # Vim recent file
-  if [[ -x "$(command -v zoxide)" ]]; then
+  # Start fzf (only once)
+  if [ -f ~/.fzf.zsh ] && [ -z "$FZF_ZSH_INITIALIZED" ]; then
+    source ~/.fzf.zsh
+    if [ $? -eq 0 ]; then
+      bindkey -r '^T'
+      bindkey -r '^[I'
+      # bindkey '^[i' fzf-file-widget
+      bindkey '^[t' fzf-file-widget
+      # bindkey '^T' transpose-chars # Hack: Rebind the key to default after fzf loaded
+      export FZF_ZSH_INITIALIZED=1
+    fi
+  fi
+
+  # Initialize zoxide (only once)
+  alias z >/dev/null 2>&1 && unalias z # Vim recent file
+  if [[ -x "$(command -v zoxide)" ]] && [ -z "$ZOXIDE_ZSH_INITIALIZED" ]; then
     eval "$(zoxide init zsh)"
+    export ZOXIDE_ZSH_INITIALIZED=1
   fi
 fi
 
@@ -92,19 +109,25 @@ if [[ "$SHELL" == *"bash" ]] || [[ "$SHELL" == *"/sh" ]]; then
   HISTFILESIZE=2000
   HISTFILE="$HOME/.bash_history"
 
-  # [ -f ~/.fzf.bash ] && source ~/.fzf.bash # Problem if via packet manager
-  [ -f ~/.fzf.bash ] && source ~/.fzf.bash || eval "$(fzf --bash)"
+  # FZF initialization (only once)
+  if [ -z "$FZF_BASH_INITIALIZED" ]; then
+    [ -f ~/.fzf.bash ] && source ~/.fzf.bash || eval "$(fzf --bash)"
+    export FZF_BASH_INITIALIZED=1
+  fi
 
-  if [[ -x "$(command -v fasd)" ]]; then
+  # Initialize fasd (only once)
+  if [[ -x "$(command -v fasd)" ]] && [ -z "$FASD_INITIALIZED" ]; then
     eval "$(fasd --init auto)"
     alias j='fasd_cd -d'
     alias v='f -e vim'
     _fasd_bash_hook_cmd_complete
+    export FASD_INITIALIZED=1
   fi
 
-  # Initialize zoxide. To use it in yazi.
-  if [[ -x "$(command -v zoxide)" ]]; then
+  # Initialize zoxide (only once)
+  if [[ -x "$(command -v zoxide)" ]] && [ -z "$ZOXIDE_BASH_INITIALIZED" ]; then
     eval "$(zoxide init bash)"
+    export ZOXIDE_BASH_INITIALIZED=1
   fi
 fi
 
@@ -157,12 +180,17 @@ if [[ -x "$(command -v fasd)" ]]; then
  fi
 fi
 
-# Initiate broot
-if [ -x "$(command -v broot)" ]; then
+# Initiate broot (only once)
+if [ -x "$(command -v broot)" ] && [ -f ~/.config/broot/launcher/bash/br ] && [ -z "$BROOT_INITIALIZED" ]; then
     source ~/.config/broot/launcher/bash/br
+    export BROOT_INITIALIZED=1
 fi
 
-# Initiate the fuck
-if [ -x "$(command -v thefuck)" ]; then
+# Initiate the fuck (only once)
+if [ -x "$(command -v thefuck)" ] && [ -z "$THEFUCK_INITIALIZED" ]; then
     eval $(thefuck --alias)
+    export THEFUCK_INITIALIZED=1
 fi
+
+# Mark shellrc as loaded
+export SHELLRC_LOADED=1
