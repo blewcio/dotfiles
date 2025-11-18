@@ -73,6 +73,73 @@ if [[ "$SHELL" == *"zsh" ]]; then
   # Load antigen configuration
   antigen init ~/dotfiles/.antigenrc
 
+  # Custom widgets for visual selection with Shift+arrows
+
+  # Shift+Left: select backward by character
+  select-backward-char() {
+    ((REGION_ACTIVE)) || zle set-mark-command
+    zle backward-char
+  }
+  zle -N select-backward-char
+
+  # Shift+Right: select forward by character
+  select-forward-char() {
+    ((REGION_ACTIVE)) || zle set-mark-command
+    zle forward-char
+  }
+  zle -N select-forward-char
+
+  # Shift+Up: select entire line
+  select-entire-line() {
+    zle beginning-of-line
+    zle set-mark-command
+    zle end-of-line
+  }
+  zle -N select-entire-line
+
+  # Shift+Down: deselect and move to end of line
+  deselect-region() {
+    # Exit visual mode by toggling mark off
+    if ((REGION_ACTIVE)); then
+      zle set-mark-command
+    fi
+    # Move cursor to end of line
+    zle end-of-line
+  }
+  zle -N deselect-region
+
+  # Shift+Alt+Left: select backward by word
+  select-backward-word() {
+    ((REGION_ACTIVE)) || zle set-mark-command
+    zle backward-word
+  }
+  zle -N select-backward-word
+
+  # Shift+Alt+Right: select forward by word
+  select-forward-word() {
+    ((REGION_ACTIVE)) || zle set-mark-command
+    zle forward-word
+  }
+  zle -N select-forward-word
+
+  # Configure zsh-autocomplete if loaded
+  if (( $+functions[.autocomplete:async:start] )) || [[ -n "${_autocomplete__async_timeout:-}" ]]; then
+    bindkey              '^I'         menu-complete
+    bindkey "$terminfo[kcbt]" reverse-menu-complete
+    bindkey              '^S'         history-incremental-search-forward
+    bindkey              '^R'         fzf-history-widget
+  fi
+
+  # Key bindings for text selection
+  bindkey '^[[1;2D'    select-backward-char      # Shift+Left: select left by char
+  bindkey '^[[1;2C'    select-forward-char       # Shift+Right: select right by char
+  bindkey '^[[1;2A'    select-entire-line        # Shift+Up: select entire line
+  bindkey '^[[1;2B'    deselect-region           # Shift+Down: deselect
+  bindkey '^[[1;4D'    select-backward-word      # Shift+Alt+Left: select left by word
+  bindkey '^[[1;4C'    select-forward-word       # Shift+Alt+Right: select right by word
+  bindkey '^[[1;4A'    select-entire-line        # Shift+Alt+Up: select entire line
+  bindkey '^[[1;4B'    select-entire-line        # Shift+Alt+Down: select entire line
+
   # Initialize fasd (which I use bacause of file history and  v command)
   if [[ -x "$(command -v fasd)" ]] && [ -z "$FASD_INITIALIZED" ]; then
     eval "$(fasd --init posix-alias zsh-hook zsh-ccomp zsh-ccomp-install \
