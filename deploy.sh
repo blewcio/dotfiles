@@ -205,7 +205,7 @@ if [ "$(uname)" = "Linux" ]; then
       read -p "Install base Linux packages via apt? (y/n): " choice
       if [ "$choice" = "y" ] || [ "$choice" = "Y" ]; then
         echo "Installing Linux packages..."
-        packages="tmux bat vim fzf fasd eza tldr pixz lbzip2 rsync ripgrep zoxide wget qemu-guest-agent fd-find git btop iperf iperf3 nfs-common"
+        packages="tmux bat vim fzf fasd eza pixz lbzip2 rsync ripgrep zoxide wget qemu-guest-agent fd-find git btop iperf iperf3 nfs-common bash-completion"
         sudo apt install -y $packages
       fi
     else
@@ -213,6 +213,32 @@ if [ "$(uname)" = "Linux" ]; then
     fi
   else
     echo "Non-Debian system detected - skipping apt package installation"
+  fi
+
+  # Install tldr (tealdeer) - apt version often unavailable on Debian
+  if ! command -v tldr >/dev/null 2>&1; then
+    read -p "Install tldr (simplified man pages) via pip3 or cargo? (y/n): " choice
+    if [ "$choice" = "y" ] || [ "$choice" = "Y" ]; then
+      # Try pip3 first (most reliable cross-platform method)
+      if command -v pip3 >/dev/null 2>&1; then
+        echo "Installing tldr via pip3..."
+        pip3 install --user tldr
+      # Try cargo (Rust) for tealdeer (faster implementation)
+      elif command -v cargo >/dev/null 2>&1; then
+        echo "Installing tealdeer (Rust tldr client) via cargo..."
+        cargo install tealdeer
+        # Create tldr symlink if tealdeer was installed
+        if command -v tealdeer >/dev/null 2>&1; then
+          mkdir -p ~/.local/bin
+          ln -sf $(which tealdeer) ~/.local/bin/tldr
+        fi
+      else
+        echo "Neither pip3 nor cargo available - skipping tldr installation"
+        echo "  Install with: pip3 install tldr  OR  cargo install tealdeer"
+      fi
+    fi
+  else
+    echo "tldr already installed - skipping"
   fi
 fi
 
