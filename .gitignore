@@ -2,4 +2,8 @@
 antigen.zsh
 private.sh
 *@eaDir*
+CLAUDE.md
+.claude/
+exported-defaults
+
 
