@@ -37,6 +37,32 @@ if [[ "$SHELL" == *zsh ]]; then
   unset antigenrc
 fi
 
+# Install bash plugin manager and enhancements
+if [[ "$SHELL" == *bash ]] || command -v bash >/dev/null 2>&1; then
+
+  # Install ble.sh (Bash Line Editor) for autosuggestions, syntax highlighting, and enhanced completion
+  if [ ! -d "$HOME/.local/share/blesh" ]; then
+    echo "Installing ble.sh (Bash Line Editor)..."
+
+    # Clone and install ble.sh
+    if git clone --recursive --depth 1 --shallow-submodules https://github.com/akinomyoga/ble.sh.git /tmp/ble.sh; then
+      make -C /tmp/ble.sh install PREFIX=~/.local
+      rm -rf /tmp/ble.sh
+      echo "ble.sh installed successfully"
+    else
+      echo "Failed to install ble.sh - skipping"
+    fi
+  else
+    echo "ble.sh already installed - skipping"
+  fi
+
+  # Note: ble.sh initialization is handled in shellrc.sh for centralized configuration
+  # Note: bash-completion package can also be installed for enhanced tab completions
+  # macOS: brew install bash-completion@2
+  # Linux: apt install bash-completion (usually pre-installed)
+
+fi
+
 # ============================================
 # Platform-Specific Configuration
 # ============================================

@@ -104,6 +104,29 @@ fi
 # Bash specific config
 if [[ "$SHELL" == *"bash" ]] || [[ "$SHELL" == *"/sh" ]]; then
 
+  # Initialize ble.sh (Bash Line Editor) for autosuggestions and syntax highlighting
+  # Must be loaded early to properly intercept shell input
+  if [ -f ~/.local/share/blesh/ble.sh ] && [ -z "$BLESH_INITIALIZED" ]; then
+    source ~/.local/share/blesh/ble.sh
+    export BLESH_INITIALIZED=1
+  fi
+
+  # Load bash-completion if available (only once)
+  if [ -z "$BASH_COMPLETION_INITIALIZED" ]; then
+    # macOS (Homebrew)
+    if [ -f $(brew --prefix 2>/dev/null)/etc/profile.d/bash_completion.sh ]; then
+      source $(brew --prefix)/etc/profile.d/bash_completion.sh
+      export BASH_COMPLETION_INITIALIZED=1
+    # Linux
+    elif [ -f /usr/share/bash-completion/bash_completion ]; then
+      source /usr/share/bash-completion/bash_completion
+      export BASH_COMPLETION_INITIALIZED=1
+    elif [ -f /etc/bash_completion ]; then
+      source /etc/bash_completion
+      export BASH_COMPLETION_INITIALIZED=1
+    fi
+  fi
+
   # FZF initialization (only once)
   if [ -z "$FZF_BASH_INITIALIZED" ]; then
     [ -f ~/.fzf.bash ] && source ~/.fzf.bash || eval "$(fzf --bash)"
