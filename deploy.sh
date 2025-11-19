@@ -228,11 +228,27 @@ if [ "$(uname)" = "Linux" ]; then
     done
 
     if [ $missing_packages -eq 1 ]; then
-      read -p "Install base Linux packages via apt? (y/n): " choice
-      if [ "$choice" = "y" ] || [ "$choice" = "Y" ]; then
-        echo "Installing Linux packages..."
+      echo ""
+      echo "Linux packages can be installed via:"
+      echo "  1. Quick install (basic tools only)"
+      echo "  2. Full install using debian-packages.sh (recommended)"
+      read -p "Choose installation method (1/2) or skip (n): " choice
+
+      if [ "$choice" = "1" ]; then
+        echo "Installing basic Linux packages..."
         packages="tmux bat vim fzf fasd eza pixz lbzip2 rsync ripgrep zoxide wget qemu-guest-agent fd-find git btop iperf iperf3 nfs-common bash-completion"
         sudo apt install -y $packages
+      elif [ "$choice" = "2" ]; then
+        echo "Running comprehensive package installation..."
+        if [ -f "$DOTFILES_DIR/debian-packages.sh" ]; then
+          sudo bash "$DOTFILES_DIR/debian-packages.sh" --minimal
+        else
+          echo "debian-packages.sh not found. Using basic installation..."
+          packages="tmux bat vim fzf fasd eza pixz lbzip2 rsync ripgrep zoxide wget qemu-guest-agent fd-find git btop iperf iperf3 nfs-common bash-completion"
+          sudo apt install -y $packages
+        fi
+      else
+        echo "Skipping Linux package installation"
       fi
     else
       echo "Key Linux packages already installed - skipping"

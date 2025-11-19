@@ -1,0 +1,152 @@
+# Debian/Ubuntu Package List
+# Equivalent to mac/Brewfile for Homebrew
+#
+# Install with: sudo ./debian-packages.sh [--minimal|--full]
+# Or manually: sudo apt install <package-name>
+
+# ===== Basic Terminal Tools =====
+tmux                    # Terminal multiplexer
+git                     # Version control
+wget                    # Download utility
+curl                    # Transfer data with URLs
+universal-ctags         # Code indexing for Vim
+bash-completion         # Bash completion support
+
+# Git enhancements (manual installation required)
+# git-delta             # Syntax highlighting (cargo install git-delta)
+# lazygit               # Terminal UI for git (github.com/jesseduffield/lazygit)
+
+# ===== Search & Navigation =====
+fzf                     # Fuzzy finder
+fasd                    # Quick file/directory access
+zoxide                  # Smarter cd command
+fd-find                 # Modern find replacement (fdfind → fd)
+ripgrep                 # Fast grep replacement
+broot                   # Interactive directory navigation
+
+# ===== Filesystem Tools =====
+bat                     # Cat with syntax highlighting (batcat → bat)
+eza                     # Modern ls replacement
+lsd                     # Another ls alternative
+dust                    # Disk usage analyzer
+tree                    # Directory tree viewer
+age                     # File encryption
+hdparm                  # HDD performance testing
+nnn                     # Terminal file manager
+mc                      # Midnight Commander
+rename                  # Bulk file renaming
+
+# Fast file managers (cargo)
+# yazi                  # Rust-based file manager (cargo install yazi-fm)
+
+# ===== Network & Performance =====
+wakeonlan               # Wake computers remotely
+iperf                   # Network bandwidth testing
+iperf3                  # Network bandwidth testing v3
+nmap                    # Network scanner
+speedtest-cli           # Internet speed testing
+httpie                  # Human-friendly HTTP client
+
+# Cargo-based network tools
+# bandwhich             # Network utilization (cargo install bandwhich)
+# gping                 # Ping with graph (cargo install gping)
+# hyperfine             # Benchmarking tool (cargo install hyperfine)
+
+# ===== System Monitoring =====
+htop                    # Interactive process viewer
+btop                    # Resource monitor (better top)
+glances                 # System monitoring tool
+
+# Additional monitoring (cargo/manual)
+# bottom                # Cross-platform system monitor (cargo install bottom)
+# duf                   # Disk usage (github.com/muesli/duf)
+# fastfetch             # System info (github.com/fastfetch-cli/fastfetch)
+
+# ===== Multimedia Tools =====
+ffmpeg                  # Audio/video processing
+libimage-exiftool-perl  # EXIF metadata tool (exiftool)
+exiv2                   # Image metadata manipulation
+pandoc                  # Universal document converter
+
+# Terminal image viewer (cargo)
+# viu                   # Image viewer for terminal (cargo install viu)
+
+# ===== Data Processing =====
+jq                      # JSON processor
+datamash                # Statistics calculations
+pdfgrep                 # Search text in PDFs
+lnav                    # Log file navigator
+miller                  # CSV/JSON/TSV processor
+peco                    # Interactive filtering
+poppler-utils           # PDF utilities (pdftotext, etc.)
+
+# Python-based data tools
+# visidata              # Terminal spreadsheet viewer (pip3 install visidata)
+# csvkit                # CSV toolkit (pip3 install csvkit)
+
+# Cargo-based data tools
+# jless                 # JSON viewer (cargo install jless)
+# choose                # Human-friendly cut (cargo install choose)
+
+# ===== Python Tools (pip3) =====
+# thefuck               # Command correction (pip3 install thefuck)
+# tldr                  # Simplified man pages (pip3 install tldr)
+
+# ===== Development Tools =====
+neovim                  # Modern Vim editor
+sublime-text            # Text editor (manual: sublimetext.com/docs/linux_repositories.html)
+
+# ===== GUI Applications =====
+# Only install these on desktop systems (--full mode)
+
+chromium-browser        # Open-source web browser
+gimp                    # Image editor
+vlc                     # Media player
+digikam                 # Photo management
+
+# Manual GUI installations
+# brave-browser         # Privacy browser (brave.com/linux/)
+# obsidian              # Note-taking (AppImage from obsidian.md)
+# logseq                # Note-taking (AppImage from logseq.com)
+# slack                 # Messaging (snap install slack --classic)
+# spotify               # Music (snap install spotify)
+# vscode                # Code editor (code.visualstudio.com)
+
+# ===== Linux Alternatives to macOS Apps =====
+#
+# macOS                 Linux Alternative
+# ─────────────────────────────────────────────
+# Arc Browser       →   Brave, Chromium, Firefox
+# Raycast           →   Albert, Ulauncher, Rofi
+# Caffeine          →   caffeine (apt install caffeine)
+# iTerm2            →   Alacritty, Kitty, Terminator
+# Alfred            →   Albert, Ulauncher
+# Rectangle         →   (built into most tiling WMs)
+# AppCleaner        →   apt autoremove, BleachBit
+# LastPass          →   Bitwarden, KeePassXC
+# 1Password         →   Bitwarden, KeePassXC
+# Notion            →   Notion web, Anytype
+# Spotify           →   Spotify (snap)
+# MonitorControl    →   ddcutil, ddccontrol
+# Stats             →   btop, bottom, glances
+# Android File Xfer →   Built-in MTP support
+# Cheatsheet        →   cheat, tldr
+# Gemini (dupes)    →   fdupes, fclones
+
+# ===== Installation Commands =====
+#
+# Install APT packages:
+#   sudo ./debian-packages.sh --minimal    # CLI tools only
+#   sudo ./debian-packages.sh --full       # CLI + GUI apps
+#
+# Install Rust (for cargo tools):
+#   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+#
+# Create symlinks:
+#   sudo ln -sf $(which fdfind) /usr/local/bin/fd
+#   sudo ln -sf $(which batcat) /usr/local/bin/bat
+#
+# Install snap packages:
+#   snap install slack --classic
+#   snap install spotify
+#
