@@ -74,7 +74,7 @@ if [ -x "$(command -v tmux)" ]; then
   # alias tmux='tmux -T 256'
   alias ta='tmux attach'
   alias tn='tmux new'
-  alias tm-dev='tmux-dev.sh'
+  alias tm-dev='tmux_dev.sh'
 fi
 
 # Get easy to digest help
@@ -82,8 +82,8 @@ if [ -x "$(command -v tldr)" ] && [ -x "$(command -v fzf)" ]; then
   alias thelp='tldr --list | fzf | xargs tldr'
 fi
 
-if [ -x "$(command -v tmux)" ] && [ -x "$(command -v tmux-cht.sh)" ]; then
-  alias chelp=tmux-cht.sh
+if [ -x "$(command -v tmux)" ] && [ -x "$(command -v tmux_cht.sh)" ]; then
+  alias chelp=tmux_cht.sh
 fi
 
 

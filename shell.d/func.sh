@@ -7,7 +7,6 @@ csv_cat() {
   fi
   cat "$1" | sed -e 's/,,/, ,/g' | column -s, -t # | less -#5 -N -S
 }
-alias cat-csv=csv_cat
 
 # Display CSV with csvlook (as a table)
 csv_cat2() {
@@ -18,7 +17,6 @@ csv_cat2() {
   fi
   csvlook --max-column-width=21 "$1" | bat -p -l rs
 }
-alias cat-csv2=csv_cat2
 
 ## System functions or commands
 # Safe remove
@@ -44,7 +42,6 @@ copy_to_trash() {
 mkcd() {
   mkdir -p "$@" && cd "$_"
 }
-alias mkcd=mkcd
 
 # Interactive list of most recent directories (param to prefilter)
 # then cd
@@ -79,15 +76,14 @@ if [[ -x "$(command -v tree)" ]]; then
  tree2() {
    tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
  }
- alias tree2=tree2
 fi
 
 # Change working directory to the top-most Finder window location
 if [[ "$(uname)" == "Darwin"  ]]; then
-  open_finder_directory() { 
+  open_finder_directory() {
     cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
   }
-  alias cd-finder=open_finder_directory
+  alias cdf=open_finder_directory  # Shorter alias
 fi
 
 # Time now
@@ -106,7 +102,6 @@ net_status() {
   echo -e "Open ports:"
   lsof -Pni4 | grep LISTEN | sed 's/^/\t/'
 }
-alias net-status=net_status
 
 # Remove all installed brew packages
 if [[ "$(uname)" == "Darwin"  ]]; then
@@ -127,7 +122,6 @@ if [[ "$(uname)" == "Darwin"  ]]; then
     # /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
 EOT
   }
-  alias brew-uninstall-all=brew_uninstall_all
 fi
 
 # nnn wrapper to stay in directory after exit
@@ -161,18 +155,79 @@ if [ -x "$(command -v nnn)" ]; then
         rm -f -- "$NNN_TMPFILE" > /dev/null
     }
   }
-  alias n=n
 fi
 
 if [ -x "$(command -v yazi)" ]; then
   y() {
     local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
     yazi "$@" --cwd-file="$tmp"
-    cwd=$(cat -- "$tmp") 
+    cwd=$(cat -- "$tmp")
     if [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
       cd "$cwd"
     fi
     rm -f "$tmp"
   }
-  alias y=y
 fi
+
+## Function Discovery Helpers
+
+# List all custom functions organized by category
+list_functions() {
+  echo "Scripts (from ~/dotfiles/bin/):"
+  if [ -d ~/dotfiles/bin ]; then
+    ls -1 ~/dotfiles/bin/ | sed 's/^/  /' | sort
+  fi
+  echo ""
+  echo "General Functions:"
+  grep -E "^ *[a-z0-9_]+ ?\(\)" ~/dotfiles/shell.d/func.sh | sed 's/^ *//' | sed 's/ *().*//' | grep -v '^_' | sed 's/^/  /' | sort
+  echo ""
+  echo "Picture Functions:"
+  grep -E "^ *[a-z0-9_]+ ?\(\)" ~/dotfiles/shell.d/func_pictures.sh | sed 's/^ *//' | sed 's/ *().*//' | grep -v '^_' | sed 's/^/  /' | sort
+  echo ""
+  echo "Video Functions:"
+  grep -E "^ *[a-z0-9_]+ ?\(\)" ~/dotfiles/shell.d/func_video.sh | sed 's/^ *//' | sed 's/ *().*//' | grep -v '^_' | sed 's/^/  /' | sort
+  echo ""
+  echo "Synology Functions:"
+  if [ -f ~/dotfiles/shell.d/synology.sh ]; then
+    grep -E "^ *[a-z0-9_]+ ?\(\)" ~/dotfiles/shell.d/synology.sh | sed 's/^ *//' | sed 's/ *().*//' | grep -v '^_' | sed 's/^/  /' | sort
+  fi
+}
+alias funcs=list_functions
+
+# Show function usage and description
+describe_function() {
+  if [ $# -eq 0 ]; then
+    echo "Usage: describe_function FUNCTION_OR_SCRIPT_NAME"
+    echo "Example: describe_function csv_cat"
+    echo "Example: describe_function pic_info"
+    return 1
+  fi
+
+  # First check if it's a script in bin/
+  if [ -f ~/dotfiles/bin/$1 ]; then
+    echo "Script: $1"
+    echo "Location: ~/dotfiles/bin/$1"
+    echo ""
+    # Extract header comments (lines starting with # after shebang, stop at first non-comment)
+    local header=$(awk '/^#!/{next} /^#/{print} /^[^#]/{if(NR>1)exit}' ~/dotfiles/bin/$1)
+    if [ -n "$header" ]; then
+      echo "$header"
+    else
+      echo "No description available. View the script with: cat ~/dotfiles/bin/$1"
+    fi
+    return 0
+  fi
+
+  # Otherwise check if it's a function
+  local result=$(grep -B 3 "^ *$1 *()" ~/dotfiles/shell.d/*.sh 2>/dev/null)
+  if [ -z "$result" ]; then
+    echo "Function or script '$1' not found"
+    echo ""
+    echo "Try 'funcs' to see all available functions and scripts"
+    return 1
+  fi
+  echo "Function: $1"
+  echo ""
+  echo "$result" | sed 's/.*shell.d\///' | grep -v '^--$'
+}
+alias fhelp=describe_function

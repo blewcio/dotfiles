@@ -1,0 +1,162 @@
+#!/bin/bash
+#
+# pic-info - Check if pictures have timestamp and GPS location
+# Usage: pic-info image.jpg
+#        pic-info *.JPG
+#        pic-info folder/*.jpg
+#
+
+# Colors
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+NC='\033[0m' # No Color
+
+# Check if exiftool is available
+if ! command -v exiftool &> /dev/null; then
+    echo -e "${RED}Error: exiftool is not installed${NC}"
+    echo ""
+    echo "Install exiftool:"
+    echo "  macOS:  brew install exiftool"
+    echo "  Linux:  sudo apt install libimage-exiftool-perl"
+    exit 1
+fi
+
+# Check if arguments provided
+if [ $# -eq 0 ]; then
+    echo "Usage: pic-info <image-file(s)>"
+    echo ""
+    echo "Examples:"
+    echo "  pic-info image.jpg"
+    echo "  pic-info *.JPG"
+    echo "  pic-info photos/*.jpg"
+    exit 1
+fi
+
+# Function to check and display metadata for a single file
+check_image() {
+    local file="$1"
+
+    # Check if file exists
+    if [ ! -f "$file" ]; then
+        echo -e "${RED}✗${NC} File not found: $file"
+        return
+    fi
+
+    # Check if file is an image
+    if ! file "$file" | grep -qiE "image|jpeg|jpg|png|tiff|gif|heic|heif"; then
+        echo -e "${YELLOW}⊘${NC} Not an image: $file"
+        return
+    fi
+
+    echo -e "${BOLD}${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${BOLD}File:${NC} $(basename "$file")"
+
+    # Extract metadata
+    local datetime=$(exiftool -s -s -s -DateTimeOriginal "$file" 2>/dev/null)
+    local createdate=$(exiftool -s -s -s -CreateDate "$file" 2>/dev/null)
+    local modifydate=$(exiftool -s -s -s -ModifyDate "$file" 2>/dev/null)
+
+    local gps_lat=$(exiftool -s -s -s -GPSLatitude "$file" 2>/dev/null)
+    local gps_lon=$(exiftool -s -s -s -GPSLongitude "$file" 2>/dev/null)
+    local gps_lat_ref=$(exiftool -s -s -s -GPSLatitudeRef "$file" 2>/dev/null)
+    local gps_lon_ref=$(exiftool -s -s -s -GPSLongitudeRef "$file" 2>/dev/null)
+
+    # Check timestamp
+    echo -n "Timestamp: "
+    if [ -n "$datetime" ]; then
+        echo -e "${GREEN}✓ Yes${NC} - $datetime"
+    elif [ -n "$createdate" ]; then
+        echo -e "${GREEN}✓ Yes${NC} - $createdate (CreateDate)"
+    elif [ -n "$modifydate" ]; then
+        echo -e "${YELLOW}⊙ Maybe${NC} - $modifydate (ModifyDate - less reliable)"
+    else
+        echo -e "${RED}✗ No${NC}"
+    fi
+
+    # Check GPS
+    echo -n "GPS Location: "
+    if [ -n "$gps_lat" ] && [ -n "$gps_lon" ]; then
+        echo -e "${GREEN}✓ Yes${NC}"
+        echo -e "  ${BLUE}Latitude:${NC}  $gps_lat $gps_lat_ref"
+        echo -e "  ${BLUE}Longitude:${NC} $gps_lon $gps_lon_ref"
+
+        # Try to get altitude if available
+        local gps_alt=$(exiftool -s -s -s -GPSAltitude "$file" 2>/dev/null)
+        if [ -n "$gps_alt" ]; then
+            echo -e "  ${BLUE}Altitude:${NC}  $gps_alt"
+        fi
+
+        # Create Google Maps link if coordinates exist
+        if [ -n "$gps_lat" ] && [ -n "$gps_lon" ]; then
+            # Convert to decimal degrees for Google Maps
+            local lat_decimal=$(exiftool -s -s -s -n -GPSLatitude "$file" 2>/dev/null)
+            local lon_decimal=$(exiftool -s -s -s -n -GPSLongitude "$file" 2>/dev/null)
+
+            if [ -n "$lat_decimal" ] && [ -n "$lon_decimal" ]; then
+                echo -e "  ${BLUE}Map:${NC}       https://www.google.com/maps?q=$lat_decimal,$lon_decimal"
+            fi
+        fi
+    else
+        echo -e "${RED}✗ No${NC}"
+    fi
+
+    # Additional useful metadata
+    local camera=$(exiftool -s -s -s -Model "$file" 2>/dev/null)
+    if [ -n "$camera" ]; then
+        echo -e "${BLUE}Camera:${NC}       $camera"
+    fi
+
+    local dimensions=$(exiftool -s -s -s -ImageSize "$file" 2>/dev/null)
+    if [ -n "$dimensions" ]; then
+        echo -e "${BLUE}Dimensions:${NC}   $dimensions"
+    fi
+
+    echo ""
+}
+
+# Summary counters
+total_files=0
+files_with_timestamp=0
+files_with_gps=0
+files_with_both=0
+
+# Process all files
+for file in "$@"; do
+    check_image "$file"
+
+    # Update counters
+    ((total_files++))
+
+    # Check for timestamp
+    datetime=$(exiftool -s -s -s -DateTimeOriginal "$file" 2>/dev/null)
+    createdate=$(exiftool -s -s -s -CreateDate "$file" 2>/dev/null)
+    if [ -n "$datetime" ] || [ -n "$createdate" ]; then
+        ((files_with_timestamp++))
+    fi
+
+    # Check for GPS
+    gps_lat=$(exiftool -s -s -s -GPSLatitude "$file" 2>/dev/null)
+    gps_lon=$(exiftool -s -s -s -GPSLongitude "$file" 2>/dev/null)
+    if [ -n "$gps_lat" ] && [ -n "$gps_lon" ]; then
+        ((files_with_gps++))
+
+        # Check if has both
+        if [ -n "$datetime" ] || [ -n "$createdate" ]; then
+            ((files_with_both++))
+        fi
+    fi
+done
+
+# Display summary if multiple files
+if [ $total_files -gt 1 ]; then
+    echo -e "${BOLD}${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${BOLD}Summary:${NC}"
+    echo "Total files processed: $total_files"
+    echo -e "Files with timestamp:  ${GREEN}$files_with_timestamp${NC} ($(( files_with_timestamp * 100 / total_files ))%)"
+    echo -e "Files with GPS:        ${GREEN}$files_with_gps${NC} ($(( files_with_gps * 100 / total_files ))%)"
+    echo -e "Files with both:       ${GREEN}$files_with_both${NC} ($(( files_with_both * 100 / total_files ))%)"
+fi
