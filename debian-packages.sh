@@ -65,6 +65,7 @@ SEARCH_TOOLS=(
 # ===== Filesystem Tools =====
 FILESYSTEM_TOOLS=(
   bat                  # Improved cat with syntax highlighting
+  glow                 # Markdown renderer with styling
   eza                  # Improved ls (exa replacement)
   lsd                  # Another improved ls
   dust                 # File/directory space utilization

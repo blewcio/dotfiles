@@ -236,7 +236,7 @@ if [ "$(uname)" = "Linux" ]; then
 
       if [ "$choice" = "1" ]; then
         echo "Installing basic Linux packages..."
-        packages="tmux bat vim fzf fasd eza pixz lbzip2 rsync ripgrep zoxide wget qemu-guest-agent fd-find git btop iperf iperf3 nfs-common bash-completion"
+        packages="tmux bat glow vim fzf fasd eza pixz lbzip2 rsync ripgrep zoxide wget qemu-guest-agent fd-find git btop iperf iperf3 nfs-common bash-completion"
         sudo apt install -y $packages
       elif [ "$choice" = "2" ]; then
         echo "Running comprehensive package installation..."
@@ -244,7 +244,7 @@ if [ "$(uname)" = "Linux" ]; then
           sudo bash "$DOTFILES_DIR/debian-packages.sh" --minimal
         else
           echo "debian-packages.sh not found. Using basic installation..."
-          packages="tmux bat vim fzf fasd eza pixz lbzip2 rsync ripgrep zoxide wget qemu-guest-agent fd-find git btop iperf iperf3 nfs-common bash-completion"
+          packages="tmux bat glow vim fzf fasd eza pixz lbzip2 rsync ripgrep zoxide wget qemu-guest-agent fd-find git btop iperf iperf3 nfs-common bash-completion"
           sudo apt install -y $packages
         fi
       else

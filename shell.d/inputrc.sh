@@ -18,8 +18,8 @@ if [[ "$SHELL" == *"/sh" ]] || [[ "$SHELL" == *"bash" ]]; then
   # Filesystem operations
   # bind '"\eh": "cd $HOME\C-j"' # Home Dir
   # bind '"\el": "ls -la\C-j"' # Rebind to la, instead ls
-  bind '"\eh": backward-word' # Home Dir
-  bind '"\el": forward-word' # Rebind to la, instead ls
+  # bind '"\eh": backward-word' # Home Dir (commented out)
+  # bind '"\el": forward-word' # Rebind to la, instead ls (commented out)
   bind '"\e*": "ls\C-j"' # Rebind to la, instead ls
   bind '"\e-": "cd -\C-j"' # Alternate dir
   bind '"\e.": "cd ..\C-j"' # Alternate dir
@@ -56,10 +56,10 @@ else
   bindkey -s "^[-" "cd -^J" # Alternate dir
   bindkey -s "^[." "cd ..^J" # Alternate dir
 
-  bindkey -r "^[h"
-  bindkey -r "^[l"
-  bindkey "^[h" backward-word
-  bindkey "^[l" forward-word
+  # bindkey -r "^[h"
+  # bindkey -r "^[l"
+  # bindkey "^[h" backward-word
+  # bindkey "^[l" forward-word
   # Note: fzf cd on Alt-c and fzf file on Alt-i
 
   # Command line

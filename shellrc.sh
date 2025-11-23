@@ -151,11 +151,9 @@ if [[ "$SHELL" == *"zsh" ]]; then
   if [ -f ~/.fzf.zsh ] && [ -z "$FZF_ZSH_INITIALIZED" ]; then
     source ~/.fzf.zsh
     if [ $? -eq 0 ]; then
-      bindkey -r '^T'
       bindkey -r '^[I'
       # bindkey '^[i' fzf-file-widget
-      bindkey '^[t' fzf-file-widget
-      # bindkey '^T' transpose-chars # Hack: Rebind the key to default after fzf loaded
+      bindkey '^T' fzf-file-widget
       export FZF_ZSH_INITIALIZED=1
     fi
   fi

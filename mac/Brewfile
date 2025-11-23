@@ -132,7 +132,7 @@ brew "miller"      # For csv formatting
 brew "peco"        # For interactive file filtering (like br and print selected line)
 brew "poppler"     # Pdf to text
 brew "choose"      # Human friendly cut
-# brew "glow"      # Colourful rendering of markup files (bat can do to)
+brew "glow"      # Colourful rendering of markdown files
 
 # Apps from Appstore
 mas "HomeAtmo : Der Netatmo client", id: 1359795390  # HomeAtmo Lite
@@ -149,11 +149,10 @@ mas "Windows App", id: 1295203466 # Remote desktop client for RDP
 
 # Install Quick Look Plugins
 cask "syntax-highlight"  # Quick Look plug-in that renders source code with syntax highlighting
-cask "qlmarkdown"    # Quick Look plugin for CommonMark and Markdown
+cask "qlmarkdown"    # Quick Look plugin for CommonMark and Markdown (!must be started once)
 cask "qlvideo"         # Thumbnails, static previews, cover art and metadata for video files
 # cask "qlcolorcode"     # Quick Look plug-in that renders source code with syntax highlighting
 # cask "qlstephen"       # Quick Look plugin for plaintext files without an extension
-# cask "qlcommonmark"    # Quick Look plugin for CommonMark and Markdown
 # cask "quicklook-json"  # Quick Look plugin to view json files / Solved by # syntax-highlight
 # cask "quicklook-csv"   # Quick Look plugin to view csv
 # cask "qlimagesize"     # Display image info and preview unsupported formats in QuickLook
