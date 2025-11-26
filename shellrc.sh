@@ -58,6 +58,10 @@ if [[ "$SHELL" == *"zsh" ]]; then
     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
   fi
 
+  # Configure zsh-autosuggestions styling (before loading plugins)
+  ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=240'        # Gray color (240 = dark gray)
+  ZSH_AUTOSUGGEST_STRATEGY=(history completion)   # Use both history and completion
+
   # Load zsh plugin manager
   source ~/dotfiles/antigen.zsh
 
@@ -122,13 +126,52 @@ if [[ "$SHELL" == *"zsh" ]]; then
   }
   zle -N select-forward-word
 
-  # Configure zsh-autocomplete if loaded
-  if (( $+functions[.autocomplete:async:start] )) || [[ -n "${_autocomplete__async_timeout:-}" ]]; then
-    bindkey              '^I'         menu-complete
-    bindkey "$terminfo[kcbt]" reverse-menu-complete
-    bindkey              '^S'         history-incremental-search-forward
-    bindkey              '^R'         fzf-history-widget
-  fi
+  # Configure keybindings after zsh-autocomplete loads
+  # This function runs after zle is initialized to ensure bindings persist
+  _fix_autocomplete_bindings() {
+    if (( $+functions[.autocomplete:async:start] )); then
+      # Tab: Use menu-complete for cycling through completions
+      bindkey              '^I'         menu-complete
+      # Shift+Tab: Reverse menu-complete
+      bindkey "$terminfo[kcbt]" reverse-menu-complete
+
+      # Ctrl+S: Different behavior based on context
+      bindkey              '^S'         history-incremental-search-forward  # Command line: history search
+      bindkey -M menuselect '^S'        history-incremental-search-forward  # In menu: search menu items
+
+      # Ctrl+R: FZF history widget (overrides autocomplete's Ctrl+R)
+      bindkey              '^R'         fzf-history-widget
+
+      # Restore default Up/Down arrow behavior (undo zsh-autocomplete bindings)
+      bindkey              '^[[A'       up-line-or-history      # Up arrow
+      bindkey              '^[OA'       up-line-or-history      # Up arrow (alternative)
+      bindkey              '^[[B'       down-line-or-history    # Down arrow
+      bindkey              '^[OB'       down-line-or-history    # Down arrow (alternative)
+
+      # Configure zsh-autocomplete BEFORE loading (required)
+      zstyle ':autocomplete:*' min-delay 0.5  # seconds (float)
+      zstyle ':autocomplete:*' min-input 2     # characters
+
+    fi
+  }
+
+  # Run after zle initialization to override plugin defaults
+  autoload -Uz add-zle-hook-widget
+  add-zle-hook-widget zle-line-init _fix_autocomplete_bindings
+
+  # Override zsh-autocomplete's recent directories with fasd/zoxide
+  +autocomplete:recent-directories() {
+    if (( $+commands[zoxide] )); then
+      # Use zoxide for recent directories (sorted by frecency)
+      typeset -ga reply=( ${(f)"$(zoxide query --list 2>/dev/null)"} )
+    elif (( $+commands[fasd] )); then
+      # Fallback to fasd for recent directories
+      typeset -ga reply=( ${(f)"$(fasd -dl 2>/dev/null)"} )
+    else
+      # Fallback to empty array if neither is available
+      typeset -ga reply=()
+    fi
+  }
 
   # Key bindings for text selection
   bindkey '^[[1;2D'    select-backward-char      # Shift+Left: select left by char
