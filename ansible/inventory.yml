@@ -1,0 +1,20 @@
+---
+# Ansible Inventory for Dotfiles Deployment
+# This deploys to localhost by default
+
+all:
+  hosts:
+    localhost:
+      ansible_connection: local
+      ansible_python_interpreter: "{{ ansible_playbook_python }}"
+
+# Optional: Define additional hosts for remote deployment
+# remote_machines:
+#   hosts:
+#     server1:
+#       ansible_host: 192.168.1.100
+#       ansible_user: your_username
+#       ansible_ssh_private_key_file: ~/.ssh/id_rsa
+#     server2:
+#       ansible_host: 192.168.1.101
+#       ansible_user: your_username

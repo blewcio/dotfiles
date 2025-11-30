@@ -16,7 +16,7 @@ antigen bundle fzf
 # Load zsh-autocomplete BEFORE syntax highlighting (required order)
 antigen bundle marlonrichert/zsh-autocomplete@main
 
-# antigen bundle aloxaf/fzf-tab
+antigen bundle aloxaf/fzf-tab # e.g. vim **<Tab>
 antigen bundle marzocchi/zsh-notify # send notification to macOS
 antigen bundle zsh-users/zsh-syntax-highlighting #highlighting in CLI, grey/green command
 antigen bundle zsh-users/zsh-autosuggestions #suggestinons in greyp based on history and completio

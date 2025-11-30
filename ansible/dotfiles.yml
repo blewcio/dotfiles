@@ -1,0 +1,433 @@
+---
+# Ansible Playbook for Dotfiles Deployment
+# Converted from deploy.sh script
+# Usage: ansible-playbook -i ansible/inventory.yml ansible/dotfiles.yml
+
+- name: Deploy dotfiles configuration
+  hosts: localhost
+  connection: local
+  vars_files:
+    - vars.yml
+
+  tasks:
+    # ===== OS Detection =====
+    - name: Detect operating system
+      set_fact:
+        is_macos: "{{ ansible_os_family == 'Darwin' }}"
+        is_linux: "{{ ansible_os_family == 'Debian' or ansible_os_family == 'RedHat' }}"
+
+    - name: Display detected OS
+      debug:
+        msg: "Detected OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+
+    # ===== Zsh Plugin Manager Setup =====
+    - name: Check if zsh is the default shell
+      set_fact:
+        using_zsh: "{{ ansible_env.SHELL is search('zsh') }}"
+
+    - name: Download Antigen (zsh plugin manager)
+      get_url:
+        url: https://git.io/antigen
+        dest: "{{ dotfiles_dir }}/antigen.zsh"
+        mode: '0644'
+      when: using_zsh
+
+    - name: Symlink antigenrc configuration
+      file:
+        src: "{{ dotfiles_dir }}/config/antigenrc"
+        dest: "{{ dotfiles_dir }}/.antigenrc"
+        state: link
+        force: yes
+      when: using_zsh
+
+    # ===== Bash Plugin Manager Setup =====
+    - name: Check if bash is available
+      set_fact:
+        using_bash: "{{ ansible_env.SHELL is search('bash') or lookup('pipe', 'which bash') != '' }}"
+
+    - name: Check if ble.sh is already installed
+      stat:
+        path: "{{ ansible_env.HOME }}/.local/share/blesh"
+      register: blesh_check
+      when: using_bash
+
+    - name: Clone ble.sh (Bash Line Editor)
+      git:
+        repo: https://github.com/akinomyoga/ble.sh.git
+        dest: /tmp/ble.sh
+        depth: 1
+        recursive: yes
+      when:
+        - using_bash
+        - not blesh_check.stat.exists
+
+    - name: Install ble.sh
+      shell: |
+        make -C /tmp/ble.sh install PREFIX={{ ansible_env.HOME }}/.local
+        rm -rf /tmp/ble.sh
+      when:
+        - using_bash
+        - not blesh_check.stat.exists
+      ignore_errors: yes
+
+    # Note: ble.sh initialization is handled in shellrc.sh for centralized configuration
+    # No need to add it to .bashrc directly
+
+    # ===== Oh-My-Zsh Addons =====
+    - name: Ensure oh-my-zsh custom plugins directory exists
+      file:
+        path: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins"
+        state: directory
+        mode: '0755'
+      when: using_zsh
+
+    - name: Clone zsh-autocomplete plugin
+      git:
+        repo: https://github.com/marlonrichert/zsh-autocomplete.git
+        dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/zsh-autocomplete"
+        depth: 1
+        update: yes
+      when: using_zsh
+      ignore_errors: yes
+
+    - name: Clone fast-syntax-highlighting plugin
+      git:
+        repo: https://github.com/zdharma-continuum/fast-syntax-highlighting.git
+        dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/fast-syntax-highlighting"
+        update: yes
+      when: using_zsh
+      ignore_errors: yes
+
+    - name: Clone zsh-syntax-highlighting plugin
+      git:
+        repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
+        dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+        update: yes
+      when: using_zsh
+      ignore_errors: yes
+
+    - name: Clone zsh-autosuggestions plugin
+      git:
+        repo: https://github.com/zsh-users/zsh-autosuggestions.git
+        dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+        update: yes
+      when: using_zsh
+      ignore_errors: yes
+
+    - name: Check if plugins line exists in .zshrc
+      shell: grep -q "^plugins=(" {{ ansible_env.HOME }}/.zshrc
+      register: plugins_line_check
+      ignore_errors: yes
+      changed_when: false
+      when: using_zsh
+
+    - name: Add plugins line to .zshrc (before oh-my-zsh.sh source)
+      lineinfile:
+        path: "{{ ansible_env.HOME }}/.zshrc"
+        line: "plugins=(fasd alias-finder virtualenv direnv git zsh-autosuggestions zsh-syntax-highlighting fast-syntax-highlighting zsh-autocomplete)"
+        insertbefore: "^source.*oh-my-zsh.sh"
+        state: present
+      when:
+        - using_zsh
+        - plugins_line_check.rc != 0
+
+    # ===== iTerm2 Integration =====
+    - name: Download iTerm2 shell integration script
+      get_url:
+        url: https://iterm2.com/misc/install_shell_integration.sh
+        dest: "{{ ansible_env.HOME }}/.install_shell_integration.sh"
+        mode: '0755'
+      when: is_macos
+
+    # ===== macOS Package Installation =====
+    - name: Check if Homebrew is installed
+      stat:
+        path: /opt/homebrew/bin/brew
+      register: homebrew_check
+      when: is_macos
+
+    - name: Install Homebrew
+      shell: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      when:
+        - is_macos
+        - install_macos_packages
+        - not homebrew_check.stat.exists
+
+    - name: Install packages from Brewfile
+      community.general.homebrew_bundle:
+        file: "{{ dotfiles_dir }}/mac/Brewfile"
+      when:
+        - is_macos
+        - install_macos_packages
+
+    - name: Check if FZF is already configured
+      shell: grep -q "fzf" {{ ansible_env.HOME }}/.zshrc {{ ansible_env.HOME }}/.bashrc 2>/dev/null
+      register: fzf_configured
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Run FZF installer (macOS)
+      shell: |
+        if command -v fzf &> /dev/null; then
+          $(brew --prefix)/opt/fzf/install --key-bindings --completion --no-update-rc
+        fi
+      when:
+        - is_macos
+        - install_macos_packages
+        - fzf_configured.rc != 0
+
+    - name: Check if p10k is available
+      command: which p10k
+      register: p10k_check
+      ignore_errors: yes
+      changed_when: false
+      when:
+        - is_macos
+        - configure_p10k
+
+    - name: Configure Powerline10k (macOS)
+      shell: p10k configure
+      when:
+        - is_macos
+        - install_macos_packages
+        - configure_p10k
+        - p10k_check.rc == 0
+      ignore_errors: yes
+
+    - name: Display p10k not found message
+      debug:
+        msg: "Powerlevel10k not found. You can run 'p10k configure' later after installing zsh plugins."
+      when:
+        - is_macos
+        - configure_p10k
+        - p10k_check.rc != 0
+
+    # ===== Linux Package Installation =====
+    - name: Install base Linux packages (Debian/Ubuntu)
+      apt:
+        name: "{{ linux_packages }}"
+        state: present
+        update_cache: yes
+      become: yes
+      when:
+        - is_linux
+        - ansible_os_family == 'Debian'
+        - install_linux_packages
+
+    # ===== Shell RC Configuration =====
+    - name: Check if .bashrc exists
+      stat:
+        path: "{{ ansible_env.HOME }}/.bashrc"
+      register: bashrc_file
+
+    - name: Check if shellrc.sh is already sourced in .bashrc
+      lineinfile:
+        path: "{{ ansible_env.HOME }}/.bashrc"
+        line: '[[ -r "{{ dotfiles_dir }}/{{ shellrc_file }}" ]] && source {{ dotfiles_dir }}/{{ shellrc_file }}'
+        state: present
+      check_mode: yes
+      register: bashrc_check
+      when: bashrc_file.stat.exists
+      changed_when: false
+
+    - name: Add shellrc.sh sourcing to .bashrc
+      lineinfile:
+        path: "{{ ansible_env.HOME }}/.bashrc"
+        line: '[[ -r "{{ dotfiles_dir }}/{{ shellrc_file }}" ]] && source {{ dotfiles_dir }}/{{ shellrc_file }}'
+        state: present
+        create: no
+      when:
+        - bashrc_file.stat.exists
+        - bashrc_check is changed
+
+    - name: Check if .zshrc exists
+      stat:
+        path: "{{ ansible_env.HOME }}/.zshrc"
+      register: zshrc_file
+
+    - name: Check if shellrc.sh is already sourced in .zshrc
+      lineinfile:
+        path: "{{ ansible_env.HOME }}/.zshrc"
+        line: '[[ -r "{{ dotfiles_dir }}/{{ shellrc_file }}" ]] && source {{ dotfiles_dir }}/{{ shellrc_file }}'
+        state: present
+      check_mode: yes
+      register: zshrc_check
+      when: zshrc_file.stat.exists
+      changed_when: false
+
+    - name: Add shellrc.sh sourcing to .zshrc
+      lineinfile:
+        path: "{{ ansible_env.HOME }}/.zshrc"
+        line: '[[ -r "{{ dotfiles_dir }}/{{ shellrc_file }}" ]] && source {{ dotfiles_dir }}/{{ shellrc_file }}'
+        state: present
+        create: no
+      when:
+        - zshrc_file.stat.exists
+        - zshrc_check is changed
+
+    # ===== Python Packages =====
+    - name: Install Python packages for visidata
+      pip:
+        name:
+          - xlrd
+          - openpyxl
+        executable: pip3
+        extra_args: --user
+      when: install_python_packages
+
+    # ===== Tmux Plugin Manager =====
+    - name: Create tmux plugins directory
+      file:
+        path: "{{ ansible_env.HOME }}/.tmux/plugins/tpm"
+        state: directory
+        mode: '0755'
+
+    - name: Clone Tmux Plugin Manager (TPM)
+      git:
+        repo: https://github.com/tmux-plugins/tpm
+        dest: "{{ ansible_env.HOME }}/.tmux/plugins/tpm"
+        update: yes
+        force: yes
+
+    # ===== Configuration Symlinks =====
+    - name: Create symlinks for main config files
+      file:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        state: link
+        force: yes
+      loop:
+        - { src: "{{ dotfiles_dir }}/config/tmux/tmux.conf", dest: "{{ ansible_env.HOME }}/.tmux.conf" }
+        - { src: "{{ dotfiles_dir }}/config/ripgrep/ignore", dest: "{{ ansible_env.HOME }}/.ignore" }
+        - { src: "{{ dotfiles_dir }}/config/visidata/visidatarc", dest: "{{ ansible_env.HOME }}/.visidatarc" }
+        - { src: "{{ dotfiles_dir }}/config/git/gitconfig", dest: "{{ ansible_env.HOME }}/.gitconfig" }
+        - { src: "{{ dotfiles_dir }}/config/git/gitignore_global", dest: "{{ ansible_env.HOME }}/.gitignore_global" }
+
+    - name: Configure git to use global gitignore
+      git_config:
+        name: core.excludesfile
+        value: "~/.gitignore_global"
+        scope: global
+
+    - name: Create .config subdirectories
+      file:
+        path: "{{ ansible_env.HOME }}/.config/{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - fd
+        - bat
+        - fastfetch
+
+    - name: Create symlinks for .config files
+      file:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        state: link
+        force: yes
+      loop:
+        - { src: "{{ dotfiles_dir }}/config/fd/ignore", dest: "{{ ansible_env.HOME }}/.config/fd/ignore" }
+        - { src: "{{ dotfiles_dir }}/config/bat/config", dest: "{{ ansible_env.HOME }}/.config/bat/config" }
+        - { src: "{{ dotfiles_dir }}/config/fastfetch/config.jsonc", dest: "{{ ansible_env.HOME }}/.config/fastfetch/config.jsonc" }
+
+    # ===== Vim Configuration Setup =====
+    - name: Clone vim-config repository
+      git:
+        repo: https://github.com/blewcio/vim-config.git
+        dest: "{{ ansible_env.HOME }}/vim-config"
+        update: yes
+
+    - name: Create symlinks for Vim configuration
+      file:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        state: link
+        force: yes
+      loop:
+        - { src: "{{ ansible_env.HOME }}/vim-config/.vimrc", dest: "{{ ansible_env.HOME }}/.vimrc" }
+        - { src: "{{ ansible_env.HOME }}/vim-config/.vim", dest: "{{ ansible_env.HOME }}/.vim" }
+
+    - name: Create Vim temporary directories
+      file:
+        path: "{{ ansible_env.HOME }}/.vim/var/{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - view
+        - swp
+        - undo
+        - backup
+
+    - name: Check if Vundle is installed
+      stat:
+        path: "{{ ansible_env.HOME }}/.vim/bundle/Vundle.vim"
+      register: vundle_check
+
+    - name: Clone Vundle plugin manager
+      git:
+        repo: https://github.com/VundleVim/Vundle.vim.git
+        dest: "{{ ansible_env.HOME }}/.vim/bundle/Vundle.vim"
+      when: not vundle_check.stat.exists
+
+    - name: Install Vim plugins via Vundle
+      shell: vim +PluginInstall +qall
+      when: not vundle_check.stat.exists
+      ignore_errors: yes
+
+    # ===== Neovim Configuration =====
+    - name: Check if Neovim is installed
+      command: which nvim
+      register: nvim_check
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Check if existing Neovim config is a directory (not symlink)
+      stat:
+        path: "{{ ansible_env.HOME }}/.config/nvim"
+      register: nvim_config_check
+      when: nvim_check.rc == 0
+
+    - name: Backup existing Neovim configuration
+      command: mv {{ ansible_env.HOME }}/.config/nvim {{ ansible_env.HOME }}/.config/nvim.backup
+      when:
+        - nvim_check.rc == 0
+        - nvim_config_check.stat.exists
+        - nvim_config_check.stat.isdir
+        - not nvim_config_check.stat.islnk
+
+    - name: Create .config directory
+      file:
+        path: "{{ ansible_env.HOME }}/.config"
+        state: directory
+        mode: '0755'
+      when: nvim_check.rc == 0
+
+    - name: Symlink Neovim configuration
+      file:
+        src: "{{ ansible_env.HOME }}/vim-config/nvim"
+        dest: "{{ ansible_env.HOME }}/.config/nvim"
+        state: link
+        force: yes
+      when: nvim_check.rc == 0
+
+    - name: Display Neovim setup message
+      debug:
+        msg: "Neovim configuration symlinked. Plugins will auto-install on first launch. Run :Mason to install LSP servers."
+      when: nvim_check.rc == 0
+
+    - name: Display Neovim not installed message
+      debug:
+        msg: "Neovim not installed. Install with: brew install neovim (macOS) or apt install neovim (Linux)"
+      when: nvim_check.rc != 0
+
+    # ===== Final Message =====
+    - name: Display completion message
+      debug:
+        msg: |
+          Dotfiles deployment completed!
+
+          Next steps:
+          1. Restart your shell or run: source ~/dotfiles/shellrc.sh
+          2. Launch tmux and press prefix+I to install tmux plugins
+          3. If using Neovim, launch it and run :Mason to install LSP servers
+          4. Update git user.name and user.email in ~/.gitconfig

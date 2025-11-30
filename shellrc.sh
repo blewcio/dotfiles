@@ -28,9 +28,15 @@ if [ -d "$SHELL_CONFIG_DIR" ]; then
 fi
 
 # If a new remote session, start ssh as tmux, if tmux available
-if [ -n "$SSH_TTY" ] && [ -z "$TMUX" ]; then
+# Skip if already in tmux (check both $TMUX and $TMUX_PANE to catch nested sessions)
+if [ -n "$SSH_TTY" ] && [ -z "$TMUX" ] && [ -z "$TMUX_PANE" ]; then
   if [ -x "$(command -v $(type -P tmux))" ]; then
-    tmux attach-session -t ssh_tmux || tmux new-session -s ssh_tmux
+    # Only attach if this is a top-level SSH connection (not SSH within SSH)
+    # Check if parent process is sshd to avoid nested auto-attach
+    parent_cmd=$(ps -o comm= -p $PPID 2>/dev/null)
+    if [[ "$parent_cmd" == *"sshd"* ]]; then
+      tmux attach-session -t ssh_tmux || tmux new-session -s ssh_tmux
+    fi
   fi
 fi
 
@@ -126,12 +132,22 @@ if [[ "$SHELL" == *"zsh" ]]; then
   }
   zle -N select-forward-word
 
+  # Configure autocomplete
+  zstyle ':autocomplete:*' min-delay 0.5  # seconds (float)
+  zstyle ':autocomplete:*' min-input 2     # characters
+  zstyle ':autocomplete:*' insert-unambiguous yes # Insert common prefix automatically
+  zstyle ':autocomplete:*' widget-style menu-select
+  bindkey '^I' menu-complete
+
+
   # Configure keybindings after zsh-autocomplete loads
   # This function runs after zle is initialized to ensure bindings persist
   _fix_autocomplete_bindings() {
     if (( $+functions[.autocomplete:async:start] )); then
       # Tab: Use menu-complete for cycling through completions
-      bindkey              '^I'         menu-complete
+      # bindkey              '^I'         menu-complete
+      # bindkey              '^I'         fzf_completion
+      
       # Shift+Tab: Reverse menu-complete
       bindkey "$terminfo[kcbt]" reverse-menu-complete
 
@@ -148,9 +164,6 @@ if [[ "$SHELL" == *"zsh" ]]; then
       bindkey              '^[[B'       down-line-or-history    # Down arrow
       bindkey              '^[OB'       down-line-or-history    # Down arrow (alternative)
 
-      # Configure zsh-autocomplete BEFORE loading (required)
-      zstyle ':autocomplete:*' min-delay 0.5  # seconds (float)
-      zstyle ':autocomplete:*' min-input 2     # characters
 
     fi
   }

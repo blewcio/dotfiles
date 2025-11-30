@@ -1,0 +1,61 @@
+---
+# Variables for Dotfiles Ansible Playbook
+# Customize these values to control the deployment behavior
+
+# Path to dotfiles directory
+dotfiles_dir: "{{ ansible_env.HOME }}/dotfiles"
+
+# Main shell configuration file
+shellrc_file: "shellrc.sh"
+
+# ===== Package Installation Flags =====
+# Set to true/false to control which packages are installed
+
+# Install macOS packages via Homebrew
+install_macos_packages: true
+
+# Install Linux packages via apt
+install_linux_packages: true
+
+# Install Python packages (xlrd, openpyxl for visidata)
+install_python_packages: true
+
+# Configure Powerline10k (interactive, may require manual intervention)
+configure_p10k: false
+
+# ===== Linux Package List =====
+# Packages to install on Debian/Ubuntu systems
+linux_packages:
+  - tmux
+  - bat
+  - vim
+  - fzf
+  - fasd
+  - eza
+  - pixz
+  - lbzip2
+  - rsync
+  - ripgrep
+  - zoxide
+  - wget
+  - qemu-guest-agent
+  - fd-find
+  - git
+  - btop
+  - iperf
+  - iperf3
+  - nfs-common
+  - bash-completion
+
+# ===== Optional Configuration =====
+# These can be overridden at runtime with:
+# ansible-playbook -e "variable_name=value" dotfiles.yml
+
+# Skip all interactive prompts (useful for CI/CD)
+# non_interactive: false
+
+# Skip specific installation steps
+# skip_homebrew: false
+# skip_apt: false
+# skip_vim_setup: false
+# skip_neovim_setup: false
