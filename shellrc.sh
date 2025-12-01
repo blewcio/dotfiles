@@ -27,16 +27,14 @@ if [ -d "$SHELL_CONFIG_DIR" ]; then
   unset shellfile
 fi
 
-# If a new remote session, start ssh as tmux, if tmux available
-# Skip if already in tmux (check both $TMUX and $TMUX_PANE to catch nested sessions)
-if [ -n "$SSH_TTY" ] && [ -z "$TMUX" ] && [ -z "$TMUX_PANE" ]; then
+# Track SSH nesting depth to prevent tmux auto-attach in nested SSH sessions
+export SSH_DEPTH=${SSH_DEPTH:-0}
+export SSH_DEPTH=$((SSH_DEPTH + 1))
+
+# If a new remote session, start ssh as tmux (only on first SSH hop)
+if [ -n "$SSH_TTY" ] && [ -z "$TMUX" ] && [ -z "$TMUX_PANE" ] && [ "$SSH_DEPTH" -eq 1 ]; then
   if [ -x "$(command -v $(type -P tmux))" ]; then
-    # Only attach if this is a top-level SSH connection (not SSH within SSH)
-    # Check if parent process is sshd to avoid nested auto-attach
-    parent_cmd=$(ps -o comm= -p $PPID 2>/dev/null)
-    if [[ "$parent_cmd" == *"sshd"* ]]; then
-      tmux attach-session -t ssh_tmux || tmux new-session -s ssh_tmux
-    fi
+    tmux attach-session -t ssh_tmux || tmux new-session -s ssh_tmux
   fi
 fi
 
