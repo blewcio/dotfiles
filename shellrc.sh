@@ -213,7 +213,7 @@ if [[ "$SHELL" == *"zsh" ]]; then
   fi
 
   # Initialize zoxide (only once)
-  alias z >/dev/null 2>&1 && unalias z # Vim recent file
+  unalias z 2>/dev/null || true  # Remove z alias if it exists
   if [[ -x "$(command -v zoxide)" ]] && [ -z "$ZOXIDE_ZSH_INITIALIZED" ]; then
     eval "$(zoxide init zsh)"
     export ZOXIDE_ZSH_INITIALIZED=1
@@ -274,10 +274,11 @@ if [[ -x "$(command -v fasd)" ]]; then
  # if there is fzf available use it to search fasd results
  if [[ -x "$(command -v fzf)" ]]; then
 
-   alias v >/dev/null 2>&1 && unalias v # Vim recent file
-   alias f >/dev/null 2>&1 && unalias f # Jump to directory of recent file
-   alias j >/dev/null 2>&1 && unalias j # Jump to directory
-   alias o >/dev/null 2>&1 && unalias o # Jump to directory
+   # Remove any existing aliases (suppress errors if they don't exist)
+   unalias v 2>/dev/null || true
+   unalias f 2>/dev/null || true
+   unalias j 2>/dev/null || true
+   unalias o 2>/dev/null || true
 
   # edit given file or search in recently used files
   function fzf_fasd_edit {
