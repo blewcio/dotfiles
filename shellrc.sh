@@ -233,9 +233,12 @@ if [[ "$SHELL" == *"bash" ]] || [[ "$SHELL" == *"/sh" ]]; then
   # Load bash-completion if available (only once)
   if [ -z "$BASH_COMPLETION_INITIALIZED" ]; then
     # macOS (Homebrew)
-    if [ -f $(brew --prefix 2>/dev/null)/etc/profile.d/bash_completion.sh ]; then
-      source $(brew --prefix)/etc/profile.d/bash_completion.sh
-      export BASH_COMPLETION_INITIALIZED=1
+    if command -v brew >/dev/null 2>&1; then
+      local brew_prefix=$(brew --prefix)
+      if [ -f "$brew_prefix/etc/profile.d/bash_completion.sh" ]; then
+        source "$brew_prefix/etc/profile.d/bash_completion.sh"
+        export BASH_COMPLETION_INITIALIZED=1
+      fi
     # Linux
     elif [ -f /usr/share/bash-completion/bash_completion ]; then
       source /usr/share/bash-completion/bash_completion
