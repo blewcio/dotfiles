@@ -1,8 +1,8 @@
-# Disable bell sound on terminal
-set bell-style none
-
 # Different bind commands for sh
 if [[ "$SHELL" == *"/sh" ]] || [[ "$SHELL" == *"bash" ]]; then
+
+  # Disable bell sound on terminal (must use bind command for readline)
+  bind 'set bell-style none'
 
   #Rebind German keys to something useful
   bind '"ß": "/"'
@@ -29,7 +29,10 @@ if [[ "$SHELL" == *"/sh" ]] || [[ "$SHELL" == *"bash" ]]; then
   bind '"\ek": kill-line' # Rebind kill-line (as K i used for tmux movement)
 
 # Different bind commands for zsh
-else 
+else
+
+  # Disable bell sound on terminal
+  unsetopt BEEP
 
   # set completion-ignore-case on
   # set show-all-if-ambiguous 
