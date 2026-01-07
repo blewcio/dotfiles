@@ -18,7 +18,7 @@ if [[ "$SHELL" == *"zsh" ]] || [[ -n "$ZSH_VERSION" ]]; then
   setopt HIST_FIND_NO_DUPS         # Don't display duplicates in search
   setopt HIST_REDUCE_BLANKS        # Remove superfluous blanks
   setopt HIST_VERIFY               # Show command before executing from history
-  setopt SHARE_HISTORY             # Share history between sessions
+  # setopt SHARE_HISTORY             # Share history between sessions
   setopt INC_APPEND_HISTORY        # Write immediately, not on exit
   setopt APPEND_HISTORY            # Append to history file
 

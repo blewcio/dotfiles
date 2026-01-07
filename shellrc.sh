@@ -227,6 +227,7 @@ if [[ "$SHELL" == *"bash" ]] || [[ "$SHELL" == *"/sh" ]]; then
   # Must be loaded early to properly intercept shell input
   if [ -f ~/.local/share/blesh/ble.sh ] && [ -z "$BLESH_INITIALIZED" ]; then
     source ~/.local/share/blesh/ble.sh
+    export BLE_MULTILINE_KEY='\C-M' # Rebind multiline accept due to conflict with tmux bindings
     export BLESH_INITIALIZED=1
   fi
 
