@@ -86,6 +86,8 @@ brew "tree"
 brew "age"                 # File encryption
 brew "hdparm"              # HDD performance
 brew "knqyf263/pet/pet"    # CLI snippet manager
+brew "mcat"                # Multimedia cat
+
 # TODO vimv - vim style mass renamer of files
 # TODO brew "pigz"         # Parallel gzip (add alias) / Not used daily
 # TODO cask foremost/testdisk recovery # Data recovery tool
@@ -100,6 +102,7 @@ brew "speedtest-cli"       # Network speed test
 brew "gping"               # Plot ping in terminal
 brew "hyperfine"           # Process performance measurement
 brew "httpie"              # Human friendly HTTP client for API era
+brew "zenith"              # Like btop but in Rust
 
 # System status
 brew "duf"                 # Disk space utilization
@@ -132,7 +135,12 @@ brew "miller"      # For csv formatting
 brew "peco"        # For interactive file filtering (like br and print selected line)
 brew "poppler"     # Pdf to text
 brew "choose"      # Human friendly cut
-brew "glow"      # Colourful rendering of markdown files
+brew "glow"        # Colourful rendering of markdown files
+brew "nushell"     # Shell for structural/table-based data editing and pipes
+
+# Python workflows
+brew "uv" # Python project management
+brew "just" # Better make to save project commands
 
 # Apps from Appstore
 mas "HomeAtmo : Der Netatmo client", id: 1359795390  # HomeAtmo Lite
