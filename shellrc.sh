@@ -238,6 +238,17 @@ if [[ "$SHELL" == *"bash" ]] || [[ "$SHELL" == *"/sh" ]]; then
     ble-bind -m emacs -f 'C-x C-v' 'edit-and-execute-command'
     # Turn off the exit status mark [ble: exit ???]
     bleopt exec_errexit_mark=
+    # Prompt appearance 
+    bleopt prompt_rps1='\e[32m\t\e[m'
+    bleopt prompt_ps1_transient=always
+    bleopt complete_auto_delay=150
+    # Disable some noisy highlight categories (common customization)
+    bleopt highlight_filename=
+    bleopt highlight_variable=
+    # Make errors obvious but not painful
+    ble-face syntax_error='fg=231,bg=160'
+    # History-based autosuggestions (very popular feature)
+    bleopt history_share=1
     export BLESH_INITIALIZED=1
   fi
 
