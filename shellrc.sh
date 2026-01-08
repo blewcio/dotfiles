@@ -130,59 +130,10 @@ if [[ "$SHELL" == *"zsh" ]]; then
   }
   zle -N select-forward-word
 
-  # Configure autocomplete
-  zstyle ':autocomplete:*' min-delay 0.5  # seconds (float)
-  zstyle ':autocomplete:*' min-input 2     # characters
-  zstyle ':autocomplete:*' insert-unambiguous yes # Insert common prefix automatically
-  zstyle ':autocomplete:*' widget-style menu-select
-  bindkey '^I' menu-complete
-
-
-  # Configure keybindings after zsh-autocomplete loads
-  # This function runs after zle is initialized to ensure bindings persist
-  _fix_autocomplete_bindings() {
-    if (( $+functions[.autocomplete:async:start] )); then
-      # Tab: Use menu-complete for cycling through completions
-      # bindkey              '^I'         menu-complete
-      # bindkey              '^I'         fzf_completion
-      
-      # Shift+Tab: Reverse menu-complete
-      bindkey "$terminfo[kcbt]" reverse-menu-complete
-
-      # Ctrl+S: Different behavior based on context
-      bindkey              '^S'         history-incremental-search-forward  # Command line: history search
-      bindkey -M menuselect '^S'        history-incremental-search-forward  # In menu: search menu items
-
-      # Ctrl+R: FZF history widget (overrides autocomplete's Ctrl+R)
-      bindkey              '^R'         fzf-history-widget
-
-      # Restore default Up/Down arrow behavior (undo zsh-autocomplete bindings)
-      bindkey              '^[[A'       up-line-or-history      # Up arrow
-      bindkey              '^[OA'       up-line-or-history      # Up arrow (alternative)
-      bindkey              '^[[B'       down-line-or-history    # Down arrow
-      bindkey              '^[OB'       down-line-or-history    # Down arrow (alternative)
-
-
-    fi
-  }
-
-  # Run after zle initialization to override plugin defaults
-  autoload -Uz add-zle-hook-widget
-  add-zle-hook-widget zle-line-init _fix_autocomplete_bindings
-
-  # Override zsh-autocomplete's recent directories with fasd/zoxide
-  +autocomplete:recent-directories() {
-    if (( $+commands[zoxide] )); then
-      # Use zoxide for recent directories (sorted by frecency)
-      typeset -ga reply=( ${(f)"$(zoxide query --list 2>/dev/null)"} )
-    elif (( $+commands[fasd] )); then
-      # Fallback to fasd for recent directories
-      typeset -ga reply=( ${(f)"$(fasd -dl 2>/dev/null)"} )
-    else
-      # Fallback to empty array if neither is available
-      typeset -ga reply=()
-    fi
-  }
+  # Keybindings for standard zsh completion and utilities
+  bindkey '^I' expand-or-complete              # Tab: standard completion
+  bindkey "$terminfo[kcbt]" reverse-menu-complete  # Shift+Tab: reverse completion
+  bindkey '^S' history-incremental-search-forward  # Ctrl+S: forward history search
 
   # Key bindings for text selection
   bindkey '^[[1;2D'    select-backward-char      # Shift+Left: select left by char

@@ -54,7 +54,6 @@ else
 
   # Custom mappings
   # Filesystem operations
-  echo "Loading critical keys"
   bindkey -s "^[*" "ls^J" # Rebind to la, instead ls
   bindkey -s "^[-" "cd -^J" # Alternate dir
   bindkey -s "^[." "cd ..^J" # Alternate dir
