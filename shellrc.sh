@@ -226,7 +226,15 @@ if [[ "$SHELL" == *"bash" ]] || [[ "$SHELL" == *"/sh" ]]; then
   # Initialize ble.sh (Bash Line Editor) for autosuggestions and syntax highlighting
   # Must be loaded early to properly intercept shell input
   if [ -f ~/.local/share/blesh/ble.sh ] && [ -z "$BLESH_INITIALIZED" ]; then
+    # Load bash-completion if available (only once)
     source ~/.local/share/blesh/ble.sh
+    export BLESH_INITIALIZED=1
+    
+    # Transient prompt appearance  after prompt
+    bleopt prompt_ps1_transient=always
+    bleopt prompt_ps1_final='\e[33m[\t] \w \$ \e[m'
+    # History-based autosuggestions (very popular feature)
+    bleopt history_share=1
     # Use grey for completion of lines
     ble-face auto_complete='fg=gray'
     # For autocompletion dropdown use system colors
@@ -238,21 +246,31 @@ if [[ "$SHELL" == *"bash" ]] || [[ "$SHELL" == *"/sh" ]]; then
     ble-bind -m emacs -f 'C-x C-v' 'edit-and-execute-command'
     # Turn off the exit status mark [ble: exit ???]
     bleopt exec_errexit_mark=
-    # Prompt appearance 
-    bleopt prompt_rps1='\e[32m\t\e[m'
-    bleopt prompt_ps1_transient=always
-    bleopt complete_auto_delay=150
-    # Disable some noisy highlight categories (common customization)
-    bleopt highlight_filename=
-    bleopt highlight_variable=
-    # Make errors obvious but not painful
-    ble-face syntax_error='fg=231,bg=160'
-    # History-based autosuggestions (very popular feature)
-    bleopt history_share=1
-    export BLESH_INITIALIZED=1
+    # Slow down auto complete while typing
+    bleopt complete_auto_delay=200
+
+    # Disable menu completions (keep auto-suggestions)
+    bleopt complete_ambiguous=
+    bleopt complete_menu_complete=
+    bleopt complete_menu_filter=
+
+    # Common color customizations
+    ble-face -s command_builtin fg=cyan
+    ble-face -s command_alias fg=green
+    ble-face region='bg=60,fg=white'
+    ble-face region_target='bg=153,fg=black'
+    ble-face syntax_command='fg=brown'
+    ble-face syntax_quoted='fg=green'
+    ble-face syntax_error='bg=203,fg=231'
+    ble-face command_function='fg=92'
+    ble-face argument_option='fg=teal'
+
+    #Vim mode
+    set -o vi
+    # Vim-surround functionality
+    blehook keymap_vi_load='ble-import vim-surround'
   fi
 
-  # Load bash-completion if available (only once)
   if [ -z "$BASH_COMPLETION_INITIALIZED" ]; then
     # macOS (Homebrew)
     if command -v brew >/dev/null 2>&1; then
