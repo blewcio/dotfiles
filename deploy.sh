@@ -89,6 +89,17 @@ if [ "$(uname)" = "Darwin" ]; then
       echo "iTerm2 shell integration already installed - skipping"
     fi
 
+    # Download iTerm2 Catppuccin theme
+    mkdir -p $DOTFILES_DIR/config/iTerm2
+    if [ ! -f "$DOTFILES_DIR/config/iTerm2/catppuccin-mocha.itermcolors" ]; then
+      echo "Downloading Catppuccin Mocha theme for iTerm2..."
+      curl -L https://github.com/catppuccin/iterm2/raw/main/colors/catppuccin-mocha.itermcolors \
+        -o $DOTFILES_DIR/config/iTerm2/catppuccin-mocha.itermcolors
+      echo "Catppuccin theme downloaded to config/iTerm2/"
+    else
+      echo "Catppuccin theme already downloaded - skipping"
+    fi
+
   # FZF install, useful key bindings
   if [[ -x "$(command -v fzf)" ]]; then
     # Check if FZF is already configured in shell files
@@ -303,10 +314,13 @@ mkdir -p ~/.config/fd
 ln -sf $DOTFILES_DIR/config/fd/ignore ~/.config/fd/ignore 
 
 mkdir -p ~/.config/bat
-ln -sf $DOTFILES_DIR/config/bat/config ~/.config/bat/config 
+ln -sf $DOTFILES_DIR/config/bat/config ~/.config/bat/config
 
 mkdir -p ~/.config/fastfetch
 ln -sf $DOTFILES_DIR/config/fastfetch/config.jsonc ~/.config/fastfetch/
+
+# Link Powerlevel10k config with Catppuccin theme
+ln -sf $DOTFILES_DIR/config/p10k/p10k-catppuccin.zsh ~/.p10k.zsh
 
 echo "Symlinks created successfully"
 
@@ -378,6 +392,25 @@ echo "Next steps:"
 echo "  1. Restart your shell or run: source ~/.zshrc (or ~/.bashrc)"
 echo "  2. If using tmux, press prefix+I to install tmux plugins"
 echo "  3. If using Neovim, run :Mason to install LSP servers"
+
+if [ "$(uname)" = "Darwin" ]; then
+  if [ -f "$DOTFILES_DIR/config/iTerm2/catppuccin-mocha.itermcolors" ]; then
+    echo ""
+    echo "To apply Catppuccin theme to iTerm2:"
+    echo "  1. Open iTerm2 → Preferences (Cmd+,)"
+    echo "  2. Go to Profiles → Colors"
+    echo "  3. Click 'Color Presets' dropdown → Import"
+    echo "  4. Select: ~/dotfiles/config/iTerm2/catppuccin-mocha.itermcolors"
+    echo "  5. Choose 'Catppuccin Mocha' from the Color Presets dropdown"
+    echo ""
+    echo "Catppuccin theme is now applied to:"
+    echo "  ✓ Powerlevel10k prompt (automatic)"
+    echo "  ✓ bat syntax highlighting (automatic)"
+    echo "  ✓ fzf fuzzy finder (automatic)"
+    echo "  ✓ tmux status line (automatic)"
+  fi
+fi
+
 echo ""
 echo "The script is idempotent - you can safely run it again to update."
 echo ""
