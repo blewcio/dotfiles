@@ -1,0 +1,248 @@
+#!/bin/bash
+#
+# Dotfiles Update Script
+# Updates all third-party tools and plugins installed by deploy.sh
+#
+# Usage: ./update.sh
+#
+
+DOTFILES_DIR=~/dotfiles
+
+echo "================================"
+echo "Dotfiles Update Starting..."
+echo "================================"
+echo ""
+
+# Track if any updates were performed
+UPDATES_PERFORMED=0
+
+# ============================================
+# Shell Plugin Managers
+# ============================================
+
+# Update Antigen (zsh plugin manager)
+if [ -f "${DOTFILES_DIR}/antigen.zsh" ]; then
+  echo "Updating Antigen plugin manager..."
+  if curl -L git.io/antigen > ${DOTFILES_DIR}/antigen.zsh.new 2>/dev/null; then
+    mv ${DOTFILES_DIR}/antigen.zsh.new ${DOTFILES_DIR}/antigen.zsh
+    echo "  ✓ Antigen updated"
+    UPDATES_PERFORMED=1
+  else
+    echo "  ✗ Failed to update Antigen"
+    rm -f ${DOTFILES_DIR}/antigen.zsh.new
+  fi
+else
+  echo "Antigen not installed - skipping"
+fi
+
+# Update ble.sh (Bash Line Editor)
+if [ -d "$HOME/.local/share/blesh" ]; then
+  echo "Updating ble.sh (Bash Line Editor)..."
+
+  # Clone latest version to temp directory
+  if git clone --recursive --depth 1 --shallow-submodules https://github.com/akinomyoga/ble.sh.git /tmp/ble.sh 2>/dev/null; then
+    # Backup current installation
+    if [ -d "$HOME/.local/share/blesh.backup" ]; then
+      rm -rf "$HOME/.local/share/blesh.backup"
+    fi
+    mv "$HOME/.local/share/blesh" "$HOME/.local/share/blesh.backup"
+
+    # Install new version
+    if make -C /tmp/ble.sh install PREFIX=~/.local >/dev/null 2>&1; then
+      rm -rf /tmp/ble.sh
+      rm -rf "$HOME/.local/share/blesh.backup"
+      echo "  ✓ ble.sh updated"
+      UPDATES_PERFORMED=1
+    else
+      echo "  ✗ Failed to install new version, restoring backup"
+      rm -rf "$HOME/.local/share/blesh"
+      mv "$HOME/.local/share/blesh.backup" "$HOME/.local/share/blesh"
+      rm -rf /tmp/ble.sh
+    fi
+  else
+    echo "  ✗ Failed to clone ble.sh repository"
+    rm -rf /tmp/ble.sh
+  fi
+else
+  echo "ble.sh not installed - skipping"
+fi
+
+# ============================================
+# macOS-Specific Updates
+# ============================================
+
+if [ "$(uname)" = "Darwin" ]; then
+
+  # Update iTerm2 shell integration
+  if [ -f "$HOME/.iterm2_shell_integration.bash" ] || [ -f "$HOME/.iterm2_shell_integration.zsh" ]; then
+    echo "Updating iTerm2 shell integration..."
+    if wget -qO- https://iterm2.com/misc/install_shell_integration.sh | bash 2>/dev/null; then
+      echo "  ✓ iTerm2 shell integration updated"
+      UPDATES_PERFORMED=1
+    else
+      echo "  ✗ Failed to update iTerm2 shell integration"
+    fi
+  else
+    echo "iTerm2 shell integration not installed - skipping"
+  fi
+
+  # Update iTerm2 Catppuccin theme
+  if [ -f "$DOTFILES_DIR/config/iTerm2/catppuccin-mocha.itermcolors" ]; then
+    echo "Updating Catppuccin Mocha theme for iTerm2..."
+    if curl -L https://github.com/catppuccin/iterm2/raw/main/colors/catppuccin-mocha.itermcolors \
+        -o $DOTFILES_DIR/config/iTerm2/catppuccin-mocha.itermcolors.new 2>/dev/null; then
+      mv $DOTFILES_DIR/config/iTerm2/catppuccin-mocha.itermcolors.new \
+         $DOTFILES_DIR/config/iTerm2/catppuccin-mocha.itermcolors
+      echo "  ✓ Catppuccin theme updated"
+      UPDATES_PERFORMED=1
+    else
+      echo "  ✗ Failed to update Catppuccin theme"
+      rm -f $DOTFILES_DIR/config/iTerm2/catppuccin-mocha.itermcolors.new
+    fi
+  else
+    echo "Catppuccin theme not installed - skipping"
+  fi
+
+fi
+
+# ============================================
+# Oh-My-Zsh Plugins
+# ============================================
+
+if [ -d "$HOME/.oh-my-zsh" ]; then
+  ZSH_CUSTOM=$HOME/.oh-my-zsh/custom
+  echo "Updating oh-my-zsh plugins..."
+
+  PLUGIN_UPDATED=0
+
+  # Update each plugin
+  for plugin_dir in "$ZSH_CUSTOM/plugins/"*; do
+    if [ -d "$plugin_dir/.git" ]; then
+      plugin_name=$(basename "$plugin_dir")
+      echo "  Updating $plugin_name..."
+      if git -C "$plugin_dir" pull --quiet 2>/dev/null; then
+        echo "    ✓ $plugin_name updated"
+        PLUGIN_UPDATED=1
+      else
+        echo "    ✗ Failed to update $plugin_name"
+      fi
+    fi
+  done
+
+  if [ $PLUGIN_UPDATED -eq 1 ]; then
+    UPDATES_PERFORMED=1
+  fi
+
+  # Update oh-my-zsh itself
+  if [ -d "$HOME/.oh-my-zsh/.git" ]; then
+    echo "  Updating oh-my-zsh core..."
+    if git -C "$HOME/.oh-my-zsh" pull --quiet 2>/dev/null; then
+      echo "    ✓ oh-my-zsh updated"
+      UPDATES_PERFORMED=1
+    else
+      echo "    ✗ Failed to update oh-my-zsh"
+    fi
+  fi
+else
+  echo "oh-my-zsh not installed - skipping plugin updates"
+fi
+
+# ============================================
+# Tmux Plugin Manager
+# ============================================
+
+if [ -d "$HOME/.tmux/plugins/tpm" ]; then
+  echo "Updating tmux plugin manager (TPM)..."
+  if git -C "$HOME/.tmux/plugins/tpm" pull --quiet 2>/dev/null; then
+    echo "  ✓ TPM updated"
+    echo "  Note: Run prefix+U in tmux to update tmux plugins"
+    UPDATES_PERFORMED=1
+  else
+    echo "  ✗ Failed to update TPM"
+  fi
+else
+  echo "TPM not installed - skipping"
+fi
+
+# ============================================
+# Vim Configuration
+# ============================================
+
+if [ -d "$HOME/vim-config/.git" ]; then
+  echo "Updating vim-config repository..."
+  if git -C "$HOME/vim-config" pull --quiet 2>/dev/null; then
+    echo "  ✓ vim-config updated"
+    UPDATES_PERFORMED=1
+  else
+    echo "  ✗ Failed to update vim-config"
+  fi
+else
+  echo "vim-config not installed or not a git repository - skipping"
+fi
+
+# Update Vundle
+if [ -d "$HOME/.vim/bundle/Vundle.vim/.git" ]; then
+  echo "Updating Vundle plugin manager..."
+  if git -C "$HOME/.vim/bundle/Vundle.vim" pull --quiet 2>/dev/null; then
+    echo "  ✓ Vundle updated"
+    echo "  Note: Run :PluginUpdate in vim to update vim plugins"
+    UPDATES_PERFORMED=1
+  else
+    echo "  ✗ Failed to update Vundle"
+  fi
+else
+  echo "Vundle not installed - skipping"
+fi
+
+# ============================================
+# Package Manager Updates
+# ============================================
+
+echo ""
+echo "Checking package managers..."
+
+# Homebrew (macOS)
+if [ "$(uname)" = "Darwin" ] && command -v brew >/dev/null 2>&1; then
+  read -p "Update Homebrew packages? (y/n): " choice
+  if [ "$choice" = "y" ] || [ "$choice" = "Y" ]; then
+    echo "Updating Homebrew..."
+    brew update
+    brew upgrade
+    brew cleanup
+    UPDATES_PERFORMED=1
+  fi
+fi
+
+# APT (Linux)
+if [ "$(uname)" = "Linux" ] && command -v apt-get >/dev/null 2>&1; then
+  read -p "Update APT packages? (y/n): " choice
+  if [ "$choice" = "y" ] || [ "$choice" = "Y" ]; then
+    echo "Updating APT packages..."
+    sudo apt update
+    sudo apt upgrade -y
+    sudo apt autoremove -y
+    UPDATES_PERFORMED=1
+  fi
+fi
+
+# ============================================
+# Summary
+# ============================================
+
+echo ""
+echo "================================"
+echo "Update Complete!"
+echo "================================"
+echo ""
+
+if [ $UPDATES_PERFORMED -eq 1 ]; then
+  echo "Updates were performed. Consider:"
+  echo "  1. Restart your shell or run: source ~/.zshrc (or ~/.bashrc)"
+  echo "  2. If using tmux, press prefix+U to update tmux plugins"
+  echo "  3. If using vim, run :PluginUpdate to update vim plugins"
+  echo "  4. If using neovim, run :Lazy update to update neovim plugins"
+else
+  echo "No updates were performed or all components were already up to date."
+fi
+
+echo ""
