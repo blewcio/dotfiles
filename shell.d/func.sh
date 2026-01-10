@@ -57,15 +57,57 @@ fi
 
 # Use ripgrep and fzf to search file content
 # Find in files
-if [[ -x "$(command -v fzf)" ]] && [[ -x "$(command -v fasd)" ]]; then
+if [[ -x "$(command -v fzf)" ]] && [[ -x "$(command -v rg)" ]]; then
   find_in_files() {
    rg --column --line-number --no-heading --color=always --smart-case "${*:-}" |
    fzf --ansi -d ':' --preview 'bat --style=numbers --color=always --highlight-line {2} {1}' --preview-window='50%' --preview-window '~3:+{2}+3/2' \
        --header=$'Press ? to preview\n      Enter/CTRL-E to edit\n      CTRL-Y to yank filename\n\n' --header-lines=0 \
-       --bind 'ctrl-y:execute-silent(echo {1} | pbcopy)' --bind 'enter:become(vim {1} +{2})' --bind 'ctrl-e:execute(vim {1} +{2})' 
-  # [ -n "$selected" ] && $EDITOR "$selected" # not needed
+       --bind 'ctrl-y:execute-silent(echo {1} | pbcopy)' --bind 'enter:become(vim {1} +{2})' --bind 'ctrl-e:execute(vim {1} +{2})'
   }
   alias fif=find_in_files
+fi
+
+# Interactive git branch checkout with fzf
+if [[ -x "$(command -v fzf)" ]] && [[ -x "$(command -v git)" ]]; then
+  fzf_git_checkout() {
+    local branch
+    branch=$(git branch -a --color=always | grep -v '/HEAD\s' | \
+      fzf --ansi --height=40% --reverse --tac \
+          --preview 'git log --oneline --graph --color=always $(echo {} | sed "s/.* //" | sed "s#remotes/[^/]*/##")' \
+          --preview-window=right:50% | \
+      sed 's/.* //' | sed 's#remotes/[^/]*/##')
+    [ -n "$branch" ] && git checkout "$branch"
+  }
+  alias gco=fzf_git_checkout
+
+  # Interactive git log browser with fzf
+  fzf_git_log() {
+    git log --oneline --color=always --decorate | \
+      fzf --ansi --no-sort --reverse --height=80% \
+          --preview 'git show --color=always {1}' \
+          --preview-window=right:60% \
+          --bind 'enter:execute(git show --color=always {1} | less -R)'
+  }
+  alias glog=fzf_git_log
+fi
+
+# Interactive process killer with fzf
+if [[ -x "$(command -v fzf)" ]]; then
+  fzf_kill_process() {
+    local pid
+    if [[ "$(uname)" == "Darwin" ]]; then
+      pid=$(ps -ef | sed 1d | fzf -m --height=40% --reverse \
+            --header='Select process(es) to kill' | awk '{print $2}')
+    else
+      pid=$(ps -ef | sed 1d | fzf -m --height=40% --reverse \
+            --header='Select process(es) to kill' | awk '{print $2}')
+    fi
+    if [ -n "$pid" ]; then
+      echo "$pid" | xargs kill -${1:-9}
+      echo "Killed process(es): $pid"
+    fi
+  }
+  alias fkill=fzf_kill_process
 fi
 
 # `tree2` is a shorthand for `tree` with hidden files and color enabled, ignoring

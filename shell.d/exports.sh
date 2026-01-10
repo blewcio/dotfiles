@@ -17,17 +17,33 @@ export PATH="$HOME/bin:$HOME/sbin:$PATH"
 # Make Python use UTF-8 encoding for output to stdin, stdout, and stderr.
 export PYTHONIOENCODING='UTF-8';
 
-# Configure FZF 
+# Configure FZF
 if [ -v FZF_CTRL_T_COMMAND ]; then
-  #
-  # Overwrite FZF command to surpress find errors
-  # export FZF_CTRL_T_COMMAND='rg --files --hidden --glob "!.git/*" 2> /dev/null'
+
+  # Global FZF defaults - styling, layout, and keybindings
+  # Catppuccin Mocha theme colors
+  export FZF_DEFAULT_OPTS="
+    --height=40%
+    --layout=reverse
+    --border=rounded
+    --info=inline
+    --margin=1
+    --padding=1
+    --bind 'ctrl-/:toggle-preview'
+    --bind 'ctrl-a:select-all'
+    --bind 'ctrl-d:preview-page-down'
+    --bind 'ctrl-u:preview-page-up'
+    --color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8
+    --color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc
+    --color=marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8
+    --color=border:#6c7086"
 
   # Replace filesearch with fd if installed
+  # Uses --hidden to find dotfiles, --follow to traverse symlinks
   if command -v fd &> /dev/null; then
-    export FZF_DEFAULT_COMMAND="fd . $HOME"
-    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-    export FZF_ALT_C_COMMAND="fd -t d . $HOME"
+    export FZF_DEFAULT_COMMAND="fd --type f --hidden --follow --exclude .git"
+    export FZF_CTRL_T_COMMAND="fd --type f --hidden --follow --exclude .git"
+    export FZF_ALT_C_COMMAND="fd --type d --hidden --follow --exclude .git"
   fi
 
   # Preview file content using bat (https://github.com/sharkdp/bat)
@@ -44,8 +60,8 @@ if [ -v FZF_CTRL_T_COMMAND ]; then
   --color header:italic
   --header 'Press CTRL-Y to copy command into clipboard'"
 
-  # Print tree structure in the preview window
-  export FZF_ALT_C_OPTS="--preview 'tree -C {}'"
+  # Print tree structure in the preview window (limited depth for performance)
+  export FZF_ALT_C_OPTS="--preview 'tree -C -L 2 {}'"
 fi
 
 if [[ "$(uname)" == "Darwin"  ]]; then
