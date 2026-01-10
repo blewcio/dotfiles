@@ -284,13 +284,15 @@ if [[ -x "$(command -v fasd)" ]]; then
   }
   alias v=fzf_fasd_edit
 
-  # edit given file or search in recently used files
+  # open given file or search in recently used files (cross-platform)
   function fzf_fasd_open {
-    local file
-    # if arg1 is a path to existing file then simply open it in the editor
-    test -e "$1" && open "$@" && return
+    local file opener
+    # Use open on macOS, xdg-open on Linux
+    [[ "$(uname)" == "Darwin" ]] && opener="open" || opener="xdg-open"
+    # if arg1 is a path to existing file then simply open it
+    test -e "$1" && $opener "$@" && return
     # else use fasd and fzf to search for recent files
-    file="$(fasd -Rfl "$*" | fzf -1 -0 --no-sort +m)" && open "${file}" || open "$@"
+    file="$(fasd -Rfl "$*" | fzf -1 -0 --no-sort +m)" && $opener "${file}" || $opener "$@"
   }
   alias o=fzf_fasd_open
 

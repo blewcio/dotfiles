@@ -6,7 +6,6 @@ antigen bundle git
 antigen bundle command-not-found
 antigen bundle copybuffer
 antigen bundle iterm2
-antigen bundle fasd
 antigen bundle brew
 antigen bundle colorize
 antigen bundle macos

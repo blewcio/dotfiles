@@ -43,18 +43,6 @@ mkcd() {
   mkdir -p "$@" && cd "$_"
 }
 
-# Interactive list of most recent directories (param to prefilter)
-# then cd
-if [[ -x "$(command -v fzf)" ]] && [[ -x "$(command -v fasd)" ]]; then
-  find_recent_dir() {
-    local fasdlist
-    fasdlist=$(fasd -d -l -r $1 | \
-      fzf --query="$1 " --select-1 --exit-0 --height=25% --reverse --tac --no-sort --cycle) &&
-      cd "$fasdlist"
-  }
-  alias t=find_recent_dir
-fi
-
 # Use ripgrep and fzf to search file content
 # Find in files
 if [[ -x "$(command -v fzf)" ]] && [[ -x "$(command -v rg)" ]]; then

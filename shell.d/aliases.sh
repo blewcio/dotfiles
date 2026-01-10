@@ -52,9 +52,9 @@ if [ -x "$(command -v broot)" ]; then
   alias lo="br -sdp"
 fi
 
-# fasd shortcuts
+# fasd maintenance - remove stale entries (deleted files/dirs)
 if [ -x "$(command -v fasd)" ]; then
-  alias v='f -e vim' # Quickly open recent file
+  alias fasd-cleanup='fasd -l | while read f; do [ ! -e "$f" ] && fasd -D "$f"; done && echo "Cleaned stale fasd entries"'
 fi
 
 # Process shortcuts

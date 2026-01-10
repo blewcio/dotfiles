@@ -17,6 +17,10 @@ export PATH="$HOME/bin:$HOME/sbin:$PATH"
 # Make Python use UTF-8 encoding for output to stdin, stdout, and stderr.
 export PYTHONIOENCODING='UTF-8';
 
+# fasd configuration
+export _FASD_MAX=2000              # Max score before cleanup (default)
+export _FASD_IGNORE="fasd ls echo" # Commands to skip tracking
+
 # Configure FZF
 if [ -v FZF_CTRL_T_COMMAND ]; then
 
