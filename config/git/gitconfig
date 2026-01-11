@@ -5,6 +5,12 @@
 [credential]
 	helper = store
 
+[include]
+	path = ~/.config/delta/themes/catppuccin.gitconfig
+
+[delta]
+	features = catppuccin-mocha
+
 [core]
   pager = delta
 	excludesfile = ~/.gitignore_global
@@ -22,5 +28,4 @@
 
 [diff]
   colorMoved = default
-
 

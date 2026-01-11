@@ -1,3 +1,18 @@
 [submodule "vim-config"]
 	path = vim-config
 	url = https://github.com/blewcio/vim-config.git
+[submodule "config/delta/themes"]
+	path = config/delta/themes
+	url = https://github.com/catppuccin/delta.git
+[submodule "config/lsd/themes"]
+	path = config/lsd/themes
+	url = https://github.com/catppuccin/lsd.git
+[submodule "config/yazi/themes"]
+	path = config/yazi/themes
+	url = https://github.com/catppuccin/yazi.git
+[submodule "config/btop/themes"]
+	path = config/btop/themes
+	url = https://github.com/catppuccin/btop.git
+[submodule "config/bat/themes"]
+	path = config/bat/themes
+	url = https://github.com/catppuccin/bat.git

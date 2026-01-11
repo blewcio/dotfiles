@@ -315,14 +315,149 @@ ln -sf $DOTFILES_DIR/config/fd/ignore ~/.config/fd/ignore
 
 mkdir -p ~/.config/bat
 ln -sf $DOTFILES_DIR/config/bat/config ~/.config/bat/config
+ln -sf $DOTFILES_DIR/config/bat/themes/themes ~/.config/bat/themes
+bat cache --build
+
+# Rebuild bat cache with new themes
+if command -v bat >/dev/null 2>&1; then
+  bat cache --build >/dev/null 2>&1
+  echo "✓ Rebuilt bat cache"
+fi
 
 mkdir -p ~/.config/fastfetch
-ln -sf $DOTFILES_DIR/config/fastfetch/config.jsonc ~/.config/fastfetch/
+ln -sf $DOTFILES_DIR/config/fastfetch/config.jsonc ~/.config/fastfetch/config.jsonc
+
+mkdir -p ~/.config/yazi
+ln -sf $DOTFILES_DIR/config/yazi/yazi.toml ~/.config/yazi/yazi.toml
+ln -sf $DOTFILES_DIR/config/yazi/themes/themes/mocha/catppuccin-mocha-blue.toml ~/.config/yazi/theme.toml
+
+mkdir -p ~/.config/lsd
+ln -sf $DOTFILES_DIR/config/lsd/themes/themes/catppuccin-mocha/colors.yaml ~/.config/lsd/colors.yaml
+ln -sf $DOTFILES_DIR/config/lsd/config.yaml ~/.config/lsd/config.yaml
+
+mkdir -p ~/.config/delta/themes
+ln -sf $DOTFILES_DIR/config/delta/themes/catppuccin.gitconfig ~/.config/delta/themes/catppuccin.gitconfig
+
+mkdir -p ~/.config/btop/themes
+ln -sf $DOTFILES_DIR/config/btop/btop.conf ~/.config/btop/btop.conf
+ln -sf $DOTFILES_DIR/config/btop/themes/themes/catppuccin_mocha.theme ~/.config/btop/themes/catppuccin_mocha.theme
+
+# lazygit
+mkdir -p ~/.config/lazygit
+if [ "$(uname)" = "Darwin" ]; then
+  APPSUPPORT="$HOME/Library/Application Support"
+  #Map burried config directory to .config
+  ln -sf $APPSUPPORT/lazygit ~/.config/lazygit/AppSupport # Symlink directory
+  ln -sf $DOTFILES_DIR/config/lazygit/config.yml ~/.config/lazygit/AppSupport/config.yml
+else
+  ln -sf $DOTFILES_DIR/config/lazygit/config.yml ~/.config/lazygit/config.yml
+fi
 
 # Link Powerlevel10k config with Catppuccin theme
 ln -sf $DOTFILES_DIR/config/p10k/p10k-catppuccin.zsh ~/.p10k.zsh
 
+# Claude code and desktop goes into two differnt dirs
+mkdir -p ~/.claude # Code
+ln -sf $DOTFILES_DIR/config/claude_code/CLAUDE.md ~/.claude/CLAUDE.md
+ln -sf $DOTFILES_DIR/config/claude_code/skills ~/.claude/skills # Symlink directory
+ln -sf $DOTFILES_DIR/config/claude_code/agents ~/.claude/agents # Symlink directory
+
+mkdir -p ~/.config/claude # Desktop
+ln -sf $DOTFILES_DIR/config/claude_desktop/config.json ~/.config/claude/config.json
+ln -sf $DOTFILES_DIR/config/claude_desktop/claude_desktop_config.json ~/.config/claude/claude_desktop_config.json
+
 echo "Symlinks created successfully"
+
+# ============================================
+# Vim and Neovim Configuration
+# ============================================
+
+# Install vim and neovim configurations
+echo "Setting up Vim configuration..."
+if [ ! -d "$HOME/vim-config" ]; then
+  echo "  Cloning vim-config repository..."
+  git clone https://github.com/blewcio/vim-config.git $HOME/vim-config
+else
+  echo "  vim-config already exists - skipping clone"
+fi
+
+# Symlink classic Vim configuration
+ln -sf $HOME/vim-config/.vimrc ~/.vimrc
+ln -sf $HOME/vim-config/.vim ~/.vim
+
+# Create tmp dirs for Vim (vim cannot create them automatically)
+mkdir -p $HOME/.vim/var/view
+mkdir -p $HOME/.vim/var/swp
+mkdir -p $HOME/.vim/var/undo
+mkdir -p $HOME/.vim/var/backup
+
+# Pull Vundle package manager and install dependencies for Vim
+if [ ! -d "$HOME/.vim/bundle/Vundle.vim" ]; then
+  echo "  Installing Vundle plugin manager..."
+  git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+  if command -v vim >/dev/null 2>&1; then
+    vim +PluginInstall +qall
+  else
+    echo "  vim not found - skipping plugin installation (run :PluginInstall manually)"
+  fi
+else
+  echo "  Vundle already installed - skipping"
+fi
+
+# Setup Neovim configuration (modern Lua-based setup)
+if [ -x "$(command -v nvim)" ]; then
+  echo "Setting up Neovim configuration..."
+
+  # Backup existing nvim config if it exists and is not a symlink
+  if [ -d "$HOME/.config/nvim" ] && [ ! -L "$HOME/.config/nvim" ]; then
+    echo "Backing up existing Neovim config to ~/.config/nvim.backup"
+    mv $HOME/.config/nvim $HOME/.config/nvim.backup
+  fi
+
+  # Create .config directory if it doesn't exist
+  mkdir -p $HOME/.config
+
+  # Symlink Neovim configuration
+  ln -sf $HOME/vim-config/nvim $HOME/.config/nvim
+
+  echo "  Neovim configuration symlinked. Plugins will auto-install on first launch."
+  echo "  After launching nvim, run: :Mason to install LSP servers"
+else
+  echo "Neovim not installed. Skipping Neovim configuration."
+  echo "  Install with: brew install neovim (macOS) or apt install neovim (Linux)"
+fi
+
+echo ""
+echo "================================"
+echo "Deployment Complete!"
+echo "================================"
+echo ""
+echo "Next steps:"
+echo "  1. Restart your shell or run: source ~/.zshrc (or ~/.bashrc)"
+echo "  2. If using tmux, press prefix+I to install tmux plugins"
+echo "  3. If using Neovim, run :Mason to install LSP servers"
+
+if [ "$(uname)" = "Darwin" ]; then
+  if [ -f "$DOTFILES_DIR/config/iTerm2/catppuccin-mocha.itermcolors" ]; then
+    echo ""
+    echo "To apply Catppuccin theme to iTerm2:"
+    echo "  1. Open iTerm2 → Preferences (Cmd+,)"
+    echo "  2. Go to Profiles → Colors"
+    echo "  3. Click 'Color Presets' dropdown → Import"
+    echo "  4. Select: ~/dotfiles/config/iTerm2/catppuccin-mocha.itermcolors"
+    echo "  5. Choose 'Catppuccin Mocha' from the Color Presets dropdown"
+    echo ""
+    echo "Catppuccin theme is now applied to:"
+    echo "  ✓ Powerlevel10k prompt (automatic)"
+    echo "  ✓ bat syntax highlighting (automatic)"
+    echo "  ✓ fzf fuzzy finder (automatic)"
+    echo "  ✓ tmux status line (automatic)"
+  fi
+fi
+
+echo ""
+echo "The script is idempotent - you can safely run it again to update."
+echo ""
 
 # ============================================
 # Vim and Neovim Configuration

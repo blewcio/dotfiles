@@ -87,6 +87,7 @@ brew "age"                 # File encryption
 brew "hdparm"              # HDD performance
 brew "knqyf263/pet/pet"    # CLI snippet manager
 brew "mcat"                # Multimedia cat
+brew "gawk"                # Needed by some installers
 
 # TODO vimv - vim style mass renamer of files
 # TODO brew "pigz"         # Parallel gzip (add alias) / Not used daily
