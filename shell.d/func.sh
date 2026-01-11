@@ -19,7 +19,7 @@ csv_cat2() {
 }
 
 ## System functions or commands
-# Safe remove
+# Safe remove - moves files to trash with automatic name increment for duplicates
 copy_to_trash() {
   local TRASH
   TRASH=~/.Trash/
@@ -33,8 +33,41 @@ copy_to_trash() {
       echo "$i does not exist."
       continue
     fi
-    echo "Moving $i to $TRASH"
-    mv "$i" "$TRASH"
+
+    local basename=$(basename "$i")
+    local target="$TRASH$basename"
+
+    # If file doesn't exist in trash, move it directly
+    if [ ! -e "$target" ]; then
+      echo "Moving $i to $TRASH"
+      mv "$i" "$TRASH"
+      continue
+    fi
+
+    # File exists in trash, find an incremented name
+    local filename="${basename%.*}"
+    local extension="${basename##*.}"
+
+    # Handle files without extension
+    if [ "$filename" = "$extension" ]; then
+      extension=""
+    fi
+
+    local counter=1
+    if [ -n "$extension" ]; then
+      while [ -e "$TRASH$filename-$counter.$extension" ]; do
+        counter=$((counter + 1))
+      done
+      target="$TRASH$filename-$counter.$extension"
+    else
+      while [ -e "$TRASH$basename-$counter" ]; do
+        counter=$((counter + 1))
+      done
+      target="$TRASH$basename-$counter"
+    fi
+
+    echo "Moving $i to $target"
+    mv "$i" "$target"
   done
 }
 
