@@ -358,9 +358,9 @@ ln -sf $DOTFILES_DIR/config/p10k/p10k-catppuccin.zsh ~/.p10k.zsh
 
 # Claude code and desktop goes into two differnt dirs
 mkdir -p ~/.claude # Code
-ln -sf $DOTFILES_DIR/config/claude_code/CLAUDE.md ~/.claude/CLAUDE.md
-ln -sf $DOTFILES_DIR/config/claude_code/skills ~/.claude/skills # Symlink directory
-ln -sf $DOTFILES_DIR/config/claude_code/agents ~/.claude/agents # Symlink directory
+ln -sf $DOTFILES_DIR/agents/CLAUDE.md ~/.claude/CLAUDE.md
+ln -sf $DOTFILES_DIR/agents/skills ~/.claude/skills # Symlink directory
+ln -sf $DOTFILES_DIR/agents/agents ~/.claude/agents # Symlink directory
 
 mkdir -p ~/.config/claude # Desktop
 ln -sf $DOTFILES_DIR/config/claude_desktop/claude_desktop_config.json ~/.config/claude/claude_desktop_config.json
