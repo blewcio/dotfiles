@@ -2,7 +2,7 @@
   "mcpServers": {
     "failover": {
       "transport": "sse",
-      "url": "http://localhost:8010/mcp",
+      "url": "http://192.168.50.1:8010/mcp",
       "timeout": 30000
     }
   }

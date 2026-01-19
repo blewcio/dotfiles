@@ -1,0 +1,10 @@
+{
+  "mcp": {
+    "failover": {
+      "type": "remote",
+      "url": "http://failover-rpi5-1:8010/mcp",
+      "enabled": true
+    }
+  },
+  "$schema": "https://opencode.ai/config.json"
+}

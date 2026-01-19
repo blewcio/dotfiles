@@ -17,6 +17,7 @@ cask "appcleaner"
 cask "lastpass"
 cask "alt-tab"        # Windows like tab
 cask "claude-code"    # Claude code
+cask "anomalyco/tap/opencode" # Opencode repo for faster updates
 
 # Install basic tools for improved terminal
 brew "tmux"                # Improved screen

@@ -1,9 +1,0 @@
-{
-  "mcpServers": {
-    "network-failover": {
-      "transport": "sse",
-      "url": "http://localhost:8010/mcp",
-      "timeout": 30000
-    }
-  }
-}

@@ -363,8 +363,10 @@ ln -sf $DOTFILES_DIR/config/claude_code/skills ~/.claude/skills # Symlink direct
 ln -sf $DOTFILES_DIR/config/claude_code/agents ~/.claude/agents # Symlink directory
 
 mkdir -p ~/.config/claude # Desktop
-ln -sf $DOTFILES_DIR/config/claude_desktop/config.json ~/.config/claude/config.json
 ln -sf $DOTFILES_DIR/config/claude_desktop/claude_desktop_config.json ~/.config/claude/claude_desktop_config.json
+
+mkdir -p ~/.config/opencode # Desktop
+ln -sf $DOTFILES_DIR/config/opencode/opencode.json ~/.config/opencode/opencode.json
 
 echo "Symlinks created successfully"
 
