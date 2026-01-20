@@ -216,8 +216,6 @@ if [[ "$SHELL" == *"bash" ]] || [[ "$SHELL" == *"/sh" ]]; then
     ble-face command_function='fg=92'
     ble-face argument_option='fg=teal'
 
-    #Vim mode
-    set -o vi
     # Vim-surround functionality
     blehook keymap_vi_load='ble-import vim-surround'
   fi
