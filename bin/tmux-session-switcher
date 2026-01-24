@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Quick switch between existing tmux sessions using fzf popup
+# Bound to Prefix+C-f in tmux.conf
+
+set -e
+
+# Get current session to exclude from list (optional)
+current_session=$(tmux display-message -p '#S' 2>/dev/null || echo "")
+
+# List sessions and select with fzf
+# Format: session_name: windows (attached/not attached)
+selected=$(
+    tmux list-sessions -F "#{session_name}: #{session_windows} windows #{?session_attached,(attached),}" 2>/dev/null \
+    | fzf-tmux -p 60%,40% --reverse --prompt="Session: " \
+    | cut -d: -f1
+)
+
+# Exit if nothing selected
+if [[ -z $selected ]]; then
+    exit 0
+fi
+
+# Switch to selected session
+if [[ -z $TMUX ]]; then
+    tmux attach-session -t "$selected"
+else
+    tmux switch-client -t "$selected"
+fi

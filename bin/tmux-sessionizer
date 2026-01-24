@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# Browse project directories and create/attach to tmux session based on selection
+# Uses fzf-tmux popup for selection, creates session with directory name
+
+set -e
+
+# Source private.sh if TMUX_PROJECT_DIRS not set (e.g., when called from tmux run-shell)
+if [[ -z "$TMUX_PROJECT_DIRS" ]] && [[ -f "$HOME/dotfiles/shell.d/private.sh" ]]; then
+    source "$HOME/dotfiles/shell.d/private.sh"
+fi
+
+# TMUX_PROJECT_DIRS should be space-separated list of directories
+PROJECT_DIRS="${TMUX_PROJECT_DIRS:-$HOME}"
+
+# If argument provided, use it directly instead of fzf
+if [[ $# -eq 1 ]]; then
+    selected=$1
+else
+    # Find directories (depth 1) in all project directories
+    selected=$(
+        for dir in $PROJECT_DIRS; do
+            if [[ -d "$dir" ]]; then
+                find "$dir" -mindepth 1 -maxdepth 1 -type d 2>/dev/null
+            fi
+        done | fzf-tmux -p 80%,60% --reverse --prompt="Project: "
+    )
+fi
+
+# Exit if nothing selected
+if [[ -z $selected ]]; then
+    exit 0
+fi
+
+# Create session name from directory basename (replace dots with underscores for tmux)
+selected_name=$(basename "$selected" | tr '.' '_')
+
+# Check if tmux is running
+tmux_running=$(pgrep tmux || true)
+
+# If not in tmux and tmux is not running, start new session
+if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
+    tmux new-session -s "$selected_name" -c "$selected"
+    exit 0
+fi
+
+# Create session if it doesn't exist
+if ! tmux has-session -t="$selected_name" 2>/dev/null; then
+    tmux new-session -ds "$selected_name" -c "$selected"
+fi
+
+# Switch to session (or attach if outside tmux)
+if [[ -z $TMUX ]]; then
+    tmux attach-session -t "$selected_name"
+else
+    tmux switch-client -t "$selected_name"
+fi

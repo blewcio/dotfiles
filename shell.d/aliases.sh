@@ -71,9 +71,75 @@ alias cb="chrome-bookmark-browser"
 
 # Tmux shortcuts
 if [ -x "$(command -v tmux)" ]; then
-  # alias tmux='tmux -T 256'
-  alias ta='tmux attach'
-  alias tn='tmux new'
+  # ta [name] - attach/switch to session, fzf select if no name given
+  ta() {
+    local sessions
+    sessions=$(tmux list-sessions -F "#{session_name}" 2>/dev/null)
+    if [[ -z "$sessions" ]]; then
+      echo "No tmux sessions running"
+      return 1
+    fi
+
+    # Helper: attach or switch depending on context
+    _tmux_goto() {
+      if [[ -n "$TMUX" ]]; then
+        tmux switch-client -t "$1"
+      else
+        tmux attach -t "$1"
+      fi
+    }
+
+    if [[ $# -eq 0 ]]; then
+      # No argument: use fzf to select from existing sessions
+      local selected
+      selected=$(echo "$sessions" | fzf --reverse --prompt="Session: ")
+      [[ -n "$selected" ]] && _tmux_goto "$selected"
+    else
+      # Try exact/prefix match first
+      if tmux has-session -t "$1" 2>/dev/null; then
+        _tmux_goto "$1"
+      else
+        # No match: filter sessions with fzf using input as query
+        local selected
+        selected=$(echo "$sessions" | fzf --filter="$1" --select-1 --exit-0 | head -1)
+        if [[ -n "$selected" ]]; then
+          _tmux_goto "$selected"
+        else
+          echo "No session matching '$1'"
+          return 1
+        fi
+      fi
+    fi
+
+    unset -f _tmux_goto
+  }
+
+  # tn [name] - create session with dir basename (or given name), attach if exists
+  tn() {
+    local session_name
+    if [[ $# -eq 0 ]]; then
+      session_name=$(basename "$PWD" | tr '.' '_')
+    else
+      session_name=$(echo "$1" | tr '.' '_')
+    fi
+
+    if tmux has-session -t="$session_name" 2>/dev/null; then
+      # Session exists, attach to it
+      if [[ -z $TMUX ]]; then
+        tmux attach -t "$session_name"
+      else
+        tmux switch-client -t "$session_name"
+      fi
+    else
+      # Create new session
+      tmux new-session -s "$session_name"
+    fi
+  }
+
+  # tp - project selector, browse project dirs and create/attach session
+  alias tp='tmux-sessionizer'
+
+  # tm-dev - start dev layout
   alias tm-dev='tmux_dev.sh'
 fi
 
