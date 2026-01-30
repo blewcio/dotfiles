@@ -1,0 +1,36 @@
+# Antidote plugin configuration
+# This file defines all zsh plugins to be loaded by Antidote
+# Plugins are loaded in the order they appear
+
+# Oh-My-Zsh library for completions
+mattmc3/ez-compinit
+
+# Oh-My-Zsh plugins (via ohmyzsh/ prefix)
+ohmyzsh/ohmyzsh path:plugins/git
+ohmyzsh/ohmyzsh path:plugins/sudo
+ohmyzsh/ohmyzsh path:plugins/direnv
+ohmyzsh/ohmyzsh path:plugins/virtualenv
+ohmyzsh/ohmyzsh path:plugins/command-not-found
+ohmyzsh/ohmyzsh path:plugins/copybuffer
+ohmyzsh/ohmyzsh path:plugins/extract
+ohmyzsh/ohmyzsh path:plugins/docker
+ohmyzsh/ohmyzsh path:plugins/docker-compose
+ohmyzsh/ohmyzsh path:plugins/brew conditional:is-macos
+ohmyzsh/ohmyzsh path:plugins/macos conditional:is-macos
+
+# Catppuccin theme for zsh-syntax-highlighting (must load BEFORE the plugin)
+catppuccin/zsh-syntax-highlighting path:themes/catppuccin_mocha-zsh-syntax-highlighting.zsh
+
+# Community plugins (defer loading for speed where possible)
+aloxaf/fzf-tab kind:defer
+marzocchi/zsh-notify conditional:is-macos
+
+# Essential plugins (load last for priority)
+zsh-users/zsh-autosuggestions
+zsh-users/zsh-syntax-highlighting
+
+# Powerlevel10k theme (managed by Antidote)
+romkatv/powerlevel10k
+
+# Catppuccin theme for Powerlevel10k (provides apply_catppuccin function)
+tolkonepiu/catppuccin-powerlevel10k-themes

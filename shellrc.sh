@@ -49,11 +49,8 @@ if [[ "$SHELL" == *"zsh" ]]; then
   # If not remote, check shell integration with iTerm2
   test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
-  # Load P10 for prompt customization
-  # To customize prompt, run  or edit ~/.p10k.zsh.
-  [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-  # Surpress P10 warning before printing system info
-  # typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+  # Suppress instant prompt console output warnings (recommended by P10k)
+  typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 
   # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
   # Initialization code that may require console input (password prompts, [y/n]
@@ -61,25 +58,47 @@ if [[ "$SHELL" == *"zsh" ]]; then
   if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
   fi
-
+ 
   # Configure zsh-autosuggestions styling (before loading plugins)
   ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=240'        # Gray color (240 = dark gray)
   ZSH_AUTOSUGGEST_STRATEGY=(history completion)   # Use both history and completion
 
-  # Load zsh plugin manager
-  source ~/dotfiles/antigen.zsh
+  # Load Catppuccin FZF theme (must be before fzf initialization)
+  catppuccin_fzf="${HOME}/dotfiles/config/zsh/catppuccin-fzf.zsh"
+  [[ -r "$catppuccin_fzf" ]] && source "$catppuccin_fzf"
+  unset catppuccin_fzf
 
-  # Clean up stale Antigen lock file (older than 1 hour)
-  ANTIGEN_LOCK="$HOME/.antigen/.lock"
-  if [ -f "$ANTIGEN_LOCK" ]; then
-    # Check if lock file is older than 1 hour (3600 seconds)
-    if [ $(($(date +%s) - $(stat -f %m "$ANTIGEN_LOCK" 2>/dev/null || stat -c %Y "$ANTIGEN_LOCK" 2>/dev/null))) -gt 3600 ]; then
-      rm -f "$ANTIGEN_LOCK"
+  # Define conditional helper for Antidote (used in zsh_plugins.txt)
+  is-macos() { [[ "$OSTYPE" == darwin* ]] }
+
+  # Load Antidote plugin manager
+  if [ -f "${HOME}/.antidote/antidote.zsh" ]; then
+    source "${HOME}/.antidote/antidote.zsh"
+
+    # Initialize plugins (includes Powerlevel10k and Catppuccin P10k themes)
+    zsh_plugins="${HOME}/.zsh_plugins.txt"
+    if [ -f "$zsh_plugins" ]; then
+      # Load static file if exists (faster), otherwise generate it
+      antidote load "$zsh_plugins"
     fi
-  fi
+    unset zsh_plugins
 
-  # Load antigen configuration
-  antigen init ~/dotfiles/.antigenrc
+    # Apply Catppuccin Mocha theme to Powerlevel10k
+    # Options: lean, classic, rainbow, pure, robbyrussell
+    # Flavors: latte, frappe, macchiato, mocha
+    if typeset -f apply_catppuccin > /dev/null; then
+      apply_catppuccin pure mocha  # Using 'pure' style (single-line) with 'mocha' flavor
+    fi
+
+    # Configure menuselect keymap (completion menu navigation)
+    # Note: These bindings are optional and will be applied once completion menu is used
+    # Errors are suppressed as the keymap is created on-demand by the completion system
+    {
+      bindkey -M menuselect '^I' menu-complete
+      bindkey -M menuselect "$terminfo[kcbt]" reverse-menu-complete
+      bindkey -M menuselect '^M' .accept-line
+    } 2>/dev/null
+  fi
 
   # Custom widgets for visual selection with Shift+arrows
 
@@ -130,8 +149,8 @@ if [[ "$SHELL" == *"zsh" ]]; then
   }
   zle -N select-forward-word
 
-  # Keybindings for standard zsh completion and utilities
-  bindkey '^I' expand-or-complete              # Tab: standard completion
+  # Keybindings for zsh-autocomplete and completion
+  bindkey '^I' menu-complete                       # Tab: complete then cycle through menu
   bindkey "$terminfo[kcbt]" reverse-menu-complete  # Shift+Tab: reverse completion
   bindkey '^S' history-incremental-search-forward  # Ctrl+S: forward history search
 
@@ -144,6 +163,9 @@ if [[ "$SHELL" == *"zsh" ]]; then
   bindkey '^[[1;4C'    select-forward-word       # Shift+Alt+Right: select right by word
   bindkey '^[[1;4A'    select-entire-line        # Shift+Alt+Up: select entire line
   bindkey '^[[1;4B'    select-entire-line        # Shift+Alt+Down: select entire line
+
+  # Up arrow: show history list
+  bindkey '^[[A' up-line-or-search
 
   # Initialize fasd (which I use bacause of file history and  v command)
   if [[ -x "$(command -v fasd)" ]] && [ -z "$FASD_INITIALIZED" ]; then

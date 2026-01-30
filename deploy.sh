@@ -21,20 +21,14 @@ echo ""
 # Install zsh plugin manager
 if [[ "$SHELL" == *zsh ]]; then
 
-  # Install plugin manager for zsh
-  if [ ! -f "${DOTFILES_DIR}/antigen.zsh" ]; then
-    echo "Installing Antigen plugin manager..."
-    curl -L git.io/antigen > ${DOTFILES_DIR}/antigen.zsh
+  # Install Antidote plugin manager
+  if [ ! -d "${HOME}/.antidote" ]; then
+    echo "Installing Antidote plugin manager..."
+    git clone --depth=1 https://github.com/mattmc3/antidote.git ${HOME}/.antidote
   else
-    echo "Antigen already installed - skipping"
+    echo "Antidote already installed - skipping"
   fi
 
-  # Re-link antigenrc to avoid error messages
-  antigenrc=$DOTFILES_DIR/config/antigenrc
-  if [[ -r "$antigenrc" ]]; then
-    ln -sf $antigenrc $DOTFILES_DIR/.antigenrc
-  fi
-  unset antigenrc
 fi
 
 # Install bash plugin manager and enhancements
@@ -110,67 +104,6 @@ if [ "$(uname)" = "Darwin" ]; then
       echo "FZF already configured - skipping"
     fi
   fi
-fi
-
-# ============================================
-# Oh-My-Zsh Plugins
-# ============================================
-
-# Install oh-my-zsh addons
-if [ -d "$HOME/.oh-my-zsh" ]; then
-  ZSH_CUSTOM=$HOME/.oh-my-zsh/custom
-
-  # Clone plugins if they don't already exist
-  echo "Installing oh-my-zsh plugins..."
-
-  if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autocomplete" ]; then
-    git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git $ZSH_CUSTOM/plugins/zsh-autocomplete 2>/dev/null || echo "  - zsh-autocomplete already exists or clone failed"
-  fi
-
-  if [ ! -d "$ZSH_CUSTOM/plugins/fast-syntax-highlighting" ]; then
-    git clone --depth 1 https://github.com/zdharma-continuum/fast-syntax-highlighting.git $ZSH_CUSTOM/plugins/fast-syntax-highlighting 2>/dev/null || echo "  - fast-syntax-highlighting already exists or clone failed"
-  fi
-
-  if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
-    git clone --depth 1 https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting 2>/dev/null || echo "  - zsh-syntax-highlighting already exists or clone failed"
-  fi
-
-  if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
-    git clone --depth 1 https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions 2>/dev/null || echo "  - zsh-autosuggestions already exists or clone failed"
-  fi
-
-  echo "  oh-my-zsh plugins installation complete"
-
-  # Automatically add plugins line to .zshrc
-  ZSHRC="$HOME/.zshrc"
-  PLUGINS_LINE="plugins=(fasd alias-finder virtualenv direnv git zsh-autosuggestions zsh-syntax-highlighting fast-syntax-highlighting zsh-autocomplete)"
-
-  if [ -f "$ZSHRC" ]; then
-    # Check if plugins line already exists
-    if grep -q "^plugins=(" "$ZSHRC"; then
-      echo "Plugins line already exists in .zshrc - skipping"
-    else
-      # Find the line with "source \$ZSH/oh-my-zsh.sh" and insert before it
-      if grep -q "source.*oh-my-zsh.sh" "$ZSHRC"; then
-        # Create a backup
-        cp "$ZSHRC" "$ZSHRC.backup"
-
-        # Insert plugins line before the source line
-        sed -i.tmp "/source.*oh-my-zsh.sh/i\\
-$PLUGINS_LINE\\
-" "$ZSHRC"
-        rm -f "$ZSHRC.tmp"
-
-        echo "Added plugins line to .zshrc"
-      else
-        echo "Warning: oh-my-zsh source line not found in .zshrc - please add plugins line manually"
-      fi
-    fi
-  else
-    echo "Warning: .zshrc not found - skipping plugins line addition"
-  fi
-else
-  echo "oh-my-zsh not installed - skipping plugin installation"
 fi
 
 # ============================================
@@ -353,8 +286,9 @@ else
   ln -sf $DOTFILES_DIR/config/lazygit/config.yml ~/.config/lazygit/config.yml
 fi
 
-# Link Powerlevel10k config with Catppuccin theme
-ln -sf $DOTFILES_DIR/config/p10k/p10k-catppuccin.zsh ~/.p10k.zsh
+# Antidote plugin configuration
+ln -sf $DOTFILES_DIR/config/zsh/zsh_plugins.txt ~/.zsh_plugins.txt
+# Note: catppuccin-fzf.zsh is sourced directly from config/zsh/, no symlink needed
 
 # Claude code and desktop goes into two differnt dirs
 mkdir -p ~/.claude # Code
