@@ -90,6 +90,19 @@ if [[ "$SHELL" == *"zsh" ]]; then
       apply_catppuccin pure mocha  # Using 'pure' style (single-line) with 'mocha' flavor
     fi
 
+    # Apply Catppuccin Mocha theme to fast-syntax-highlighting
+    # First copy theme files to XDG config location if not already there
+    if [ -d "${HOME}/.antidote/https-COLON--SLASH--SLASH-github.com-SLASH-catppuccin-SLASH-zsh-fsh/themes" ]; then
+      local fsh_config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/fsh"
+      mkdir -p "$fsh_config_dir"
+      # Copy all Catppuccin theme files if not present
+      if [ ! -f "$fsh_config_dir/catppuccin-mocha.ini" ]; then
+        cp -n "${HOME}/.antidote/https-COLON--SLASH--SLASH-github.com-SLASH-catppuccin-SLASH-zsh-fsh/themes/"*.ini "$fsh_config_dir/" 2>/dev/null || true
+      fi
+      # Activate Mocha theme (options: catppuccin-latte, catppuccin-frappe, catppuccin-macchiato, catppuccin-mocha)
+      fast-theme XDG:catppuccin-mocha 2>/dev/null || true
+    fi
+
     # Configure menuselect keymap (completion menu navigation)
     # Note: These bindings are optional and will be applied once completion menu is used
     # Errors are suppressed as the keymap is created on-demand by the completion system
@@ -149,11 +162,6 @@ if [[ "$SHELL" == *"zsh" ]]; then
   }
   zle -N select-forward-word
 
-  # Keybindings for zsh-autocomplete and completion
-  bindkey '^I' menu-complete                       # Tab: complete then cycle through menu
-  bindkey "$terminfo[kcbt]" reverse-menu-complete  # Shift+Tab: reverse completion
-  bindkey '^S' history-incremental-search-forward  # Ctrl+S: forward history search
-
   # Key bindings for text selection
   bindkey '^[[1;2D'    select-backward-char      # Shift+Left: select left by char
   bindkey '^[[1;2C'    select-forward-char       # Shift+Right: select right by char
@@ -164,14 +172,23 @@ if [[ "$SHELL" == *"zsh" ]]; then
   bindkey '^[[1;4A'    select-entire-line        # Shift+Alt+Up: select entire line
   bindkey '^[[1;4B'    select-entire-line        # Shift+Alt+Down: select entire line
 
-  # Up arrow: show history list
-  bindkey '^[[A' up-line-or-search
+  # Keybindings for zsh-autocomplete and completion
+  bindkey '^I' menu-complete                       # Tab: complete then cycle through menu
+  bindkey "$terminfo[kcbt]" reverse-menu-complete  # Shift+Tab: reverse completion
+  bindkey '^S' history-incremental-search-forward  # Ctrl+S: forward history search
 
   # Initialize fasd (which I use bacause of file history and  v command)
   if [[ -x "$(command -v fasd)" ]] && [ -z "$FASD_INITIALIZED" ]; then
     eval "$(fasd --init posix-alias zsh-hook zsh-ccomp zsh-ccomp-install \
       zsh-wcomp zsh-wcomp-install)"
     export FASD_INITIALIZED=1
+  fi
+
+  # Initialize zoxide (only once)
+  unalias z 2>/dev/null || true  # Remove z alias if it exists
+  if [[ -x "$(command -v zoxide)" ]] && [ -z "$ZOXIDE_ZSH_INITIALIZED" ]; then
+    eval "$(zoxide init zsh)"
+    export ZOXIDE_ZSH_INITIALIZED=1
   fi
 
   # Start fzf (only once)
@@ -183,13 +200,6 @@ if [[ "$SHELL" == *"zsh" ]]; then
       bindkey '^T' fzf-file-widget
       export FZF_ZSH_INITIALIZED=1
     fi
-  fi
-
-  # Initialize zoxide (only once)
-  unalias z 2>/dev/null || true  # Remove z alias if it exists
-  if [[ -x "$(command -v zoxide)" ]] && [ -z "$ZOXIDE_ZSH_INITIALIZED" ]; then
-    eval "$(zoxide init zsh)"
-    export ZOXIDE_ZSH_INITIALIZED=1
   fi
 fi
 

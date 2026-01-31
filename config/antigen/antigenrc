@@ -13,7 +13,7 @@ antigen bundle wakeonlan
 antigen bundle fzf
 
 # Load zsh-autocomplete BEFORE syntax highlighting (required order)
-# antigen bundle marlonrichert/zsh-autocomplete@main  # Disabled - using zsh-autosuggestions only for bash-like experience
+# antigen bundle marlonrichert/zsh-autocomplete@main
 
 antigen bundle aloxaf/fzf-tab # e.g. vim **<Tab>
 antigen bundle marzocchi/zsh-notify # send notification to macOS

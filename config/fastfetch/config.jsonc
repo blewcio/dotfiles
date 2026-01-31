@@ -7,7 +7,7 @@
     "host",
     // "kernel",
     "uptime",
-    "packages",
+    // "packages",
     "shell",
     // "display",
     // "de",
@@ -29,7 +29,7 @@
     // "battery",
     // "poweradapter",
     "locale",
-    "break",
-    "colors"
+    // "break",
+    // "colors"
   ]
 }
