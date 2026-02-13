@@ -9,7 +9,7 @@ jeffreytse/zsh-vi-mode
 
 # Benchmarking tool for zsh startup performance
 # Usage: zsh-bench to measure shell startup time
-romkatv/zsh-bench kind:path
+# romkatv/zsh-bench kind:path
 
 # Abbreviations - expand shortcuts like Fish shell
 # Usage: abbr <name>=<expansion>, then type name and space to expand
@@ -29,17 +29,10 @@ mattmc3/ez-compinit
 # Provides completions for 200+ commands not in zsh core
 zsh-users/zsh-completions kind:fpath path:src
 
-# Utility functions from Zephyr framework
-# Provides: mkalias, reassign, and other shell utilities
-mattmc3/zephyr path:plugins/utility
-
-# Editor configuration from Zephyr framework
-# Sets up key bindings, word characters, and editor preferences
-mattmc3/zephyr path:plugins/editor
-
 # Function utilities - helper functions for managing zsh functions
+# and loading from files in a directory
 # Provides: fadd, fdel, fpath-add, etc. for function management
-mattmc3/zfunctions
+# mattmc3/zfunctions
 
 # Git plugin - aliases and functions for git
 # Shortcuts: g (git), ga (add), gc (commit), gco (checkout), gp (push), gl (pull), gst (status), etc.
@@ -53,17 +46,12 @@ ohmyzsh/ohmyzsh path:plugins/sudo
 # Shortcuts: Ctrl+T (files), Ctrl+R (history), Alt+C (cd directories)
 ohmyzsh/ohmyzsh path:plugins/fzf
 
-# Direnv plugin - automatic environment switching per directory
-# Auto-loads .envrc files when entering directories
-ohmyzsh/ohmyzsh path:plugins/direnv
+# Note: direnv is initialized manually in shellrc.sh before P10k instant prompt
+# to prevent console output warnings
 
 # Virtualenv plugin - Python virtual environment indicator in prompt
 # Shows active virtualenv name in prompt
-ohmyzsh/ohmyzsh path:plugins/virtualenv
-
-# Command-not-found - suggests package to install for missing commands
-# Automatically suggests which package provides a missing command
-ohmyzsh/ohmyzsh path:plugins/command-not-found
+# ohmyzsh/ohmyzsh path:plugins/virtualenv
 
 # Copybuffer - copy command line to clipboard
 # Shortcuts: Ctrl+O to copy current command to clipboard
