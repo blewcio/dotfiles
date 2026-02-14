@@ -1,10 +1,6 @@
 [user]
   name = Blazej Lewcio
   email = blazej.lewcio@gmail.com
-
-[credential]
-	helper = store
-
 [include]
 	path = ~/.config/delta/themes/catppuccin.gitconfig
 

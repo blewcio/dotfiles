@@ -6,5 +6,6 @@ CLAUDE.md
 .claude/
 exported-defaults
 config/iTerm2/catp*
+.stow*
 
 

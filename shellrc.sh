@@ -49,6 +49,13 @@ if [[ "$SHELL" == *"zsh" ]]; then
   # If not remote, check shell integration with iTerm2
   test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
+  # Initialize direnv before P10k instant prompt to prevent console output warnings
+  # Direnv must load early to hook directory changes, but we silence its output
+  if command -v direnv >/dev/null 2>&1; then
+    export DIRENV_LOG_FORMAT=  # Silence direnv output
+    eval "$(direnv hook zsh)"
+  fi
+
   # Suppress instant prompt console output warnings (recommended by P10k)
   typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 
@@ -70,6 +77,26 @@ if [[ "$SHELL" == *"zsh" ]]; then
 
   # Define conditional helper for Antidote (used in zsh_plugins.txt)
   is-macos() { [[ "$OSTYPE" == darwin* ]] }
+
+  # Define zvm_after_init hook for zsh-vi-mode
+  # This function runs after zsh-vi-mode initializes to set up other plugin keybindings
+  # that would otherwise be overridden by vi-mode
+  zvm_after_init() {
+    # Bind up/down arrows for zsh-history-substring-search
+    bindkey '^[[A' history-substring-search-up      # Up arrow
+    bindkey '^[[B' history-substring-search-down    # Down arrow
+    bindkey "$terminfo[kcuu1]" history-substring-search-up    # Up arrow (terminfo)
+    bindkey "$terminfo[kcud1]" history-substring-search-down  # Down arrow (terminfo)
+
+    # In vi mode, also bind k/j in command mode for history search
+    bindkey -M vicmd 'k' history-substring-search-up
+    bindkey -M vicmd 'j' history-substring-search-down
+
+    # Restore fzf keybindings (overridden by zsh-vi-mode)
+    bindkey '^R' fzf-history-widget      # Ctrl-R: fzf history search
+    bindkey '^T' fzf-file-widget         # Ctrl-T: fzf file search
+    bindkey '^[c' fzf-cd-widget          # Alt-C: fzf directory search
+  }
 
   # Load Antidote plugin manager
   if [ -f "${HOME}/.antidote/antidote.zsh" ]; then
