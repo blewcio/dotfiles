@@ -5,7 +5,7 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BREWFILE="$SCRIPT_DIR/Brewfile"
-MACOS_SH="$SCRIPT_DIR/macos.sh"
+MACOS_SH="$SCRIPT_DIR/default_macos_settings.sh"
 
 # Install homebrew
 echo "Installing Homebrew..."
@@ -37,7 +37,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo "Configuring macOS system preferences..."
     bash "$MACOS_SH"
   else
-    echo "macos.sh not found at $MACOS_SH. Skipping..."
+    echo "default_macos_settings.sh not found at $MACOS_SH. Skipping..."
   fi
 fi
 

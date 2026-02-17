@@ -44,6 +44,21 @@ defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
 # Clicking in scroll bar jumps to spot that's clicked
 defaults write NSGlobalDomain AppleScrollerPagingBehavior -int 1
 
+# Set accent color to Blue (0=Red, 1=Orange, 2=Yellow, 3=Green, 4=Blue, 5=Purple, 6=Pink, -1=Graphite)
+defaults write NSGlobalDomain AppleAccentColor -int 4
+
+# Automatically switch between light and dark mode based on time of day
+defaults write NSGlobalDomain AppleInterfaceStyleSwitchesAutomatically -int 1
+
+# Disable minimizing windows on double-click of title bar
+defaults write NSGlobalDomain AppleMiniaturizeOnDoubleClick -int 0
+
+# When switching to an app, automatically switch to space with its windows
+defaults write NSGlobalDomain AppleSpacesSwitchOnActivate -int 1
+
+# Disable flash screen when alert sound occurs (accessibility)
+defaults write NSGlobalDomain com.apple.sound.beep.flash -int 0
+
 ###############################################################################
 # Keyboard                                                                    #
 ###############################################################################
@@ -63,14 +78,14 @@ defaults write NSGlobalDomain InitialKeyRepeat -int 15
 # Disable press-and-hold for keys in favor of key repeat
 defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 
-# Disable automatic capitalization
-defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
+# Enable automatic capitalization (set to false to disable)
+defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool true
 
 # Disable smart dashes
 defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 
-# Disable automatic period substitution
-defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
+# Enable automatic period substitution (set to false to disable)
+defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool true
 
 # Disable smart quotes
 defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
@@ -89,13 +104,19 @@ defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
 defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
 defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
 
-# Enable three finger drag (if preferred, currently disabled in your settings)
-# defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool true
-
 # Trackpad: two finger tap for right-click
 defaults write com.apple.AppleMultitouchTrackpad TrackpadRightClick -bool true
 
-# Enable other gestures
+# Enable Force Click and haptic feedback
+defaults write NSGlobalDomain com.apple.trackpad.forceClick -int 1
+
+# Set trackpad tracking speed (0=slow, 3=high speed)
+defaults write NSGlobalDomain com.apple.trackpad.scaling -int 3
+
+# Disable three finger drag (set to true to enable)
+defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool false
+
+# Enable trackpad gestures
 defaults write com.apple.AppleMultitouchTrackpad TrackpadRotate -bool true
 defaults write com.apple.AppleMultitouchTrackpad TrackpadPinch -bool true
 defaults write com.apple.AppleMultitouchTrackpad TrackpadTwoFingerDoubleTapGesture -int 1
@@ -103,6 +124,12 @@ defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerVertSwipeGest
 defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerHorizSwipeGesture -int 2
 defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerVertSwipeGesture -int 2
 defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerHorizSwipeGesture -int 2
+
+# Two-finger swipe from right edge shows Notification Center
+defaults write com.apple.AppleMultitouchTrackpad TrackpadTwoFingerFromRightEdgeSwipeGesture -int 3
+
+# Five-finger pinch gesture opens Launchpad
+defaults write com.apple.AppleMultitouchTrackpad TrackpadFiveFingerPinchGesture -int 2
 
 ###############################################################################
 # Mouse                                                                       #
@@ -114,23 +141,39 @@ defaults write com.apple.driver.AppleBluetoothMultitouch.mouse MouseButtonMode -
 defaults write com.apple.driver.AppleBluetoothMultitouch.mouse MouseTwoFingerDoubleTapGesture -int 3
 defaults write com.apple.driver.AppleBluetoothMultitouch.mouse MouseTwoFingerHorizSwipeGesture -int 2
 
+# Enable mouse scrolling (horizontal and vertical)
+defaults write com.apple.driver.AppleBluetoothMultitouch.mouse MouseHorizontalScroll -int 1
+defaults write com.apple.driver.AppleBluetoothMultitouch.mouse MouseVerticalScroll -int 1
+
+# Enable smooth/momentum scrolling with mouse
+defaults write com.apple.driver.AppleBluetoothMultitouch.mouse MouseMomentumScroll -int 1
+
+# Mouse button division threshold
+defaults write com.apple.driver.AppleBluetoothMultitouch.mouse MouseButtonDivision -int 55
+
 ###############################################################################
 # Energy                                                                      #
 ###############################################################################
 
 echo "Setting Energy preferences..."
 
-# Sleep the display after 15 minutes
-sudo pmset -a displaysleep 15 2>/dev/null || true
+# Sleep the display after 5 minutes
+sudo pmset -a displaysleep 5 2>/dev/null || true
 
-# Disable machine sleep while charging
-sudo pmset -c sleep 0 2>/dev/null || true
+# Set machine sleep to 10 minutes
+sudo pmset -a sleep 10 2>/dev/null || true
 
-# Set machine sleep to 5 minutes on battery
-sudo pmset -b sleep 5 2>/dev/null || true
+# Put hard disks to sleep after 10 minutes
+sudo pmset -a disksleep 10 2>/dev/null || true
 
-# Set standby delay to 24 hours (default is 1 hour)
-sudo pmset -a standbydelay 86400 2>/dev/null || true
+# Set hibernate mode (3 = save to disk and memory, safe sleep)
+sudo pmset -a hibernatemode 3 2>/dev/null || true
+
+# Enable wake for network access (used by Find My Mac)
+sudo pmset -a tcpkeepalive 1 2>/dev/null || true
+
+# Disable Power Nap
+sudo pmset -a powernap 0 2>/dev/null || true
 
 ###############################################################################
 # Screen                                                                      #
@@ -138,8 +181,8 @@ sudo pmset -a standbydelay 86400 2>/dev/null || true
 
 echo "Setting Screen/Screenshot preferences..."
 
-# Save screenshots to Documents folder
-defaults write com.apple.screencapture location -string "${HOME}/Documents"
+# Save screenshots to Screenshots folder
+defaults write com.apple.screencapture location -string "${HOME}/Screenshots"
 
 # Save screenshots in PNG format (other options: BMP, GIF, JPG, PDF, TIFF)
 defaults write com.apple.screencapture type -string "png"
@@ -159,9 +202,10 @@ defaults write com.apple.finder QuitMenuItem -bool true
 # Finder: disable window animations and Get Info animations
 defaults write com.apple.finder DisableAllAnimations -bool true
 
-# Set Desktop as the default location for new Finder windows
-defaults write com.apple.finder NewWindowTarget -string "PfDe"
-defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/Desktop/"
+# Set Downloads as the default location for new Finder windows
+# Use "PfDe" for Desktop, "PfHm" for Home
+defaults write com.apple.finder NewWindowTarget -string "PfLo"
+defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/Downloads/"
 
 # Show icons for hard drives, servers, and removable media on the desktop
 defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
@@ -217,14 +261,20 @@ defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
 /usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist 2>/dev/null || true
 /usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist 2>/dev/null || true
 
+# Automatically remove items from Trash after 30 days
+defaults write com.apple.finder FXRemoveOldTrashItems -bool true
+
+# Show the preview pane in Finder
+defaults write com.apple.finder ShowPreviewPane -bool false
+
 ###############################################################################
 # Dock, Dashboard, and hot corners                                            #
 ###############################################################################
 
 echo "Setting Dock preferences..."
 
-# Set the icon size of Dock items to 36 pixels
-defaults write com.apple.dock tilesize -int 36
+# Set the icon size of Dock items to 60 pixels
+defaults write com.apple.dock tilesize -int 60
 
 # Position Dock on the left
 defaults write com.apple.dock orientation -string "left"
@@ -324,8 +374,8 @@ sudo defaults write /.Spotlight-V100/VolumeConfiguration Exclusions -array "/Vol
 
 echo "Setting Activity Monitor preferences..."
 
-# Show all processes in Activity Monitor
-defaults write com.apple.ActivityMonitor ShowCategory -int 0
+# Show My Processes in Activity Monitor (0=All Processes, 100=My Processes)
+defaults write com.apple.ActivityMonitor ShowCategory -int 100
 
 # Sort Activity Monitor results by CPU usage
 defaults write com.apple.ActivityMonitor SortColumn -string "CPUUsage"
