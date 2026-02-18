@@ -15,6 +15,25 @@ echo "================================"
 echo ""
 
 # ============================================
+# Git Submodules
+# ============================================
+
+# Initialize private configuration submodule if it exists and is accessible
+if [ -f "$DOTFILES_DIR/.gitmodules" ] && grep -q "path = private" "$DOTFILES_DIR/.gitmodules" 2>/dev/null; then
+  # Check if submodule directory is empty or doesn't exist
+  if [ ! -d "$DOTFILES_DIR/private" ] || [ -z "$(ls -A "$DOTFILES_DIR/private" 2>/dev/null)" ]; then
+    echo "Initializing private configuration submodule..."
+    if git -C "$DOTFILES_DIR" submodule update --init private 2>/dev/null; then
+      echo "✓ Private submodule initialized successfully"
+    else
+      echo "⚠ Private submodule not accessible - skipping (this is normal if you don't have access)"
+    fi
+  else
+    echo "Private submodule already initialized - skipping"
+  fi
+fi
+
+# ============================================
 # Shell Plugin Managers
 # ============================================
 
