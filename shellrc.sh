@@ -27,6 +27,16 @@ if [ -d "$SHELL_CONFIG_DIR" ]; then
   unset shellfile
 fi
 
+# Source private configuration (git submodule)
+PRIVATE_SHELL_DIR=$HOME/dotfiles/private/shell
+if [ -d "$PRIVATE_SHELL_DIR" ]; then
+  for shellfile in ${PRIVATE_SHELL_DIR}/*.sh; do
+    [ -r "$shellfile" ] && source "$shellfile"
+  done
+  unset shellfile
+fi
+unset PRIVATE_SHELL_DIR
+
 # Track SSH nesting depth to prevent tmux auto-attach in nested SSH sessions
 export SSH_DEPTH=${SSH_DEPTH:-0}
 export SSH_DEPTH=$((SSH_DEPTH + 1))

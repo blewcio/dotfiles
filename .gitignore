@@ -1,11 +1,14 @@
 .antigenrc*
 antigen.zsh
-private.sh
+shell.d/private.sh
 *@eaDir*
 CLAUDE.md
 .claude/
 exported-defaults
 config/iTerm2/catp*
 .stow*
+
+# Note: private/ directory is a git submodule for sensitive config
+# It's tracked via .gitmodules, not ignored
 
 
