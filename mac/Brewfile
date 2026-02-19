@@ -9,13 +9,13 @@ cask "iterm2"          # Improved terminal
 cask "arc"             # Arc Browser, Chromium based, with good UI and privacy focus
 cask "synology-drive"  # 2-direction sync with NAS
 cask "raycast"         # Productivity launchbar
-brew "mas"             # Install from Appstore via Terrminal)
+brew "mas"             # Install from Appstore via Terminal
 cask "spacelauncher"   # App launcher with Space key
 
 # Install basic tools for improved terminal
 brew "tmux"                # Improved screen
 brew "git"
-cask "neovim"              # Install neovim
+brew "neovim"              # Install neovim
 brew "git-delta"           # Syntax highlighting for lazygit
 brew "lazygit"             # Terminal UI for git 
 brew "tldr"                # Improved man
@@ -33,7 +33,9 @@ brew "gawk"                # Needed by some installers
 
 # AI tools
 cask "claude-code"    # Claude code
-cask "anomalyco/tap/opencode" # Opencode repo for faster updates
+brew "anomalyco/tap/opencode" # Opencode repo for faster updates
+brew "ollama"         # Run LLMs locally
+# cask "lm-studio"    # GUI for running local LLMs
 
 # Filesystem
 brew "bat"                 # Improved cat
@@ -91,7 +93,7 @@ brew "mcat"           # Multimedia cat
 cask "vlc" # Multimedia player
 cask "iina" # Modern video player 
 cask "gimp" # Image manipulation
-brew "phoenix-slides" # Handy picture viewer with metadata info on screen
+cask "phoenix-slides" # Handy picture viewer with metadata info on screen
 
 # Markdown, PDF, LaTeX
 brew "pandoc"         # Universal document converter, e.g. markdown to pdf just with 'pandoc file.md -o file.pdf'
@@ -116,10 +118,12 @@ brew "glow"        # Colourful rendering of markdown files
 brew "datediff"    # Date operations, compute differences between dates
 
 # Development tools
-brew "entr"        # File monitoring and auto eecution
+brew "entr"        # File monitoring and auto execution
 brew "uv"          # Python project management
 brew "just"        # Better make to save project commands
 brew "universal-ctags"     # ctags parser for tags in Vim
+brew "direnv"      # Per-directory environment variables
+brew "stow"        # Symlink manager for dotfiles
 
 
 # Quick Look Plugins
@@ -136,9 +140,9 @@ cask "qlvideo"         # Thumbnails, static previews, cover art and metadata for
 # cask "apparency"
 
 # Install more cask tools
-brew "flux" # Monitor color adjustment based on daytime
+cask "flux-app" # Monitor color adjustment based on daytime
 cask "logseq" # Notes taking, local files
-cask "slack" # Command line image manipulation
+cask "slack" # Team messaging
 cask "miro" # Online whiteboard
 cask "obsidian" # Notes taking, local files
 cask "notion" # Notes taking
@@ -146,7 +150,7 @@ cask "webex" # Video communication and virtual meeting platform
 cask "zoom" # Video communication and virtual meeting platform
 cask "zen" # Privacy focused browser (Mozilla based)
 cask "vivaldi" # Customizable browser (Chromium based)
-cask "cheatsheet" # Show shotcuts on screen
+cask "cheatsheet" # Show shortcuts on screen
 cask "appcleaner" # Uninstall apps and remove all related files 
 # cask "1password-cli"
 # cask "gemini" #UI duplicate finder 
