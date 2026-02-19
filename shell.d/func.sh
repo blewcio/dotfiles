@@ -22,7 +22,12 @@ csv_cat2() {
 # Safe remove - moves files to trash with automatic name increment for duplicates
 copy_to_trash() {
   local TRASH
-  TRASH=~/.Trash/
+  if [[ "$(uname)" == "Darwin" ]]; then
+    TRASH=~/.Trash/
+  else
+    TRASH="${XDG_DATA_HOME:-$HOME/.local/share}/Trash/files/"
+    mkdir -p "$TRASH"
+  fi
   len=$#
   if [ $len -eq 0 ]; then
     echo "No files to remove."

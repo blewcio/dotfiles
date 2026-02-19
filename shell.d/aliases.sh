@@ -167,8 +167,8 @@ alias rm=copy_to_trash # Call a function instead
 # Network related shortcuts
 # My external IP
 alias myip="curl http://ipecho.net/plain; echo"
-#Serve current directory tree at http://$HOSTNAME:8000/
-alias lsw="python -m SimpleHTTPServer"
+# Serve current directory tree at http://$HOSTNAME:8000/
+alias http-server="python3 -m http.server"
 
 # Keep current location after exiting mc
 MC_WRAPPER='/usr/lib/mc/mc-wrapper.sh'

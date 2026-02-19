@@ -22,7 +22,7 @@ export _FASD_MAX=2000              # Max score before cleanup (default)
 export _FASD_IGNORE="fasd ls echo" # Commands to skip tracking
 
 # Configure FZF
-if [ -v FZF_CTRL_T_COMMAND ]; then
+if command -v fzf &>/dev/null; then
 
   # Global FZF defaults - styling, layout, and keybindings
   # Catppuccin Mocha theme colors
