@@ -20,19 +20,17 @@ UPDATES_PERFORMED=0
 # Shell Plugin Managers
 # ============================================
 
-# Update Antigen (zsh plugin manager)
-if [ -f "${DOTFILES_DIR}/antigen.zsh" ]; then
-  echo "Updating Antigen plugin manager..."
-  if curl -L git.io/antigen > ${DOTFILES_DIR}/antigen.zsh.new 2>/dev/null; then
-    mv ${DOTFILES_DIR}/antigen.zsh.new ${DOTFILES_DIR}/antigen.zsh
-    echo "  ✓ Antigen updated"
+# Update Antidote (zsh plugin manager)
+if command -v antidote >/dev/null 2>&1; then
+  echo "Updating Antidote plugins..."
+  if antidote update 2>/dev/null; then
+    echo "  ✓ Antidote plugins updated"
     UPDATES_PERFORMED=1
   else
-    echo "  ✗ Failed to update Antigen"
-    rm -f ${DOTFILES_DIR}/antigen.zsh.new
+    echo "  ✗ Failed to update Antidote plugins"
   fi
 else
-  echo "Antigen not installed - skipping"
+  echo "Antidote not installed - skipping"
 fi
 
 # Update ble.sh (Bash Line Editor)
@@ -103,48 +101,6 @@ if [ "$(uname)" = "Darwin" ]; then
     echo "Catppuccin theme not installed - skipping"
   fi
 
-fi
-
-# ============================================
-# Oh-My-Zsh Plugins
-# ============================================
-
-if [ -d "$HOME/.oh-my-zsh" ]; then
-  ZSH_CUSTOM=$HOME/.oh-my-zsh/custom
-  echo "Updating oh-my-zsh plugins..."
-
-  PLUGIN_UPDATED=0
-
-  # Update each plugin
-  for plugin_dir in "$ZSH_CUSTOM/plugins/"*; do
-    if [ -d "$plugin_dir/.git" ]; then
-      plugin_name=$(basename "$plugin_dir")
-      echo "  Updating $plugin_name..."
-      if git -C "$plugin_dir" pull --quiet 2>/dev/null; then
-        echo "    ✓ $plugin_name updated"
-        PLUGIN_UPDATED=1
-      else
-        echo "    ✗ Failed to update $plugin_name"
-      fi
-    fi
-  done
-
-  if [ $PLUGIN_UPDATED -eq 1 ]; then
-    UPDATES_PERFORMED=1
-  fi
-
-  # Update oh-my-zsh itself
-  if [ -d "$HOME/.oh-my-zsh/.git" ]; then
-    echo "  Updating oh-my-zsh core..."
-    if git -C "$HOME/.oh-my-zsh" pull --quiet 2>/dev/null; then
-      echo "    ✓ oh-my-zsh updated"
-      UPDATES_PERFORMED=1
-    else
-      echo "    ✗ Failed to update oh-my-zsh"
-    fi
-  fi
-else
-  echo "oh-my-zsh not installed - skipping plugin updates"
 fi
 
 # ============================================

@@ -7,6 +7,7 @@ CLAUDE.md
 exported-defaults
 config/iterm/catp*
 .stow*
+.crush/
 
 # Note: private/ directory is a git submodule for sensitive config
 # It's tracked via .gitmodules, not ignored

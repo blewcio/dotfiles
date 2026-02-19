@@ -165,7 +165,7 @@ The following modern alternatives are configured and aliased:
 
 ### Linux
 - Debian/Ubuntu package installation
-- Optional comprehensive package setup via `debian-packages.sh`
+- Optional comprehensive package setup via `linux/debian-packages.sh`
 
 ## Development Workflow
 

@@ -33,8 +33,8 @@ if command -v apt-get >/dev/null 2>&1; then
       sudo apt install -y $packages
     elif [ "$choice" = "2" ]; then
       echo "Running comprehensive package installation..."
-      if [ -f "$DOTFILES_DIR/debian-packages.sh" ]; then
-        sudo bash "$DOTFILES_DIR/debian-packages.sh" --minimal
+      if [ -f "$DOTFILES_DIR/linux/debian-packages.sh" ]; then
+        sudo bash "$DOTFILES_DIR/linux/debian-packages.sh" --minimal
       else
         echo "debian-packages.sh not found. Using basic installation..."
         packages="tmux bat glow vim fzf fasd eza pixz lbzip2 rsync ripgrep zoxide wget qemu-guest-agent fd-find git btop iperf iperf3 nfs-common bash-completion"
