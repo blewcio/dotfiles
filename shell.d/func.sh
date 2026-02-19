@@ -333,7 +333,7 @@ ask() {
       prompt="${stdin_content}"$'\n\n'"$*"
     fi
   fi
-  claude -p "$prompt"
+  claude -p "$prompt" | glow -
 }
 
 # Send recent terminal output to Claude for error diagnosis
@@ -351,7 +351,7 @@ wtf() {
     claude -p "I was working in my terminal and encountered an error. Please look at the terminal output below, identify what went wrong, and suggest a fix.
 
 Terminal output:
-${context}"
+${context}" | glow -
   else
     echo "Not running in tmux — retroactive terminal capture is unavailable." >&2
     echo "Tip: start a tmux session for seamless capture, or pipe output directly:" >&2
