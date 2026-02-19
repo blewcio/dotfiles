@@ -5,15 +5,26 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BREWFILE="$SCRIPT_DIR/Brewfile"
+BREWDIR="$HOME/.homebrew"
 MACOS_SH="$SCRIPT_DIR/default_macos_settings.sh"
 
 # Install homebrew
-echo "Installing Homebrew..."
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-if [ $? -ne 0 ]; then
-  echo "Homebrew installation failed. Aborting..."
-  exit 1
+# Uses a local prefix ($BREWDIR) so Homebrew lives inside ~/dotfiles-managed space
+# and does not require sudo. The official installer honours HOMEBREW_PREFIX.
+if command -v brew >/dev/null 2>&1; then
+  echo "Homebrew is already installed. Skipping installation..."
+elif [ -d "$BREWDIR/bin" ] && [ -x "$BREWDIR/bin/brew" ]; then
+  echo "Homebrew already present at $BREWDIR. Skipping installation..."
+  eval "$("$BREWDIR/bin/brew" shellenv)"
+else
+  echo "Installing Homebrew into $BREWDIR..."
+  HOMEBREW_PREFIX="$BREWDIR" /bin/bash -c \
+    "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  if [ $? -ne 0 ]; then
+    echo "Homebrew installation failed. Aborting..."
+    exit 1
+  fi
+  eval "$("$BREWDIR/bin/brew" shellenv)"
 fi
 
 # Install all packages from Brewfile

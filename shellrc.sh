@@ -4,6 +4,9 @@ case $- in
       *) return;;
 esac
 
+# Define conditional helper for Antidote (used in zsh_plugins.txt)
+is-macos() { [[ "$OSTYPE" == darwin* ]] }
+
 # Add sbin and bin in $HOME to $PATH (only if not already present)
 _add_to_path() {
   case ":$PATH:" in
@@ -16,7 +19,17 @@ _add_to_path "$HOME/bin"
 _add_to_path "$HOME/sbin"
 _add_to_path "$HOME/.cargo/bin"
 _add_to_path "$HOME/dotfiles/bin"
-unset -f _add_to_path
+
+# Local homebrew configuration
+if is-macos; then
+  BREWDIR="$HOME/.homebrew"
+  if [ -d "$BREWDIR" ]; then 
+    # Add homebrew bin to path
+    _add_to_path "$BREWDIR/bin"
+    # Keep Casks in your user Applications folder
+    export HOMEBREW_CASK_OPTS="--appdir=~/Applications"
+  fi
+fi
 
 # Source all config files from shell config folder
 SHELL_CONFIG_DIR=$HOME/dotfiles/shell.d
@@ -84,9 +97,6 @@ if [[ "$SHELL" == *"zsh" ]]; then
   catppuccin_fzf="${HOME}/dotfiles/config/zsh/catppuccin-fzf.zsh"
   [[ -r "$catppuccin_fzf" ]] && source "$catppuccin_fzf"
   unset catppuccin_fzf
-
-  # Define conditional helper for Antidote (used in zsh_plugins.txt)
-  is-macos() { [[ "$OSTYPE" == darwin* ]] }
 
   # Define zvm_after_init hook for zsh-vi-mode
   # This function runs after zsh-vi-mode initializes to set up other plugin keybindings
@@ -395,3 +405,5 @@ fi
 
 # Mark shellrc as loaded
 export SHELLRC_LOADED=1
+
+unset -f _add_to_path
