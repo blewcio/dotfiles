@@ -28,6 +28,8 @@ brew "fasd"                # Quick access to (recent) files and directories
 brew "zoxide"              # Same as fasd but Rust, no file history. For yazi.
 brew "fd"                  # Easy find
 brew "ripgrep"             # Improved grep
+brew "ddgr"                # DuckDuckGo search from terminal
+brew "w3m"                 # Terminal web browser (for reading search results)
 brew "knqyf263/pet/pet"    # CLI snippet manager
 brew "gawk"                # Needed by some installers
 

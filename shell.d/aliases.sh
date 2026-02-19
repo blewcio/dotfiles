@@ -203,3 +203,6 @@ alias path='echo -e ${PATH//:/\\n}'
 # Reload the shell (i.e. invoke as a login shell)
 alias reload="exec ${SHELL} -l"
 
+# Web search and LLM shortcuts (see func.sh for implementations)
+alias s='search'
+alias ai='ask'

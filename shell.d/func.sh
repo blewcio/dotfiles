@@ -237,6 +237,129 @@ if [ -x "$(command -v yazi)" ]; then
   }
 fi
 
+## Web & AI Helpers
+
+# Search DuckDuckGo and display results in the terminal
+# Usage: search <query> | s <query>
+# Set DDG_RESULTS env var to change default number of results (default: 5)
+search() {
+  if ! command -v ddgr &>/dev/null; then
+    echo "ddgr not installed. Run: brew install ddgr" >&2
+    return 1
+  fi
+  if [ $# -eq 0 ]; then
+    echo "Usage: search <query>" >&2
+    return 1
+  fi
+  ddgr --noprompt -n "${DDG_RESULTS:-5}" "$@"
+}
+
+# Search DuckDuckGo and pick a result to read in w3m (terminal browser)
+# Usage: sr <query>
+sr() {
+  if ! command -v ddgr &>/dev/null; then
+    echo "ddgr not installed. Run: brew install ddgr" >&2
+    return 1
+  fi
+  if ! command -v w3m &>/dev/null; then
+    echo "w3m not installed. Run: brew install w3m" >&2
+    return 1
+  fi
+  if [ $# -eq 0 ]; then
+    echo "Usage: sr <query>" >&2
+    return 1
+  fi
+  # Fetch results as JSON, extract title+url, pick with fzf, open in w3m
+  local selected
+  selected=$(ddgr --noprompt --json -n "${DDG_RESULTS:-10}" "$@" 2>/dev/null \
+    | jq -r '.[] | "\(.title)\t\(.url)"' \
+    | fzf --with-nth=1 --delimiter='\t' \
+          --prompt="Open in w3m > " \
+          --preview='echo {2}' \
+          --preview-window=down:1:wrap \
+    | cut -f2)
+  [ -n "$selected" ] && w3m "$selected"
+}
+
+# Fetch a cheat sheet from cheat.sh, with syntax highlighting via bat
+# Usage: cht <topic> [query...]
+#   cht tar                      # cheat sheet for tar
+#   cht python list comprehension # language-specific answer
+#   cht ~css flexbox              # search all sheets (~ prefix)
+cht() {
+  if [ $# -eq 0 ]; then
+    echo "Usage: cht <topic> [query...]" >&2
+    echo "  cht tar" >&2
+    echo "  cht python list comprehension" >&2
+    return 1
+  fi
+  local topic="$1"
+  shift
+  local query
+  if [ $# -gt 0 ]; then
+    # Join remaining args with + for cheat.sh URL encoding
+    query=$(printf '%s' "$*" | tr ' ' '+')
+    curl -s "https://cheat.sh/${topic}/${query}" | bat --plain --language=bash
+  else
+    curl -s "https://cheat.sh/${topic}" | bat --plain --language=bash
+  fi
+}
+
+# Ask Claude a question from the terminal; accepts piped stdin as context
+# Usage: ask <question>
+#        echo <context> | ask <question about the context>
+#        cat error.log  | ask "what caused this?"
+ask() {
+  if ! command -v claude &>/dev/null; then
+    echo "claude not found. Install Claude Code." >&2
+    return 1
+  fi
+  local prompt
+  if [ -t 0 ]; then
+    # No piped stdin — use arguments as the prompt
+    if [ $# -eq 0 ]; then
+      echo "Usage: ask <question>" >&2
+      echo "       echo <context> | ask <question>" >&2
+      return 1
+    fi
+    prompt="$*"
+  else
+    # Piped stdin — prepend it to the question (or use alone if no args)
+    local stdin_content
+    stdin_content=$(cat)
+    if [ $# -eq 0 ]; then
+      prompt="$stdin_content"
+    else
+      prompt="${stdin_content}"$'\n\n'"$*"
+    fi
+  fi
+  claude -p "$prompt"
+}
+
+# Send recent terminal output to Claude for error diagnosis
+# In tmux: captures the last ~100 lines of the current pane retroactively
+# Outside tmux: prints instructions (no retroactive capture available)
+# Usage: run a failing command, then call: wtf
+wtf() {
+  if ! command -v claude &>/dev/null; then
+    echo "claude not found. Install Claude Code." >&2
+    return 1
+  fi
+  if [ -n "$TMUX" ]; then
+    local context
+    context=$(tmux capture-pane -p -S -200)
+    claude -p "I was working in my terminal and encountered an error. Please look at the terminal output below, identify what went wrong, and suggest a fix.
+
+Terminal output:
+${context}"
+  else
+    echo "Not running in tmux — retroactive terminal capture is unavailable." >&2
+    echo "Tip: start a tmux session for seamless capture, or pipe output directly:" >&2
+    echo "     some_command 2>&1 | ask 'what went wrong?'" >&2
+    return 1
+  fi
+}
+
 ## Function Discovery Helpers
 
 # List all custom functions organized by category
