@@ -1,4 +1,0 @@
-# Write your default config options here!
-subcp=cp1250 
-stop-xscreensaver=yes
-subfont-text-scale=4

@@ -5,7 +5,7 @@ shell.d/private.sh
 CLAUDE.md
 .claude/
 exported-defaults
-config/iTerm2/catp*
+config/iterm/catp*
 .stow*
 
 # Note: private/ directory is a git submodule for sensitive config

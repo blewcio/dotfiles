@@ -8,6 +8,7 @@
 
 DOTFILES_DIR=~/dotfiles
 SHELLRC_FILE=shellrc.sh
+CATPPUCCIN_VARIANT=mocha
 
 echo "================================"
 echo "Dotfiles Deployment Starting..."
@@ -144,12 +145,12 @@ if [ "$(uname)" = "Darwin" ]; then
   fi
 
   # Download iTerm2 Catppuccin theme
-  mkdir -p $DOTFILES_DIR/config/iTerm2
-  if [ ! -f "$DOTFILES_DIR/config/iTerm2/catppuccin-mocha.itermcolors" ]; then
+  mkdir -p $DOTFILES_DIR/config/iterm
+  if [ ! -f "$DOTFILES_DIR/config/iterm/catppuccin-mocha.itermcolors" ]; then
     echo "Downloading Catppuccin Mocha theme for iTerm2..."
     curl -L https://github.com/catppuccin/iterm2/raw/main/colors/catppuccin-mocha.itermcolors \
-      -o $DOTFILES_DIR/config/iTerm2/catppuccin-mocha.itermcolors
-    echo "Catppuccin theme downloaded to config/iTerm2/"
+      -o $DOTFILES_DIR/config/iterm/catppuccin-mocha.itermcolors
+    echo "Catppuccin theme downloaded to config/iterm/"
   else
     echo "Catppuccin theme already downloaded - skipping"
   fi
@@ -214,18 +215,24 @@ ln -sf $DOTFILES_DIR/config/fastfetch/config.jsonc ~/.config/fastfetch/config.js
 
 mkdir -p ~/.config/yazi
 ln -sf $DOTFILES_DIR/config/yazi/yazi.toml ~/.config/yazi/yazi.toml
-ln -sf $DOTFILES_DIR/config/yazi/themes/themes/mocha/catppuccin-mocha-blue.toml ~/.config/yazi/theme.toml
+ln -sf $DOTFILES_DIR/config/yazi/themes/themes/$CATPPUCCIN_VARIANT/catppuccin-$CATPPUCCIN_VARIANT-blue.toml ~/.config/yazi/theme.toml
 
 mkdir -p ~/.config/lsd
-ln -sf $DOTFILES_DIR/config/lsd/themes/themes/catppuccin-mocha/colors.yaml ~/.config/lsd/colors.yaml
+ln -sf $DOTFILES_DIR/config/lsd/themes/themes/catppuccin-$CATPPUCCIN_VARIANT/colors.yaml ~/.config/lsd/colors.yaml
 ln -sf $DOTFILES_DIR/config/lsd/config.yaml ~/.config/lsd/config.yaml
+
+mkdir -p ~/.config/mc
+ln -sf $DOTFILES_DIR/config/mc/mc.keymap ~/.config/mc/mc.keymap
+
+mkdir -p ~/.config/pet
+ln -sf $DOTFILES_DIR/config/pet/snippet.toml ~/.config/pet/snippet.toml
 
 mkdir -p ~/.config/delta/themes
 ln -sf $DOTFILES_DIR/config/delta/themes/catppuccin.gitconfig ~/.config/delta/themes/catppuccin.gitconfig
 
 mkdir -p ~/.config/btop/themes
 ln -sf $DOTFILES_DIR/config/btop/btop.conf ~/.config/btop/btop.conf
-ln -sf $DOTFILES_DIR/config/btop/themes/themes/catppuccin_mocha.theme ~/.config/btop/themes/catppuccin_mocha.theme
+ln -sf $DOTFILES_DIR/config/btop/themes/themes/catppuccin_${CATPPUCCIN_VARIANT}.theme ~/.config/btop/themes/catppuccin_${CATPPUCCIN_VARIANT}.theme
 
 # lazygit: macOS stores config in a buried Application Support directory;
 # create a stable ~/.config/lazygit path that works on both platforms
@@ -326,13 +333,13 @@ echo "  2. If using tmux, press prefix+I to install tmux plugins"
 echo "  3. If using Neovim, run :Mason to install LSP servers"
 
 if [ "$(uname)" = "Darwin" ]; then
-  if [ -f "$DOTFILES_DIR/config/iTerm2/catppuccin-mocha.itermcolors" ]; then
+  if [ -f "$DOTFILES_DIR/config/iterm/catppuccin-mocha.itermcolors" ]; then
     echo ""
     echo "To apply Catppuccin theme to iTerm2:"
     echo "  1. Open iTerm2 → Preferences (Cmd+,)"
     echo "  2. Go to Profiles → Colors"
     echo "  3. Click 'Color Presets' dropdown → Import"
-    echo "  4. Select: ~/dotfiles/config/iTerm2/catppuccin-mocha.itermcolors"
+    echo "  4. Select: ~/dotfiles/config/iterm/catppuccin-mocha.itermcolors"
     echo "  5. Choose 'Catppuccin Mocha' from the Color Presets dropdown"
     echo ""
     echo "Catppuccin theme is now applied to:"
