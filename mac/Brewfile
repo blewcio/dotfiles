@@ -5,16 +5,12 @@ tap "buo/cask-upgrade"
 cask_args appdir: "~/Applications" # , require_sha: true # Require_sha is causing google, amazon, miro to fail
 
 # Install UI basic tools
-cask "iterm2"
-cask "arc"
+cask "iterm2"          # Improved terminal
+cask "arc"             # Arc Browser, Chromium based, with good UI and privacy focus
 cask "synology-drive"  # 2-direction sync with NAS
 cask "raycast"         # Productivity launchbar
 brew "mas"             # Install from Appstore via Terrminal)
 cask "spacelauncher"   # App launcher with Space key
-cask "appcleaner"
-#cask "hiddenbar"      # Hide icons in topbar -> TODO: muss aus dem Appstore gezogen werden
-#cask "google-chrome"
-#cask "alt-tab"        # Windows like tab
 
 # Install basic tools for improved terminal
 brew "tmux"                # Improved screen
@@ -25,9 +21,6 @@ brew "lazygit"             # Terminal UI for git
 brew "tldr"                # Improved man
 brew "wget"
 brew "terminal-notifier"   # Notify via notification center
-# brew "thefuck"             # Correction of misstyped commands
-brew "fastfetch"           # System information at login (neofetch is slow)
-brew "universal-ctags"     # ctags parser for tags in Vim
 
 # Search helpers
 brew "fzf"                 # Fuzzy finder (general purpose)
@@ -35,40 +28,12 @@ brew "fasd"                # Quick access to (recent) files and directories
 brew "zoxide"              # Same as fasd but Rust, no file history. For yazi.
 brew "fd"                  # Easy find
 brew "ripgrep"             # Improved grep
+brew "knqyf263/pet/pet"    # CLI snippet manager
+brew "gawk"                # Needed by some installers
 
 # AI tools
 cask "claude-code"    # Claude code
 cask "anomalyco/tap/opencode" # Opencode repo for faster updates
-
-# Install more cask tools
-brew "flux" # Monitor color adjustment based on daytime
-cask "logseq" # Notes taking, local files
-cask "obsidian" # Notes taking, local files
-cask "notion" # Notes taking
-cask "stats" # Productivity system status
-cask "slack" # Command line image manipulation
-cask "miro"
-cask "vlc"
-cask "iina" # Modern video player 
-cask "geotag" # Edit geodata of pictures
-cask "gimp"
-cask "webex" # Video communication and virtual meeting platform
-cask "zoom"
-cask "brave-browser"
-cask "1password-cli"
-cask "cheatsheet"      # Show shotcuts on screen
-cask "imagemagick" # Command line image manipulation
-# cask "gemini" #UI duplicate finder 
-# cask "spotify"
-# cask "spaceid" # Space ID in the menu bar
-# cask "dropzone" # Productivity drag/drop / not used recently
-# cask "monitorcontrol" ("betterdisplay") # External monitor control
-# cask "amazon-photos"
-# cask "android-file-transfer"
-# cask "tunnelbear" # Command line image manipulation
-# cask "protonvpn" # Command line image manipulation
-# cask "digikam" # Pictures and album management
-# cask "sweet-home32" # Interior design and plan
 
 # Filesystem
 brew "bat"                 # Improved cat
@@ -78,18 +43,19 @@ brew "dust"                # Fast file/directory space utilization
 brew "duf"                 # Disk space utilization
 brew "yazi"                # Lighting fast file manager written in Rust
 brew "fclones"             # The fastests file dupplicate finder
-brew "f3"                  # Testing SD cards (f3write/f3read)
-brew "mc"                  # Midnight comander
-brew "tree"
+brew "up"                  # Command for writing and testing pipelines
+brew "tree"                # Show directory structure as tree
+brew "termscp"             # Terminal scp client
 brew "age"                 # File encryption
-brew "hdparm"              # HDD performance
-brew "knqyf263/pet/pet"    # CLI snippet manager
-brew "gawk"                # Needed by some installers
-# brew "nnn"                 # Lighting fast file manager
-# brew "broot"               # Interactive file manager & search, incl. infile search
-# TODO vimv - vim style mass renamer of files
-# TODO brew "pigz"         # Parallel gzip (add alias) / Not used daily
-# TODO cask foremost/testdisk recovery # Data recovery tool
+#brew "hdparm"              # HDD performance
+#brew "f3"                  # Testing SD cards (f3write/f3read)
+#brew "thefuck"             # Correction of misstyped commands
+#brew "midnight-commander"  # Midnight comander
+#brew "nnn"                 # Lighting fast file manager
+#brew "broot"               # Interactive file manager & search, incl. infile search
+#TODO vimv - vim style mass renamer of files
+#TODO brew "pigz"         # Parallel gzip (add alias) / Not used daily
+#TODO cask foremost/testdisk recovery # Data recovery tool
 
 # Network & performance
 brew "wakeonlan"           # Wake on lan
@@ -100,60 +66,61 @@ brew "nmap"                # Network scanner
 brew "speedtest-cli"       # Network speed test
 brew "gping"               # Plot ping in terminal
 brew "httpie"              # Human friendly HTTP client for API era
+brew "doggo"               # Command-line DNS Client for Humans
 
 # System status
-brew "htop"                # Improved top
+brew "fastfetch"           # System information at login (neofetch is slow)
 brew "btop"                # Much cooler top
-brew "bottom"              # System activity monitoring, memory, network, PCU, temp (btm)
-brew "glances"             # Holistic system monitoring
 brew "zenith"              # Like btop but in Rust
 brew "hyperfine"           # Process performance measurement
+brew "pstree"              # Show running processes as tree (pstree -p to show pids)
+brew "procs"               # Service monitoring system and time series database
+cask "stats"               # Productivity system status
+#brew "htop"                # Improved top
+#brew "bottom"              # System activity monitoring, memory, network, PCU, temp (btm)
+#brew "glances"             # Holistic system monitoring
 
 # Multimedia editing
+#cask "imagemagick" # Command line image manipulation
+brew "exiftool"       # Read and write meta information in files, e.g.  exiftool -all= file.jpg to remove all metadata
+brew "ffmpeg"         # Multimedia framework for processing of multimedia files
+brew "exiv2"          # EXIF and IPTC metadata manipulation tool / Used by fclones
+cask "geotag"         # Edit geodata of pictures
 brew "viu"            # Picture viewer within iTerm
 brew "mcat"           # Multimedia cat
-brew "ffmpeg"         # Multimedia framework for processing of multimedia files
-brew "exiftool"
-brew "exiv2"          # EXIF and IPTC metadata manipulation tool / Used by fclones
-brew "datediff"       # Date operations, compute differences between dates
+cask "vlc" # Multimedia player
+cask "iina" # Modern video player 
+cask "gimp" # Image manipulation
 brew "phoenix-slides" # Handy picture viewer with metadata info on screen
+
+# Markdown, PDF, LaTeX
 brew "pandoc"         # Universal document converter, e.g. markdown to pdf just with 'pandoc file.md -o file.pdf'
 brew "pdfgrep"        # Grep pdf files
 brew "poppler"        # Pdf to text
-brew "mactex"         # LaTeX distribution for MacOS
-brew "peco"           # For interactive file filtering (like br and print selected line)
-brew "glow"           # Colourful rendering of markdown files
+#brew "mactex"        # LaTeX distribution for MacOS
+brew "tectonic"       # LaTeX engine that is easy to install and use, alternative to mactex
 
 # Data editing
 brew "nushell"     # Shell for structural/table-based data editing and pipes
 brew "saulpw/vd/visidata"  # Install saulpw/vd/visidata # Editing spreadsheets in Terminal
-brew "up"          # Command for writing and testing pipelines
 brew "jq"          # Commandline JSON processor
-brew "jless"       # JSON command line viewer
-brew "fx"          # Json viewer
+#brew "jless"       # JSON command line viewer
+brew "fx"          # JSON viewer
 brew "datamash"    # Commandline data analysis
 brew "csvkit"      # Command line csv processing
-brew "lnav"        # Log browsing / log navigator
 brew "choose"      # Human friendly cut
-#brew "miller"      # For csv formatting
+brew "peco"        # For interactive file filtering (like br and print selected line)
+#brew "lnav"        # Log browsing / log navigator
+brew "glow"        # Colourful rendering of markdown files
+#brew "miller"     # For csv formatting
+brew "datediff"    # Date operations, compute differences between dates
 
 # Development tools
 brew "entr"        # File monitoring and auto eecution
 brew "uv"          # Python project management
 brew "just"        # Better make to save project commands
+brew "universal-ctags"     # ctags parser for tags in Vim
 
-# Apps from Appstore
-mas "HomeAtmo : Der Netatmo client", id: 1359795390  # HomeAtmo Lite
-# mas "HomeAtmo Lite : Der Netatmo client", id: 1437630108  # HomeAtmo Lite
-# mas "Quick Calendar", id: 1004514425   # QuickCal for widget in notification center
-# mas "Mini Calendar", id: 1088779979 # Mini Calendar for the top bar
-# mas "Brother P-touch Editor", id: 1453365242  # Brothere P Touch
-# mas "We Love Lights für Philips Hue", id: 1479422551  # Brothere P Touch
-# mas "Hue in the Menu", id: 1534707384  # Hue App or we love lights
-# mas "JustStream", id: 1474804779  # Juststream for file to Chromecast streaming
-# mas "Meeter for Zoom, Teams & Co", id: 1510445899   # Meeter to join meetings from menubar / Not used
-mas "Memory Diag", id: 748212890 # Memory diag widget
-mas "Windows App", id: 1295203466 # Remote desktop client for RDP
 
 # Quick Look Plugins
 cask "syntax-highlight"  # Quick Look plug-in that renders source code with syntax highlighting
@@ -167,3 +134,46 @@ cask "qlvideo"         # Thumbnails, static previews, cover art and metadata for
 # cask "qlprettypatch"   # Quick Look plugin to view patch files / Solved by # syntax-highlight
 # cask "suspicious-package" # See security related apk package infos
 # cask "apparency"
+
+# Install more cask tools
+brew "flux" # Monitor color adjustment based on daytime
+cask "logseq" # Notes taking, local files
+cask "slack" # Command line image manipulation
+cask "miro" # Online whiteboard
+cask "obsidian" # Notes taking, local files
+cask "notion" # Notes taking
+cask "webex" # Video communication and virtual meeting platform
+cask "zoom" # Video communication and virtual meeting platform
+cask "zen" # Privacy focused browser (Mozilla based)
+cask "vivaldi" # Customizable browser (Chromium based)
+cask "cheatsheet" # Show shotcuts on screen
+cask "appcleaner" # Uninstall apps and remove all related files 
+# cask "1password-cli"
+# cask "gemini" #UI duplicate finder 
+# cask "spotify"
+# cask "spaceid" # Space ID in the menu bar
+# cask "dropzone" # Productivity drag/drop / not used recently
+# cask "monitorcontrol" ("betterdisplay") # External monitor control
+# cask "amazon-photos"
+# cask "android-file-transfer"
+# cask "tunnelbear" # Command line image manipulation
+# cask "protonvpn" # Command line image manipulation
+# cask "digikam" # Pictures and album management
+# cask "sweet-home32" # Interior design and plan
+#cask "hiddenbar"      # Hide icons in topbar -> TODO: muss aus dem Appstore gezogen werden
+#cask "google-chrome"
+#cask "alt-tab"        # Windows like tab
+
+# Apps from Appstore
+mas "HomeAtmo : Der Netatmo client", id: 1359795390  # HomeAtmo Lite
+mas "Mini Calendar", id: 1088779979 # Mini Calendar for the top bar
+mas "Memory Diag", id: 748212890 # Memory diag widget
+mas "Windows App", id: 1295203466 # Remote desktop client for RDP
+mas "Color Picker", id: 1545870783 # Apple color picker for menubar
+# mas "HomeAtmo Lite : Der Netatmo client", id: 1437630108  # HomeAtmo Lite
+# mas "Quick Calendar", id: 1004514425   # QuickCal for widget in notification center
+# mas "Brother P-touch Editor", id: 1453365242  # Brothere P Touch
+# mas "We Love Lights für Philips Hue", id: 1479422551  # Brothere P Touch
+# mas "Hue in the Menu", id: 1534707384  # Hue App or we love lights
+# mas "JustStream", id: 1474804779  # Juststream for file to Chromecast streaming
+# mas "Meeter for Zoom, Teams & Co", id: 1510445899   # Meeter to join meetings from menubar / Not used
