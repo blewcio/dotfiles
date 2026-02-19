@@ -239,6 +239,37 @@ fi
 
 ## Web & AI Helpers
 
+# Internal helper: send a prompt to the configured AI backend
+# Reads AI_BACKEND (opencode|claude), AI_MODEL_OPENCODE, AI_MODEL_CLAUDE
+_ai_run() {
+  local prompt="$1"
+  local backend="${AI_BACKEND:-opencode}"
+  if [[ "$backend" == "opencode" ]]; then
+    if command -v opencode &>/dev/null; then
+      opencode run -m "${AI_MODEL_OPENCODE:-github-copilot/claude-sonnet-4.6}" "$prompt"
+    elif command -v claude &>/dev/null; then
+      echo "opencode not found, falling back to claude" >&2
+      claude -p --model "${AI_MODEL_CLAUDE:-sonnet}" "$prompt"
+    else
+      echo "No AI backend found. Install opencode or Claude Code." >&2
+      return 1
+    fi
+  elif [[ "$backend" == "claude" ]]; then
+    if command -v claude &>/dev/null; then
+      claude -p --model "${AI_MODEL_CLAUDE:-sonnet}" "$prompt"
+    elif command -v opencode &>/dev/null; then
+      echo "claude not found, falling back to opencode" >&2
+      opencode run -m "${AI_MODEL_OPENCODE:-github-copilot/claude-sonnet-4.6}" "$prompt"
+    else
+      echo "No AI backend found. Install opencode or Claude Code." >&2
+      return 1
+    fi
+  else
+    echo "Unknown AI_BACKEND='$backend'. Use 'opencode' or 'claude'." >&2
+    return 1
+  fi
+}
+
 # Search DuckDuckGo and display results in the terminal
 # Usage: search <query> | s <query>
 # Set DDG_RESULTS env var to change default number of results (default: 5)
@@ -305,13 +336,13 @@ cht() {
   fi
 }
 
-# Ask Claude a question from the terminal; accepts piped stdin as context
+# Ask an AI a question from the terminal; accepts piped stdin as context
 # Usage: ask <question>
 #        echo <context> | ask <question about the context>
 #        cat error.log  | ask "what caused this?"
 ask() {
-  if ! command -v claude &>/dev/null; then
-    echo "claude not found. Install Claude Code." >&2
+  if ! command -v opencode &>/dev/null && ! command -v claude &>/dev/null; then
+    echo "No AI backend found. Install opencode or Claude Code." >&2
     return 1
   fi
   local prompt
@@ -333,22 +364,22 @@ ask() {
       prompt="${stdin_content}"$'\n\n'"$*"
     fi
   fi
-  claude -p "$prompt" | glow -
+  _ai_run "$prompt" | glow -
 }
 
-# Send recent terminal output to Claude for error diagnosis
+# Send recent terminal output to AI for error diagnosis
 # In tmux: captures the last ~100 lines of the current pane retroactively
 # Outside tmux: prints instructions (no retroactive capture available)
 # Usage: run a failing command, then call: wtf
 wtf() {
-  if ! command -v claude &>/dev/null; then
-    echo "claude not found. Install Claude Code." >&2
+  if ! command -v opencode &>/dev/null && ! command -v claude &>/dev/null; then
+    echo "No AI backend found. Install opencode or Claude Code." >&2
     return 1
   fi
   if [ -n "$TMUX" ]; then
     local context
     context=$(tmux capture-pane -p -S -200)
-    claude -p "I was working in my terminal and encountered an error. Please look at the terminal output below, identify what went wrong, and suggest a fix.
+    _ai_run "I was working in my terminal and encountered an error. Please look at the terminal output below, identify what went wrong, and suggest a fix.
 
 Terminal output:
 ${context}" | glow -

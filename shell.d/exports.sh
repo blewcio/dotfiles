@@ -79,3 +79,9 @@ if [[ -x "$(command -v nnn)" ]]; then
   export NNN_PLUG='f:fzcd;o:fzopen;d:diffs;2:dups;c:cdpath'
   export NNN_BMS="d:$HOME/Download;h:$HOME;v:/Volumes"
 fi
+
+# AI assistant backend configuration (used by ask / wtf / ai commands)
+# Override AI_BACKEND=claude in shell.d/private.sh to use Claude Code instead
+export AI_BACKEND="${AI_BACKEND:-opencode}"
+export AI_MODEL_OPENCODE="${AI_MODEL_OPENCODE:-github-copilot/claude-sonnet-4.6}"
+export AI_MODEL_CLAUDE="${AI_MODEL_CLAUDE:-sonnet}"
