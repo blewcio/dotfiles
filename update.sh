@@ -17,6 +17,26 @@ echo ""
 UPDATES_PERFORMED=0
 
 # ============================================
+# Git Submodules (Catppuccin Themes)
+# ============================================
+
+echo "Updating git submodules (Catppuccin themes and private config)..."
+if git -C "$DOTFILES_DIR" submodule update --remote --merge 2>/dev/null; then
+  echo "  ✓ Git submodules updated"
+  UPDATES_PERFORMED=1
+
+  # Rebuild bat cache after theme update
+  if command -v bat >/dev/null 2>&1; then
+    bat cache --build >/dev/null 2>&1
+    echo "  ✓ Rebuilt bat cache with updated themes"
+  fi
+else
+  echo "  ✗ Failed to update git submodules"
+fi
+
+echo ""
+
+# ============================================
 # Shell Plugin Managers
 # ============================================
 
@@ -85,17 +105,17 @@ if [ "$(uname)" = "Darwin" ]; then
   fi
 
   # Update iTerm2 Catppuccin theme
-  if [ -f "$DOTFILES_DIR/config/iTerm2/catppuccin-mocha.itermcolors" ]; then
+  if [ -f "$DOTFILES_DIR/config/iterm/catppuccin-mocha.itermcolors" ]; then
     echo "Updating Catppuccin Mocha theme for iTerm2..."
     if curl -L https://github.com/catppuccin/iterm2/raw/main/colors/catppuccin-mocha.itermcolors \
-        -o $DOTFILES_DIR/config/iTerm2/catppuccin-mocha.itermcolors.new 2>/dev/null; then
-      mv $DOTFILES_DIR/config/iTerm2/catppuccin-mocha.itermcolors.new \
-         $DOTFILES_DIR/config/iTerm2/catppuccin-mocha.itermcolors
+        -o $DOTFILES_DIR/config/iterm/catppuccin-mocha.itermcolors.new 2>/dev/null; then
+      mv $DOTFILES_DIR/config/iterm/catppuccin-mocha.itermcolors.new \
+         $DOTFILES_DIR/config/iterm/catppuccin-mocha.itermcolors
       echo "  ✓ Catppuccin theme updated"
       UPDATES_PERFORMED=1
     else
       echo "  ✗ Failed to update Catppuccin theme"
-      rm -f $DOTFILES_DIR/config/iTerm2/catppuccin-mocha.itermcolors.new
+      rm -f $DOTFILES_DIR/config/iterm/catppuccin-mocha.itermcolors.new
     fi
   else
     echo "Catppuccin theme not installed - skipping"
@@ -151,6 +171,44 @@ else
 fi
 
 # ============================================
+# Neovim Plugins
+# ============================================
+
+if command -v nvim >/dev/null 2>&1 && [ -d "$HOME/.config/nvim" ]; then
+  echo "Updating Neovim plugins..."
+  # Use Lazy.nvim's sync command (updates and cleans plugins)
+  if nvim --headless "+Lazy! sync" +qa 2>/dev/null; then
+    echo "  ✓ Neovim plugins updated"
+    UPDATES_PERFORMED=1
+  else
+    echo "  ✗ Failed to update Neovim plugins (you can manually run :Lazy update)"
+  fi
+else
+  echo "Neovim not installed or not configured - skipping"
+fi
+
+# ============================================
+# Python Packages
+# ============================================
+
+if command -v pip3 >/dev/null 2>&1; then
+  # Check if visidata packages are installed
+  if pip3 list --user 2>/dev/null | grep -q "xlrd\|openpyxl"; then
+    echo "Updating Python packages for visidata..."
+    if pip3 install --user --upgrade xlrd openpyxl 2>/dev/null; then
+      echo "  ✓ Python packages updated"
+      UPDATES_PERFORMED=1
+    else
+      echo "  ✗ Failed to update Python packages"
+    fi
+  else
+    echo "Python packages (xlrd, openpyxl) not installed - skipping"
+  fi
+else
+  echo "pip3 not installed - skipping Python packages"
+fi
+
+# ============================================
 # Package Manager Updates
 # ============================================
 
@@ -196,7 +254,6 @@ if [ $UPDATES_PERFORMED -eq 1 ]; then
   echo "  1. Restart your shell or run: source ~/.zshrc (or ~/.bashrc)"
   echo "  2. If using tmux, press prefix+U to update tmux plugins"
   echo "  3. If using vim, run :PluginUpdate to update vim plugins"
-  echo "  4. If using neovim, run :Lazy update to update neovim plugins"
 else
   echo "No updates were performed or all components were already up to date."
 fi
