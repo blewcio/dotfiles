@@ -117,7 +117,7 @@ brew "peco"        # For interactive file filtering (like br and print selected 
 #brew "lnav"        # Log browsing / log navigator
 brew "glow"        # Colourful rendering of markdown files
 #brew "miller"     # For csv formatting
-brew "datediff"    # Date operations, compute differences between dates
+brew "dateutils"   # Date operations, compute differences between dates (includes datediff command)
 
 # Development tools
 brew "entr"        # File monitoring and auto execution
@@ -152,7 +152,7 @@ cask "webex" # Video communication and virtual meeting platform
 cask "zoom" # Video communication and virtual meeting platform
 cask "zen" # Privacy focused browser (Mozilla based)
 cask "vivaldi" # Customizable browser (Chromium based)
-cask "cheatsheet" # Show shortcuts on screen
+# cask "cheatsheet" # Show shortcuts on screen # DEPRECATED - discontinued upstream
 cask "appcleaner" # Uninstall apps and remove all related files 
 # cask "1password-cli"
 # cask "gemini" #UI duplicate finder 
