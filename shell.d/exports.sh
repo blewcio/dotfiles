@@ -81,7 +81,7 @@ if [[ -x "$(command -v nnn)" ]]; then
 fi
 
 # AI assistant backend configuration (used by ask / wtf / ai commands)
-# Override AI_BACKEND=claude in shell.d/private.sh to use Claude Code instead
-export AI_BACKEND="${AI_BACKEND:-opencode}"
+# Override AI_BACKEND=opencode in shell.d/private.sh to use OpenCode instead
+export AI_BACKEND="${AI_BACKEND:-claude}"
 export AI_MODEL_OPENCODE="${AI_MODEL_OPENCODE:-github-copilot/claude-sonnet-4.6}"
 export AI_MODEL_CLAUDE="${AI_MODEL_CLAUDE:-sonnet}"
