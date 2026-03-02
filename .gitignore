@@ -2,7 +2,6 @@
 antigen.zsh
 shell.d/private.sh
 *@eaDir*
-CLAUDE.md
 .claude/
 exported-defaults
 config/iterm/catp*
