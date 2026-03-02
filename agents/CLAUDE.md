@@ -26,11 +26,14 @@
 - Present commit scope and description for approval before commiting
 - Document significant changes with reasoning and migration notes inside commit descriptions
 - Inform if I try to commit sensitive information or data 
+- Suggest using tags for major releases or milestones, ask for approval before tagging
+- If needed, suggest using branches for complex refactors or experiments, but don't create them without approval
+- Prefer rebasing feature branches before merging to keep history clean
 
 ## MCP Servers
 - For MCP server management, use `claude mcp` commands to list, add, or remove servers. Always verify the server configuration after changes.
 - Use Context7 to lookup docs of external software libraries or ducumentation
-- API keys stored in `~/dotfiles/private/private.sh`
+- API keys stored in `~/dotfiles/private`
 
 ## Skill development
 - For skill development, follow the standard structure for skills, including a clear README, well-defined input and output formats, and comprehensive tests.
