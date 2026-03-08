@@ -32,7 +32,7 @@ fi
 # Install all packages from Brewfile
 if [ -f "$BREWFILE" ]; then
   echo "Installing packages from Brewfile..."
-  brew bundle --file="$BREWFILE"
+  brew bundle --file="$BREWFILE" --verbose
 else
   echo "Brewfile not found at $BREWFILE. Skipping package installation..."
 fi
