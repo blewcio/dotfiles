@@ -254,8 +254,9 @@ ln -sf $DOTFILES_DIR/config/btop/themes/themes/catppuccin_${CATPPUCCIN_VARIANT}.
 mkdir -p ~/.config/lazygit
 if [ "$(uname)" = "Darwin" ]; then
   APPSUPPORT="$HOME/Library/Application Support"
-  ln -sf $APPSUPPORT/lazygit ~/.config/lazygit/AppSupport
-  ln -sf $DOTFILES_DIR/config/lazygit/config.yml ~/.config/lazygit/AppSupport/config.yml
+  mkdir -p "$APPSUPPORT/lazygit"
+  ln -sf "$APPSUPPORT/lazygit" ~/.config/lazygit/AppSupport
+  ln -sf $DOTFILES_DIR/config/lazygit/config.yml "$APPSUPPORT/lazygit/config.yml"
 else
   ln -sf $DOTFILES_DIR/config/lazygit/config.yml ~/.config/lazygit/config.yml
 fi
