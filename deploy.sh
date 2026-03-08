@@ -111,6 +111,21 @@ else
   echo "pip3 not installed - skipping Python packages"
 fi
 
+# fasd (removed from Homebrew core — install directly as a single shell script)
+FASD_BIN="$DOTFILES_DIR/bin/fasd"
+if [ ! -x "$FASD_BIN" ]; then
+  echo "Installing fasd..."
+  if curl -fsSL https://raw.githubusercontent.com/clvv/fasd/master/fasd -o "$FASD_BIN"; then
+    chmod +x "$FASD_BIN"
+    echo "✓ fasd installed to $FASD_BIN"
+  else
+    echo "⚠ Failed to download fasd - skipping"
+  fi
+else
+  echo "fasd already installed - skipping"
+fi
+unset FASD_BIN
+
 # Tmux plugin manager (TPM)
 if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
   echo "Installing tmux plugin manager (TPM)..."

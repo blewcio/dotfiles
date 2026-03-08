@@ -24,7 +24,7 @@ brew "terminal-notifier"   # Notify via notification center
 
 # Search helpers
 brew "fzf"                 # Fuzzy finder (general purpose)
-brew "fasd"                # Quick access to (recent) files and directories
+# fasd: installed via deploy.sh (direct script download) — removed from Homebrew core
 brew "zoxide"              # Same as fasd but Rust, no file history. For yazi.
 brew "fd"                  # Easy find
 brew "ripgrep"             # Improved grep
