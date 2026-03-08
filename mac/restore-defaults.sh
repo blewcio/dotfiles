@@ -293,6 +293,47 @@ else
   [ "$RESTART_SYNOLOGY" = true ] && echo -e "${YELLOW}⚠ Synology Drive: Restart manually to apply settings${NC}"
 fi
 
+###############################################################################
+# Arc Browser data files (key bindings, boosts, extensions)
+###############################################################################
+
+ARC_DATA_BACKUP="$EXPORT_DIR/arc"
+if [ -d "$ARC_DATA_BACKUP" ]; then
+  echo ""
+  echo -e "${YELLOW}=== Arc Browser Data Files ===${NC}"
+  echo "⚠ Arc must be CLOSED before restoring these files."
+  read -p "Restore Arc key bindings and boosts? [y/N]: " arc_choice
+  if [[ "$arc_choice" =~ ^[Yy]$ ]]; then
+    ARC_DIR="$HOME/Library/Application Support/Arc"
+
+    if [ -f "$ARC_DATA_BACKUP/StorableKeyBindings.json" ]; then
+      cp "$ARC_DATA_BACKUP/StorableKeyBindings.json" "$ARC_DIR/" && \
+        echo -e "${GREEN}✓ Key bindings restored${NC}" || \
+        echo -e "${RED}✗ Failed to restore key bindings${NC}"
+    fi
+
+    if [ -d "$ARC_DATA_BACKUP/boosts" ]; then
+      mkdir -p "$ARC_DIR/boosts"
+      cp -r "$ARC_DATA_BACKUP/boosts/." "$ARC_DIR/boosts/" && \
+        echo -e "${GREEN}✓ Boosts restored${NC}" || \
+        echo -e "${RED}✗ Failed to restore boosts${NC}"
+    fi
+
+    if [ -f "$ARC_DATA_BACKUP/extensions-list.json" ]; then
+      echo ""
+      echo -e "${YELLOW}Extensions to reinstall manually from Chrome Web Store:${NC}"
+      python3 -c "
+import json, sys
+with open(sys.argv[1]) as f:
+    exts = json.load(f)
+for e in exts:
+    print(f'  • {e[\"name\"]}  [{e[\"id\"]}]')
+" "$ARC_DATA_BACKUP/extensions-list.json"
+    fi
+  fi
+  unset ARC_DIR ARC_DATA_BACKUP arc_choice
+fi
+
 echo ""
 echo "================================"
 echo "Restore Complete!"

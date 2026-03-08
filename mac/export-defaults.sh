@@ -116,6 +116,53 @@ defaults read com.raycast.macos > "$EXPORT_DIR/raycast.plist" 2>/dev/null
 echo "Exporting Arc Browser settings..."
 defaults read company.thebrowser.Browser > "$EXPORT_DIR/arc-browser.plist" 2>/dev/null
 
+echo "Exporting Arc Browser data files (key bindings, boosts, extensions)..."
+ARC_DIR="$HOME/Library/Application Support/Arc"
+ARC_DATA_BACKUP="$EXPORT_DIR/arc"
+mkdir -p "$ARC_DATA_BACKUP"
+
+[ -f "$ARC_DIR/StorableKeyBindings.json" ] && \
+  cp "$ARC_DIR/StorableKeyBindings.json" "$ARC_DATA_BACKUP/" && \
+  echo "  ✓ Key bindings exported"
+
+if [ -d "$ARC_DIR/boosts" ] && [ -n "$(ls -A "$ARC_DIR/boosts" 2>/dev/null)" ]; then
+  mkdir -p "$ARC_DATA_BACKUP/boosts"
+  cp -r "$ARC_DIR/boosts/." "$ARC_DATA_BACKUP/boosts/" && echo "  ✓ Boosts exported"
+fi
+
+python3 - "$ARC_DIR/User Data/Default/Extensions" "$ARC_DATA_BACKUP/extensions-list.json" << 'PYEOF'
+import json, os, glob, re, sys
+
+ext_dir, out_path = sys.argv[1], sys.argv[2]
+results = []
+if os.path.isdir(ext_dir):
+    for ext_id in os.listdir(ext_dir):
+        for m in glob.glob(os.path.join(ext_dir, ext_id, '*', 'manifest.json')):
+            try:
+                with open(m) as f:
+                    data = json.load(f)
+                name = data.get('name', '?')
+                if name.startswith('__MSG_'):
+                    key = re.match(r'__MSG_(.+)__', name)
+                    if key:
+                        for locale in ['en', 'en_US', 'en_GB']:
+                            msgs = os.path.join(os.path.dirname(m), '_locales', locale, 'messages.json')
+                            if os.path.exists(msgs):
+                                with open(msgs) as mf:
+                                    resolved = json.load(mf).get(key.group(1), {}).get('message')
+                                if resolved:
+                                    name = resolved
+                                    break
+                results.append({'id': ext_id, 'name': name})
+            except Exception:
+                pass
+results.sort(key=lambda x: x['name'])
+with open(out_path, 'w') as f:
+    json.dump(results, f, indent=2)
+print(f'  ✓ Extension list exported ({len(results)} extensions)')
+PYEOF
+unset ARC_DIR ARC_DATA_BACKUP
+
 echo "Exporting Stats settings..."
 defaults read eu.exelban.Stats > "$EXPORT_DIR/stats.plist" 2>/dev/null
 
