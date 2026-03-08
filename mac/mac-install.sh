@@ -11,11 +11,13 @@ MACOS_SH="$SCRIPT_DIR/default_macos_settings.sh"
 # Install homebrew
 # Uses a local prefix ($BREWDIR) so Homebrew lives inside ~/dotfiles-managed space
 # and does not require sudo. The official installer honours HOMEBREW_PREFIX.
-if command -v brew >/dev/null 2>&1; then
-  echo "Homebrew is already installed. Skipping installation..."
-elif [ -d "$BREWDIR/bin" ] && [ -x "$BREWDIR/bin/brew" ]; then
-  echo "Homebrew already present at $BREWDIR. Skipping installation..."
+# Local install takes priority over any system-wide Homebrew.
+if [ -d "$BREWDIR/bin" ] && [ -x "$BREWDIR/bin/brew" ]; then
+  echo "Homebrew already present at $BREWDIR. Using local installation..."
   eval "$("$BREWDIR/bin/brew" shellenv)"
+elif command -v brew >/dev/null 2>&1; then
+  echo "Warning: No local Homebrew found at $BREWDIR. Falling back to system Homebrew ($(command -v brew))."
+  echo "Packages will be installed to the system prefix. To use a local sudo-free install, remove system Homebrew first."
 else
   echo "Installing Homebrew into $BREWDIR..."
   HOMEBREW_PREFIX="$BREWDIR" /bin/bash -c \
