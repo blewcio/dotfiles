@@ -147,6 +147,11 @@ fi
 if [ "$(uname)" = "Darwin" ]; then
 
   # Install Homebrew and packages from Brewfile
+  echo "⚠ Ensure Xcode Command Line Tools are up to date before installing packages."
+  echo "  If brew fails with 'Command Line Tools are too outdated', run:"
+  echo "    sudo rm -rf /Library/Developer/CommandLineTools"
+  echo "    sudo xcode-select --install"
+  echo ""
   mac_install=$DOTFILES_DIR/mac/mac-install.sh
   if [[ -r "$mac_install" ]]; then
     read -p "Install brew and packages from Brewfile? (y/n): " choice
