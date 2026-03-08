@@ -146,7 +146,7 @@ if [ "$(uname)" = "Darwin" ]; then
   if [[ -r "$mac_install" ]]; then
     read -p "Install brew and packages from Brewfile? (y/n): " choice
     if [[ "$choice" == "y" || "$choice" == "Y" ]]; then
-      eval $mac_install
+      bash "$mac_install"
     fi
   fi
   unset mac_install choice
