@@ -49,16 +49,21 @@ if [[ "$SHELL" == *zsh ]]; then
 fi
 
 # Install ble.sh (Bash Line Editor) for autosuggestions, syntax highlighting, and enhanced completion
-# Note: installed regardless of current shell since bash may also be used
-if [[ "$SHELL" == *bash ]] || command -v bash >/dev/null 2>&1; then
+# Only installed on Linux with bash as the current shell (macOS uses zsh)
+if [[ "$(uname)" != "Darwin" ]] && [[ "$SHELL" == *bash ]]; then
   if [ ! -d "$HOME/.local/share/blesh" ]; then
     echo "Installing ble.sh (Bash Line Editor)..."
-    if git clone --recursive --depth 1 --shallow-submodules https://github.com/akinomyoga/ble.sh.git /tmp/ble.sh; then
-      make -C /tmp/ble.sh install PREFIX=~/.local
+    if ! command -v gawk >/dev/null 2>&1; then
+      echo "⚠ gawk not found - skipping ble.sh install (install gawk first, e.g. brew install gawk)"
+    elif git clone --recursive --depth 1 --shallow-submodules https://github.com/akinomyoga/ble.sh.git /tmp/ble.sh; then
+      if make -C /tmp/ble.sh install PREFIX=~/.local; then
+        echo "✓ ble.sh installed successfully"
+      else
+        echo "⚠ ble.sh build failed - skipping"
+      fi
       rm -rf /tmp/ble.sh
-      echo "ble.sh installed successfully"
     else
-      echo "Failed to install ble.sh - skipping"
+      echo "⚠ Failed to clone ble.sh - skipping"
     fi
   else
     echo "ble.sh already installed - skipping"
