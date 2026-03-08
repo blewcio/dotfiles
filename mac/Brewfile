@@ -1,6 +1,7 @@
 # 'brew tap'
 tap "buo/cask-upgrade"
 tap "anomalyco/tap"
+tap "saulpw/vd"
 # set arguments for all 'brew install --cask' commands
 cask_args appdir: "~/Applications" # , require_sha: true # Require_sha is causing google, amazon, miro to fail
 
