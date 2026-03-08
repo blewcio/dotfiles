@@ -19,14 +19,14 @@ elif command -v brew >/dev/null 2>&1; then
   echo "Warning: No local Homebrew found at $BREWDIR. Falling back to system Homebrew ($(command -v brew))."
   echo "Packages will be installed to the system prefix. To use a local sudo-free install, remove system Homebrew first."
 else
-  echo "Installing Homebrew into $BREWDIR..."
-  HOMEBREW_PREFIX="$BREWDIR" /bin/bash -c \
-    "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  echo "Installing Homebrew into $BREWDIR (no sudo required)..."
+  git clone https://github.com/Homebrew/brew "$BREWDIR"
   if [ $? -ne 0 ]; then
     echo "Homebrew installation failed. Aborting..."
     exit 1
   fi
   eval "$("$BREWDIR/bin/brew" shellenv)"
+  brew update --force --quiet
 fi
 
 # Install all packages from Brewfile

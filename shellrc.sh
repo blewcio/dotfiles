@@ -23,9 +23,9 @@ _add_to_path "$HOME/dotfiles/bin"
 # Local homebrew configuration
 if is-macos; then
   BREWDIR="$HOME/.homebrew"
-  if [ -d "$BREWDIR" ]; then 
-    # Add homebrew bin to path
-    _add_to_path "$BREWDIR/bin"
+  if [ -x "$BREWDIR/bin/brew" ]; then
+    # Set HOMEBREW_PREFIX, HOMEBREW_CELLAR, PATH, MANPATH, INFOPATH
+    eval "$("$BREWDIR/bin/brew" shellenv)"
     # Keep Casks in your user Applications folder
     export HOMEBREW_CASK_OPTS="--appdir=~/Applications"
   fi
