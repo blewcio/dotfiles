@@ -16,3 +16,6 @@
 [submodule "private"]
 	path = private
 	url = https://github.com/blewcio/private.git
+[submodule "vim-config"]
+	path = vim-config
+	url = https://github.com/blewcio/vim-config.git

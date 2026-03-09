@@ -34,6 +34,15 @@ if [ -f "$DOTFILES_DIR/.gitmodules" ] && grep -q "path = private" "$DOTFILES_DIR
   fi
 fi
 
+# Initialize vim-config submodule
+if [ ! -d "$DOTFILES_DIR/vim-config" ] || [ -z "$(ls -A "$DOTFILES_DIR/vim-config" 2>/dev/null)" ]; then
+  echo "Initializing vim-config submodule..."
+  git -C "$DOTFILES_DIR" submodule update --init vim-config
+  echo "✓ vim-config submodule initialized"
+else
+  echo "vim-config submodule already initialized - skipping"
+fi
+
 # ============================================
 # General: Shell Plugin Managers
 # ============================================
@@ -295,16 +304,10 @@ echo "Symlinks created successfully"
 # ============================================
 
 echo "Setting up Vim configuration..."
-if [ ! -d "$HOME/vim-config" ]; then
-  echo "  Cloning vim-config repository..."
-  git clone https://github.com/blewcio/vim-config.git $HOME/vim-config
-else
-  echo "  vim-config already exists - skipping clone"
-fi
 
 # Symlink classic Vim configuration
-ln -sf $HOME/vim-config/.vimrc ~/.vimrc
-ln -sf $HOME/vim-config/.vim ~/.vim
+ln -sf $DOTFILES_DIR/vim-config/.vimrc ~/.vimrc
+ln -sf $DOTFILES_DIR/vim-config/.vim ~/.vim
 
 # Create tmp dirs for Vim (vim cannot create them automatically)
 mkdir -p $HOME/.vim/var/view
@@ -313,9 +316,9 @@ mkdir -p $HOME/.vim/var/undo
 mkdir -p $HOME/.vim/var/backup
 
 # Vundle plugin manager
-if [ ! -d "$HOME/.vim/bundle/Vundle.vim" ]; then
+if [ ! -d "$DOTFILES_DIR/vim-config/.vim/bundle/Vundle.vim" ]; then
   echo "  Installing Vundle plugin manager..."
-  git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+  git clone https://github.com/VundleVim/Vundle.vim.git $DOTFILES_DIR/vim-config/.vim/bundle/Vundle.vim
   if command -v vim >/dev/null 2>&1; then
     vim +PluginInstall +qall
   else
@@ -336,7 +339,7 @@ if [ -x "$(command -v nvim)" ]; then
   fi
 
   mkdir -p $HOME/.config
-  ln -sf $HOME/vim-config/nvim $HOME/.config/nvim
+  ln -sf $DOTFILES_DIR/vim-config/nvim $HOME/.config/nvim
   echo "  Neovim configuration symlinked. Plugins will auto-install on first launch."
   echo "  After launching nvim, run: :Mason to install LSP servers"
 else
