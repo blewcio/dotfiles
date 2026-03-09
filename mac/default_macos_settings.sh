@@ -93,6 +93,110 @@ defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
 # Disable auto-correct
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
 
+# Keyboard Shortcuts (com.apple.symbolichotkeys)
+# All values are stored as strings per macOS plist format.
+# Key IDs reference: https://web.archive.org/web/20141112224103/http://hintsforums.macworld.com/showthread.php?t=114785
+echo "Setting Keyboard Shortcuts..."
+TMPFILE=$(mktemp /tmp/keyboard-shortcuts.XXXXXX.plist 2>/dev/null) || true
+if [ -n "$TMPFILE" ]; then
+  python3 << PYEOF 2>/dev/null || true
+import plistlib
+
+def sc(enabled, *params):
+    entry = {"enabled": "1" if enabled else "0"}
+    if params:
+        entry["value"] = {"parameters": [str(p) for p in params], "type": "standard"}
+    return entry
+
+shortcuts = {
+    # Focus: menu bar, dock, window drawer, toolbar, window, next window, status menus
+    "7":   sc(True,  65535, 120, 262144),
+    "8":   sc(True,  65535, 99,  262144),
+    "9":   sc(True,  65535, 24,  1048576),
+    "10":  sc(True,  65535, 96,  262144),
+    "11":  sc(False, 65535, 97,  8650752),
+    "12":  sc(True,  65535, 122, 262144),
+    "13":  sc(True,  65535, 98,  262144),
+    # Accessibility: zoom on/off, zoom in/out, invert colors, contrast, grayscale, etc.
+    "15":  sc(False, 56,    28,  1572864),
+    "16":  sc(False),
+    "17":  sc(False, 48,    24,  1572864),
+    "18":  sc(False),
+    "19":  sc(False, 45,    27,  1572864),
+    "20":  sc(False),
+    "21":  sc(False, 56,    28,  1835008),
+    "22":  sc(False),
+    "23":  sc(False, 35,    42,  1572864),
+    "24":  sc(False),
+    "25":  sc(False, 46,    47,  1835008),
+    "26":  sc(False, 44,    43,  1835008),
+    # Change way Tab moves focus
+    "27":  sc(True,  65535, 10,  1048576),
+    # Screenshots: cmd+shift+3/4 (save/copy to clipboard)
+    "28":  sc(True,  51,    20,  1179648),
+    "29":  sc(True,  51,    20,  1441792),
+    "30":  sc(True,  52,    21,  1179648),
+    "31":  sc(True,  52,    21,  1441792),
+    # Mission Control, App Windows, Show Desktop
+    "32":  sc(False, 65535, 126, 8650752),
+    "33":  sc(False, 65535, 125, 9437184),
+    "34":  sc(True,  65535, 126, 393216),
+    "35":  sc(True,  65535, 125, 9568256),
+    "36":  sc(False, 65535, 125, 8650752),
+    "37":  sc(True,  65535, 125, 10878976),
+    # Brightness increase/decrease
+    "51":  sc(True,  180,   24,  1572864),
+    "52":  sc(True,  100,   2,   1572864),
+    # Display brightness keys (fn)
+    "53":  sc(True,  65535, 107, 0),
+    "54":  sc(True,  65535, 113, 0),
+    "55":  sc(True,  65535, 107, 524288),
+    "56":  sc(True,  65535, 113, 524288),
+    # Toggle Dock hiding
+    "57":  sc(True,  65535, 100, 262144),
+    # Cycle through windows (cmd+`)
+    "59":  sc(True,  65535, 96,  1048576),
+    # Spotlight: search / Finder search (disabled)
+    "60":  sc(False, 32,    49,  262144),
+    "61":  sc(False, 32,    49,  786432),
+    # Help viewer
+    "62":  sc(True,  65535, 111, 0),
+    "63":  sc(True,  65535, 111, 131072),
+    # Dictation
+    "64":  sc(True,  65535, 49,  1048576),
+    "65":  sc(True,  65535, 49,  1572864),
+    # Move focus to left/right space
+    "79":  sc(False, 65535, 123, 8650752),
+    "80":  sc(True,  65535, 123, 8781824),
+    "81":  sc(False, 65535, 124, 8650752),
+    "82":  sc(True,  65535, 124, 8781824),
+    # Notification Center
+    "98":  sc(True,  223,   27,  1179648),
+    # Switch to Desktop 1-8 (all disabled)
+    "118": sc(False, 65535, 18,  262144),
+    "119": sc(False, 65535, 19,  262144),
+    "120": sc(False, 65535, 20,  262144),
+    "121": sc(False, 65535, 21,  262144),
+    "122": sc(True,  65535, 23,  262144),
+    "123": sc(False, 65535, 22,  262144),
+    "124": sc(False, 65535, 26,  262144),
+    "125": sc(False, 65535, 28,  262144),
+    # Miscellaneous
+    "160": sc(False, 65535, 65535, 0),
+    "162": sc(True,  65535, 96,  1572864),
+    "163": sc(True,  35,    42,  1048576),
+    "164": sc(False, 65535, 65535, 0),
+    "175": sc(True,  65535, 27,  262144),
+    "179": sc(False, 65535, 65535, 0),
+}
+
+with open("${TMPFILE}", "wb") as f:
+    plistlib.dump({"AppleSymbolicHotKeys": shortcuts}, f, fmt=plistlib.FMT_XML)
+PYEOF
+  defaults import com.apple.symbolichotkeys "$TMPFILE" 2>/dev/null || true
+  rm -f "$TMPFILE"
+fi
+
 ###############################################################################
 # Trackpad                                                                    #
 ###############################################################################
@@ -189,6 +293,32 @@ defaults write com.apple.screencapture type -string "png"
 
 # Disable shadow in screenshots
 defaults write com.apple.screencapture disable-shadow -bool true
+
+###############################################################################
+# Desktop Background                                                          #
+###############################################################################
+
+echo "Setting Desktop Background..."
+
+# Generate a 1x1 black PNG for solid black wallpaper
+BLACK_PNG="${HOME}/.black-wallpaper.png"
+python3 << 'PYEOF' 2>/dev/null || true
+import struct, zlib, os
+
+def chunk(t, d):
+    return struct.pack('>I', len(d)) + t + d + struct.pack('>I', zlib.crc32(t + d) & 0xffffffff)
+
+path = os.path.expanduser('~/.black-wallpaper.png')
+png = (b'\x89PNG\r\n\x1a\n'
+       + chunk(b'IHDR', struct.pack('>IIBBBBB', 1, 1, 8, 2, 0, 0, 0))
+       + chunk(b'IDAT', zlib.compress(b'\x00\x00\x00\x00'))
+       + chunk(b'IEND', b''))
+with open(path, 'wb') as f:
+    f.write(png)
+PYEOF
+
+# Set black wallpaper for all desktops via System Events
+osascript -e "tell application \"System Events\" to set picture of every desktop to \"${BLACK_PNG}\"" 2>/dev/null || true
 
 ###############################################################################
 # Finder                                                                      #
