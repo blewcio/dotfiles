@@ -69,18 +69,10 @@ fi
 # ZSH specific config
 if [[ "$SHELL" == *"zsh" ]]; then
 
-  # If not remote, check shell integration with iTerm2
-  test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
-  # Initialize direnv before P10k instant prompt to prevent console output warnings
-  # Direnv must load early to hook directory changes, but we silence its output
-  if command -v direnv >/dev/null 2>&1; then
-    export DIRENV_LOG_FORMAT=  # Silence direnv output
-    eval "$(direnv hook zsh)"
-  fi
-
-  # Suppress instant prompt console output warnings (recommended by P10k)
+  # Must be set before P10k instant prompt is sourced to suppress console output warnings
   typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+  # Silence direnv log output (must be set before instant prompt so hook output is muted)
+  export DIRENV_LOG_FORMAT=
 
   # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
   # Initialization code that may require console input (password prompts, [y/n]
@@ -88,7 +80,15 @@ if [[ "$SHELL" == *"zsh" ]]; then
   if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
   fi
- 
+
+  # If not remote, check shell integration with iTerm2
+  test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+  # Initialize direnv hook (DIRENV_LOG_FORMAT already silenced above)
+  if command -v direnv >/dev/null 2>&1; then
+    eval "$(direnv hook zsh)"
+  fi
+
   # Configure zsh-autosuggestions styling (before loading plugins)
   ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=240'        # Gray color (240 = dark gray)
   ZSH_AUTOSUGGEST_STRATEGY=(history completion)   # Use both history and completion
