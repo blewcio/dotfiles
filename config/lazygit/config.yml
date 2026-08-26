@@ -1,8 +1,7 @@
 git:
-  pagers:
+  diffRenderers:
     - colorArg: always
-      pager: delta --dark --paging=never
-
+      command: delta --dark --paging=never
 theme:
   activeBorderColor:
     - '#89b4fa'
@@ -23,6 +22,5 @@ theme:
     - '#cdd6f4'
   searchingActiveBorderColor:
     - '#f9e2af'
-
 authorColors:
   '*': '#b4befe'
