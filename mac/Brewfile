@@ -172,11 +172,11 @@ cask "appcleaner" # Uninstall apps and remove all related files
 #cask "alt-tab"        # Windows like tab
 
 # Apps from Appstore
-mas "HomeAtmo : Der Netatmo client", id: 1359795390  # HomeAtmo Lite
+# mas "HomeAtmo : Der Netatmo client", id: 1359795390  # HomeAtmo Lite (no brew alternative, use my.netatmo.com)
 mas "Mini Calendar", id: 1088779979 # Mini Calendar for the top bar
-mas "Memory Diag", id: 748212890 # Memory diag widget
-mas "Windows App", id: 1295203466 # Remote desktop client for RDP
-mas "Color Picker", id: 1545870783 # Apple color picker for menubar
+# mas "Memory Diag", id: 748212890 # Memory diag widget (use btop/htop/glances instead)
+cask "windows-app" # Remote desktop client for RDP
+# mas "Color Picker", id: 1545870783 # Apple color picker for menubar (use Digital Color Meter in /Applications/Utilities/ or brew install pastel)
 # mas "HomeAtmo Lite : Der Netatmo client", id: 1437630108  # HomeAtmo Lite
 # mas "Quick Calendar", id: 1004514425   # QuickCal for widget in notification center
 # mas "Brother P-touch Editor", id: 1453365242  # Brothere P Touch
