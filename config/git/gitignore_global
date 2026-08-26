@@ -1,3 +1,5 @@
 .DS_Store
 # Activation: git config --global core.excludesfile '~/dotfiles/.gitignore'
 
+
+**/.claude/settings.local.json
