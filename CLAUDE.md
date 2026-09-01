@@ -42,10 +42,11 @@ The shell configuration uses a modular architecture with three layers:
    - `func.sh`: General utility functions
    - `func_pictures.sh`: Image manipulation utilities
    - `func_video.sh`: Video processing utilities
+   - `history.sh`: Shell history configuration (config-style file, like `exports.sh`/`inputrc.sh` — not a functions file)
    - `inputrc.sh`: Readline input configuration
    - `keys.sh`: Key bindings and shortcuts
    - `synology.sh`: NAS-specific functions
-   - `private.sh`: Private/local overrides (not tracked)
+   - `private.sh`: Optional local-only override file (gitignored, not synced anywhere). Most private config now lives in the `private` submodule instead — see Submodules below.
 
 3. **Application Configs** (`config/`): Per-application configuration files
    - Each subdirectory contains config for a specific tool (git, tmux, nvim, bat, fd, etc.)
@@ -84,6 +85,24 @@ Modern CLI tools are preferred and aliased as replacements:
   - `o` - Open recent files in default app
 - **Trash function**: `rm` is aliased to `copy_to_trash` (preserves original as `del`)
 
+## Submodules
+
+The repo uses 7 git submodules — running `git submodule update --init --recursive` (or `./deploy.sh`, which now initializes all of them) after cloning is required before things work correctly:
+
+- `private`: private/sensitive shell config (`private/shell/*.sh`, sourced by `shellrc.sh`) and private Claude Code skills (`private/skills/`, merged in by `bin/link-skills`). May not be accessible to everyone who clones this repo — `deploy.sh` skips it gracefully if so.
+- `vim-config`: full Neovim/Vim config with Vundle, symlinked to `~/.vimrc`/`~/.config/nvim`.
+- `config/{bat,btop,delta,lsd,yazi}/themes`: upstream Catppuccin theme repos, symlinked into each tool's config directory by `deploy.sh`.
+
+## Agents / Claude Code Integration
+
+The `agents/` directory is the source of truth for Claude Code / OpenCode configuration, deployed by `deploy.sh` and `bin/link-skills`:
+
+- `agents/CLAUDE.md` → symlinked to `~/.claude/CLAUDE.md` and `~/.config/opencode/AGENTS.md` (single source, plain symlink — Bob's global instructions live here, not in this file).
+- `agents/agents/` → symlinked whole-directory to `~/.claude/agents` (agent definitions, including `agents/agents/product-team/`).
+- `agents/skills/` → individual skill directories are symlinked into `~/.claude/skills/` (and mirrored to `~/.config/opencode/skills/`) by `bin/link-skills`, which also merges in `private/skills/`. This is a separate script (not a plain `ln -sf` in `deploy.sh`) because skills need per-item merging from two sources; `CLAUDE.md`/`agents/` don't, since they only have one source. Run `bin/link-skills` manually to pick up newly added skills without a full `deploy.sh` run.
+
+**Product Team Workflow**: an autonomous 6-agent system for running full dev lifecycles (concept → design → architecture → planning → development → delivery), defined across `agents/agents/product-team/` and `agents/skills/product-team/`. Full docs: `agents/PRODUCT-TEAM.md`.
+
 ## macOS-Specific
 
 - **Brewfile** (`mac/Brewfile`): Comprehensive list of Homebrew packages and casks
@@ -100,11 +119,11 @@ Modern CLI tools are preferred and aliased as replacements:
 
 ## Custom Scripts
 
-Located in `bin/`:
-- `tmux-cht.sh` - Cheat sheet viewer in tmux (bound to prefix+e)
-- `docker_backup.sh` - Docker backup utility
+Located in `bin/`, added to `PATH` by `shellrc.sh`.
 
-- Every script in `bin/`should have a short header comment what it does
+- **Naming convention**: `kebab-case`, no file extension (e.g. `tmux-cht`, `pic-sort-by-date`) — they're meant to be typed like ordinary commands. Exception: `fasd`, a vendored third-party script kept under its upstream name because other integrations look it up by that exact name.
+- Every script should have a short header comment explaining what it does — that's the source of truth for what each one does; run `funcs` (or `describe_function <name>` / `fhelp <name>`) to list and inspect them rather than looking here, since this file won't be kept in sync with additions.
+- `link-skills` is the one script called from `deploy.sh` itself (symlinks skills into `~/.claude/skills/` and `~/.config/opencode/skills/` — see Agents / Claude Code Integration below).
 
 ## Development Workflow
 
@@ -139,8 +158,7 @@ The setup supports both zsh and bash with shared configuration. Shell-specific c
 - Pay attention on changes to keep scripts idempotent
 - Don't commit any credentials or sensitive data. Warn and ask in such cases.
 - The git config contains user-specific name/email that should be updated
-- Private/sensitive configs should go in `shell.d/private.sh` (gitignored)
-- Vim setup uses external repo at `~/vim-config` with Vundle plugin manager
+- Private/sensitive configs belong in the `private` submodule (see Submodules); `shell.d/private.sh` is only for local-only tweaks that shouldn't be tracked anywhere, even privately
 - Tmux plugins require manual installation: prefix+I after first tmux launch
 - Some tools (eza instead of exa) reflect recent package maintenance changes
 - For longer functions `shell.d/` add a short description what it does
