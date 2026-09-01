@@ -43,6 +43,17 @@ else
   echo "vim-config submodule already initialized - skipping"
 fi
 
+# Initialize Catppuccin theme submodules (bat, btop, delta, lsd, yazi)
+for theme_submodule in config/bat/themes config/btop/themes config/delta/themes config/lsd/themes config/yazi/themes; do
+  if [ ! -d "$DOTFILES_DIR/$theme_submodule" ] || [ -z "$(ls -A "$DOTFILES_DIR/$theme_submodule" 2>/dev/null)" ]; then
+    echo "Initializing $theme_submodule submodule..."
+    git -C "$DOTFILES_DIR" submodule update --init "$theme_submodule"
+    echo "✓ $theme_submodule submodule initialized"
+  else
+    echo "$theme_submodule submodule already initialized - skipping"
+  fi
+done
+
 # ============================================
 # General: Shell Plugin Managers
 # ============================================
