@@ -367,6 +367,93 @@ ask() {
   _ai_run "$prompt" | glow -
 }
 
+# Ask Claude a concise question about macOS/Linux or the command line
+# Usage: q <question>
+q() {
+  if ! command -v claude &>/dev/null; then
+    echo "Claude Code not found. Install it first." >&2
+    return 1
+  fi
+  if [ $# -eq 0 ]; then
+    echo "Usage: q <question>" >&2
+    return 1
+  fi
+  if command -v glow &>/dev/null; then
+    claude -p "$*" \
+      --tools "" \
+      --model haiku \
+      --system-prompt "You are a concise macOS/Linux command-line assistant. Answer the question about the user's computer, shell, or tools briefly - a couple of sentences or a short list. No preamble, no repeating the question, no markdown headers." \
+      | glow -
+  else
+    claude -p "$*" \
+      --tools "" \
+      --model haiku \
+      --system-prompt "You are a concise macOS/Linux command-line assistant. Answer the question about the user's computer, shell, or tools briefly - a couple of sentences or a short list. No preamble, no repeating the question, no markdown headers."
+  fi
+}
+
+# Ask Claude for a concise terminal command suggestion (no explanations, no tool use)
+# Usage: qc <question>
+qc() {
+  if ! command -v claude &>/dev/null; then
+    echo "Claude Code not found. Install it first." >&2
+    return 1
+  fi
+  if [ $# -eq 0 ]; then
+    echo "Usage: qc <question>" >&2
+    return 1
+  fi
+  claude -p "$*" \
+    --tools "" \
+    --model haiku \
+    --system-prompt "You are a terminal command assistant. Reply with ONLY the shell command(s) needed - no explanation, no markdown fences, no commentary. If there are multiple good options, list up to 3, one per line, most idiomatic first."
+}
+
+# Ask Claude why the previous command failed. Always has the exit code and
+# command text (from shell history, or pass it explicitly if that comes up
+# empty); adds recent pane output too if run inside tmux. Outside tmux
+# there's no way to recover the previous command's actual output, so the
+# diagnosis is based on exit code + command only.
+# Usage: run a failing command, then call: qe
+#        or: qe <the failing command>   (if history capture doesn't work)
+qe() {
+  local exit_code=$?
+  if ! command -v claude &>/dev/null; then
+    echo "Claude Code not found. Install it first." >&2
+    return 1
+  fi
+  local last_cmd="$*"
+  if [ -z "$last_cmd" ]; then
+    last_cmd=$(fc -ln -1 2>/dev/null | sed 's/^[[:space:]]*//')
+  fi
+  if [ "$exit_code" -eq 0 ]; then
+    echo "Last command exited 0 (success) - nothing to diagnose." >&2
+    return 0
+  fi
+  local prompt="The command \`${last_cmd}\` exited with status ${exit_code}."
+  if [ -n "$TMUX" ]; then
+    prompt="${prompt}
+
+Recent terminal output for context:
+$(tmux capture-pane -p -S -100)"
+  fi
+  prompt="${prompt}
+
+Explain concisely why it likely failed and how to fix it."
+  if command -v glow &>/dev/null; then
+    claude -p "$prompt" \
+      --tools "" \
+      --model haiku \
+      --system-prompt "You are a concise macOS/Linux command-line assistant. Diagnose command failures briefly: state the likely cause and the fix. No fluff, no markdown headers." \
+      | glow -
+  else
+    claude -p "$prompt" \
+      --tools "" \
+      --model haiku \
+      --system-prompt "You are a concise macOS/Linux command-line assistant. Diagnose command failures briefly: state the likely cause and the fix. No fluff, no markdown headers."
+  fi
+}
+
 # Send recent terminal output to AI for error diagnosis
 # In tmux: captures the last ~100 lines of the current pane retroactively
 # Outside tmux: prints instructions (no retroactive capture available)
