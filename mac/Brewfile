@@ -145,7 +145,7 @@ cask "qlvideo"         # Thumbnails, static previews, cover art and metadata for
 # Install more cask tools
 cask "flux-app" # Monitor color adjustment based on daytime
 cask "logseq" # Notes taking, local files
-cask "slack" # Team messaging
+# cask "slack" # Team messaging
 cask "miro" # Online whiteboard
 cask "obsidian" # Notes taking, local files
 cask "notion" # Notes taking
