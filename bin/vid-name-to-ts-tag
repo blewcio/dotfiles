@@ -6,10 +6,10 @@
 # using the embedded creation_time tag.
 # ------------------------------------------------------------
 # Usage:
-#   ./vid_name_to_ts_tag.sh *.mp4                    # → 20231116123045123.mp4
-#   ./vid_name_to_ts_tag.sh -t MyEvent video.mp4    # → 20231116123045123_MyEvent.mp4
-#   ./vid_name_to_ts_tag.sh -t MyEvent *.avi        # Process multiple files with tag
-#   ./vid_name_to_ts_tag.sh -n *.mp4                # Dry-run: show what would be renamed
+#   ./vid-name-to-ts-tag *.mp4                    # → 20231116123045123.mp4
+#   ./vid-name-to-ts-tag -t MyEvent video.mp4    # → 20231116123045123_MyEvent.mp4
+#   ./vid-name-to-ts-tag -t MyEvent *.avi        # Process multiple files with tag
+#   ./vid-name-to-ts-tag -n *.mp4                # Dry-run: show what would be renamed
 # ------------------------------------------------------------
 
 # ---- 1️⃣  Parse arguments -----------------------------------------

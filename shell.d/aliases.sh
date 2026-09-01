@@ -140,7 +140,7 @@ if [ -x "$(command -v tmux)" ]; then
   alias tp='tmux-sessionizer'
 
   # tm-dev - start dev layout
-  alias tm-dev='tmux_dev.sh'
+  alias tm-dev='tmux-dev'
 fi
 
 # Get easy to digest help
@@ -148,8 +148,8 @@ if [ -x "$(command -v tldr)" ] && [ -x "$(command -v fzf)" ]; then
   alias thelp='tldr --list | fzf | xargs tldr'
 fi
 
-if [ -x "$(command -v tmux)" ] && [ -x "$(command -v tmux_cht.sh)" ]; then
-  alias chelp=tmux_cht.sh
+if [ -x "$(command -v tmux)" ] && [ -x "$(command -v tmux-cht)" ]; then
+  alias chelp=tmux-cht
 fi
 
 

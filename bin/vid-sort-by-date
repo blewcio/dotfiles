@@ -3,8 +3,8 @@
 # Move video files to YEAR/MONTH directories based on
 # the video's internal creation_time tag.
 #
-#   ./vid_sort_by_date.sh *.mp4              # Sort videos
-#   ./vid_sort_by_date.sh -n *.avi           # Dry-run (no changes)
+#   ./vid-sort-by-date *.mp4              # Sort videos
+#   ./vid-sort-by-date -n *.avi           # Dry-run (no changes)
 # ------------------------------------------------------------
 
 # ---------- 1️⃣  Parse arguments ----------

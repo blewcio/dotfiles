@@ -2,9 +2,9 @@
 # ------------------------------------------------------------
 # Sort pictures into YEAR/MONTH directories.
 #
-#   ./pic_sort_by_date.sh *.jpg              # → EXIF mode (default)
-#   ./pic_sort_by_date.sh --moddate *.png    # → use file modification time
-#   ./pic_sort_by_date.sh -n *.jpg           # → dry-run (no changes)
+#   ./pic-sort-by-date *.jpg              # → EXIF mode (default)
+#   ./pic-sort-by-date --moddate *.png    # → use file modification time
+#   ./pic-sort-by-date -n *.jpg           # → dry-run (no changes)
 # ------------------------------------------------------------
 
 # ---------- 1️⃣  Configuration ----------

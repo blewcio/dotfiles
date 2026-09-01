@@ -41,4 +41,4 @@ echo "🧹 Old backups cleaned up (if older than 5 days)."
 
 ### Add to chrontab
 # crontab -e
-# 0 2 * * * /path/to/docker_backup.sh >> /path/to/backup.log 2>&1
+# 0 2 * * * /path/to/docker-backup >> /path/to/backup.log 2>&1

@@ -295,7 +295,7 @@ ln -sf $DOTFILES_DIR/config/claude_desktop/claude_desktop_config.json ~/.config/
 mkdir -p ~/.config/opencode
 ln -sf $DOTFILES_DIR/config/opencode/opencode.json ~/.config/opencode/opencode.json
 ln -sf $DOTFILES_DIR/agents/CLAUDE.md ~/.config/opencode/AGENTS.md
-bash $DOTFILES_DIR/bin/link-skills.sh
+bash $DOTFILES_DIR/bin/link-skills
 
 echo "Symlinks created successfully"
 

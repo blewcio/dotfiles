@@ -508,7 +508,7 @@ describe_function() {
   if [ $# -eq 0 ]; then
     echo "Usage: describe_function FUNCTION_OR_SCRIPT_NAME"
     echo "Example: describe_function csv_cat"
-    echo "Example: describe_function pic_info"
+    echo "Example: describe_function pic-info"
     return 1
   fi
 
