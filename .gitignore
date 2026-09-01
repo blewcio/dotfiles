@@ -4,6 +4,7 @@ shell.d/private.sh
 *@eaDir*
 .claude/
 exported-defaults
+mac/defaults-backup-*
 config/iterm/catp*
 .stow*
 .crush/
