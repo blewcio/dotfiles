@@ -161,6 +161,8 @@ Tickets progress through statuses:
 - **Quality gates**: QA validates every ticket before marking complete
 - **Version control**: Commit `.agents/` after each phase for audit trail
 - **Parallel work**: Multiple developers can work on different tickets simultaneously
+- **Regression test**: Long regression tests not after every ticket, but once at the end of the sprint
+- **Documentation updates**: Update documentation and specifications after each sprint to keep in sync with changes
 
 ### Documentation
 
