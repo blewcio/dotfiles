@@ -41,6 +41,6 @@
 
 ## Product Team Workflow
 
-Autonomous multi-agent system (6 agents) that runs full software dev lifecycles: concept → UX/UI design → architecture → planning → development → delivery. Bob approves each phase transition. Agents in `~/dotfiles/agents/agents/product-team/`, workflow skills in `~/dotfiles/agents/skills/project-team/`, state lives in the project's `.agents/` directory.
+Autonomous multi-agent system (6 agents) that runs full software dev lifecycles: concept → UX/UI design → architecture → planning → development → delivery. Bob approves each phase transition. Agents in `~/dotfiles/agents/agents/product-team/`, workflow skills in `~/dotfiles/agents/skills/product-team/`, state lives in the project's `.agents/` directory.
 
 Full docs (agent details, phase artifacts, ticket workflow, quick-start examples, best practices, troubleshooting): `~/dotfiles/agents/PRODUCT-TEAM.md`.

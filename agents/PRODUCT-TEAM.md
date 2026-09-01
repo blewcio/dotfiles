@@ -568,7 +568,7 @@ This creates an audit trail of decisions.
 - software-developer.md
 - qa-engineer.md
 
-**Skill Definitions**: `~/dotfiles/agents/skills/project-team/`
+**Skill Definitions**: `~/dotfiles/agents/skills/product-team/`
 - project-init/SKILL.md
 - project-status/SKILL.md
 - next-ticket/SKILL.md
