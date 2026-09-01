@@ -496,6 +496,12 @@ For larger projects, assign different tickets to multiple developer instances to
 ### Keep State in Git
 The `.agents/` directory is version controlled. Commit after each phase for audit trail.
 
+### Regression Testing
+Run long regression tests once at the end of a sprint, not after every ticket.
+
+### Documentation Updates
+Update documentation and specifications after each sprint to keep them in sync with changes.
+
 ## Troubleshooting
 
 ### "No tickets available for development"
@@ -568,7 +574,7 @@ This creates an audit trail of decisions.
 - next-ticket/SKILL.md
 - transition-phase/SKILL.md
 
-**Documentation**: `~/dotfiles/agents/README-TEAM.md` (this file)
+**Documentation**: `~/dotfiles/agents/PRODUCT-TEAM.md` (this file)
 
 ## Future Enhancements
 
