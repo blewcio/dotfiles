@@ -13,6 +13,9 @@ cask "raycast"         # Productivity launchbar
 brew "mas"             # Install from Appstore via Terminal
 cask "spacelauncher"   # App launcher with Space key
 
+# Fonts
+cask "font-meslo-lg-nerd-font"  # Nerd Fonts v3 Meslo, used as iTerm2 terminal font (icons for yazi/eza/fzf/p10k)
+
 # Install basic tools for improved terminal
 brew "tmux"                # Improved screen
 brew "git"
