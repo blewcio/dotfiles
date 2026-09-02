@@ -490,12 +490,6 @@ The agents follow established software engineering practices. Let them guide the
 ### Iterate and Refine
 If a ticket is too large or unclear, ask the product manager to split it or clarify.
 
-### Parallel Development
-For larger projects, assign different tickets to multiple developer instances to work in parallel.
-
-### Keep State in Git
-The `.agents/` directory is version controlled. Commit after each phase for audit trail.
-
 ### Regression Testing
 Run long regression tests once at the end of a sprint, not after every ticket.
 
@@ -563,6 +557,7 @@ This creates an audit trail of decisions.
 
 **Agent Definitions**: `~/dotfiles/ai/agents/product-team/`
 - product-designer.md
+- ux-ui-designer.md
 - software-architect.md
 - product-manager.md
 - software-developer.md
