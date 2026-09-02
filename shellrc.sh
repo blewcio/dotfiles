@@ -220,8 +220,7 @@ if [[ "$SHELL" == *"zsh" ]]; then
   bindkey '^[[1;4B'    select-entire-line        # Shift+Alt+Down: select entire line
 
   # Keybindings for zsh-autocomplete and completion
-  bindkey '^I' menu-complete                       # Tab: complete then cycle through menu
-  bindkey "$terminfo[kcbt]" reverse-menu-complete  # Shift+Tab: reverse completion
+  # Tab/Shift+Tab left to fzf-tab (aloxaf/fzf-tab) instead of menu-complete
   bindkey '^S' history-incremental-search-forward  # Ctrl+S: forward history search
 
   # Initialize fasd (which I use bacause of file history and  v command)
