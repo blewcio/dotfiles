@@ -8,15 +8,6 @@ compatibility: opencode
 
 Initialize the `.agents/` directory structure and template files for managing a software project with the autonomous product team (product designer, software architect, product manager, developers, QA).
 
-## What This Skill Does
-
-Creates a complete `.agents/` directory structure in the current project with:
-- Template files for each workflow phase (concept, architecture, backlog, status)
-- Ticket directory for individual work items
-- Decisions directory for Architecture Decision Records (ADRs)
-- Git initialization (if not already a git repo)
-- Adds `.agents/` to version control
-
 ## Usage
 
 Invoke this skill when starting a new software project that will use the product team workflow:
@@ -43,63 +34,11 @@ Invoke this skill when starting a new software project that will use the product
 
 ## Process
 
-1. Check if `.agents/` already exists (prevent overwriting)
-2. Create directory structure
-3. Create template files with placeholder content
-4. Initialize git if not already present
-5. Add `.agents/` to git (stage but don't commit)
-6. Display success message with next steps
-
-## Template Files Content
-
-### concept.md
-Basic template showing structure for product designer to fill in.
-
-### architecture.md
-Basic template showing structure for software architect to fill in.
-
-### backlog.md
-Basic template showing structure for product manager to fill in.
-
-### status.md
-Dashboard showing current project phase and progress.
-
-## Error Handling
-
-- If `.agents/` exists: ask user if they want to overwrite or abort
-- If not in a project directory: ask user to confirm location
-- If git init fails: continue anyway (git is optional)
-
-## Next Steps After Running
-
-The skill will guide the user to:
-1. Start concept phase with product designer agent
-2. Or manually edit `.agents/concept.md` if they already have a clear concept
-
----
-
-## Implementation
-
-When invoked:
-
-1. **Check current directory**:
-   - Verify we're in a suitable location (not home directory)
-   - Check if `.agents/` already exists
-
-2. **Create structure**:
-   ```bash
-   mkdir -p .agents/tickets .agents/decisions
-   ```
-
-3. **Create template files** (see templates below)
-
-4. **Git setup**:
-   ```bash
-   git init 2>/dev/null || true
-   git add .agents/
-   ```
-
-5. **Display guidance**:
+1. Confirm we're in a suitable project directory (not the home directory). If `.agents/` already exists, ask whether to overwrite or abort.
+2. Create the structure: `mkdir -p .agents/tickets .agents/decisions`.
+3. Write the template files below into `.agents/`.
+4. Initialize git if it isn't already a repo (`git init 2>/dev/null || true`, continuing regardless of outcome — git is optional), then stage but don't commit: `git add .agents/`.
+5. Display:
    ```
    ✅ Project initialized with agent team workflow!
 
@@ -273,7 +212,3 @@ This file will be filled in by the product-manager agent after architecture is a
 # This directory will contain Architecture Decision Records (ADRs)
 # Format: NNN-title.md (e.g., 001-database-choice.md)
 ```
-
----
-
-**Compatibility**: Works with both Claude Code and OpenCode (opencode compatible).

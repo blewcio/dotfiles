@@ -1,6 +1,7 @@
 ---
 name: note-cleanup
-description: Review Obsidian notes for clarity and correctness — transcribe screenshot formulas/definitions/tables into proper Markdown/LaTeX, fix typos and grammar, reflow choppy paste artifacts into readable prose, merge duplicated content blocks, flag truncated or ambiguous source content, enforce clean heading structure, and verify the result renders cleanly. Always backs up the original file before editing. Works on any Obsidian vault, not tied to a specific one. Use when asked to review, clean up, polish, proofread, or improve the quality of one or more notes, or to "turn pictures into text/formulas".
+description: Review and polish Obsidian notes — fix typos/grammar, reflow paste artifacts, transcribe screenshots into Markdown/LaTeX, and verify clean rendering. Use when asked to review, clean up, polish, or proofread notes.
+compatibility: opencode
 ---
 
 # Clean-up Notes — note quality review

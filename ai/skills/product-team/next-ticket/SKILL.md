@@ -6,16 +6,7 @@ compatibility: opencode
 
 # Next Ticket Skill
 
-Find the next available ticket from the backlog that is ready for development and assign it to a developer.
-
-## What This Skill Does
-
-Searches `.agents/backlog.md` and `.agents/tickets/` for:
-- Tickets with status "Ready" (green light 🟢)
-- No blocking dependencies (or all dependencies completed)
-- Prioritizes by sprint order and ticket number
-- Returns ticket ID and summary for developer to claim
-- Optionally updates ticket status to "Assigned"
+Find the next available ticket from the backlog that's ready for development, and optionally assign it.
 
 ## Usage
 
@@ -30,34 +21,13 @@ Invoke this skill when a developer is ready to start work:
 
 ## Process
 
-1. **Verify `.agents/` exists and has tickets**:
-   - Check `.agents/backlog.md` exists
-   - Check `.agents/tickets/` has ticket files
+1. Verify `.agents/backlog.md` exists and `.agents/tickets/` has ticket files — if not, see Error Handling.
+2. Read every ticket in `.agents/tickets/`. A ticket qualifies if its status is "Ready" (🟢) and every ticket in its "Blocked By" list has status "QA Pass" (tickets with no dependencies always qualify).
+3. Among qualifying tickets, pick the one with the earliest sprint, then highest priority (High > Medium > Low), then lowest ticket number.
+4. Report the chosen ticket — ID, title, sprint, estimate, description, acceptance criteria, dependencies — see Output Format.
+5. If the user chooses to auto-assign: set status to "🟡 In Progress", set `**Assigned**: software-developer`, and log the change to the ticket's workflow history table.
 
-2. **Read backlog.md**:
-   - Parse sprint organization
-   - Identify ticket order and priorities
-
-3. **Find ready tickets**:
-   - Read each ticket file in `.agents/tickets/`
-   - Check status is "Ready" (🟢)
-   - Verify no blocking dependencies or all blockers are complete
-
-4. **Prioritize tickets**:
-   - Prefer earlier sprints over later
-   - Within sprint, prefer lower ticket numbers
-   - Respect explicit priority field (High > Medium > Low)
-
-5. **Return ticket details**:
-   - Ticket ID (e.g., TICKET-001)
-   - Title
-   - Sprint
-   - Estimated hours
-   - Brief description
-
-6. **Optional: Mark as assigned**:
-   - Update ticket status from "Ready" to "Assigned"
-   - Add to workflow history
+If nothing qualifies, report why instead — see Handling No Available Tickets.
 
 ## Output Format
 
@@ -97,60 +67,6 @@ Next Steps:
    "Get next ticket" (will skip TICKET-005)
 ```
 
-## Ticket Selection Algorithm
-
-```python
-def find_next_ticket():
-    ready_tickets = []
-
-    # Read all ticket files
-    for ticket_file in sorted(glob('.agents/tickets/TICKET-*.md')):
-        ticket = parse_ticket(ticket_file)
-
-        # Check if ready
-        if ticket.status != "Ready":
-            continue
-
-        # Check dependencies
-        if ticket.blocked_by:
-            all_complete = all(
-                get_ticket(dep).status == "QA Pass"
-                for dep in ticket.blocked_by
-            )
-            if not all_complete:
-                continue
-
-        ready_tickets.append(ticket)
-
-    if not ready_tickets:
-        return None
-
-    # Sort by: sprint (asc), priority (desc), ticket_number (asc)
-    ready_tickets.sort(key=lambda t: (
-        t.sprint,
-        priority_value(t.priority),  # High=0, Med=1, Low=2
-        t.number
-    ))
-
-    return ready_tickets[0]
-
-def priority_value(priority):
-    return {"High": 0, "Medium": 1, "Low": 2}.get(priority, 3)
-```
-
-## Dependency Resolution
-
-A ticket is ready if:
-- Status field is "Ready" (🟢)
-- AND (no dependencies OR all dependencies have status "QA Pass")
-
-Check dependencies:
-1. Parse "Blocked By" section in ticket file
-2. For each dependency (e.g., TICKET-002):
-   - Read `.agents/tickets/TICKET-002.md`
-   - Check its status
-   - If any dependency is not "QA Pass" or "Complete", skip this ticket
-
 ## Handling No Available Tickets
 
 ```
@@ -189,28 +105,6 @@ Recommendations:
 | ❌            | QA Fail      | Needs fixes, back to development |
 | 🔴            | Blocked      | Waiting on dependencies          |
 
-## Assignment Options
-
-When returning ticket, ask user:
-
-```
-Would you like to:
-1. Auto-assign to software-developer agent
-2. Just view details (manual assignment)
-3. Skip this ticket and see next available
-```
-
-If auto-assign:
-- Update ticket file:
-  ```markdown
-  **Status**: 🟡 In Progress
-  **Assigned**: software-developer
-  ```
-- Add to workflow history:
-  ```
-  | [Date] | Ready → Assigned | next-ticket skill | Auto-assigned via skill |
-  ```
-
 ## Error Handling
 
 - **No `.agents/` directory**:
@@ -242,7 +136,3 @@ If auto-assign:
 - **After this skill**: Developer invokes software-developer agent with ticket ID
 - **Before this skill**: Check project-status to see overall state
 - **Related skills**: transition-phase (to move between workflow phases)
-
----
-
-**Compatibility**: Works with both Claude Code and OpenCode (opencode compatible).

@@ -6,16 +6,7 @@ compatibility: opencode
 
 # Transition Phase Skill
 
-Manage transitions between workflow phases (Concept → UX/UI Design → Architecture → Planning → Development → Delivery) with validation and user approval.
-
-## What This Skill Does
-
-Orchestrates phase transitions by:
-- Validating current phase is complete
-- Requesting user approval for transition
-- Updating project status
-- Triggering the appropriate next agent
-- Recording transition in project history
+Manage transitions between workflow phases (Concept → UX/UI Design → Architecture → Planning → Development → Delivery), validating that the current phase is complete before asking the user to approve the move.
 
 ## Workflow Phases
 
@@ -38,21 +29,20 @@ Invoke this skill to move between phases:
 "Approve concept and continue"
 ```
 
-## Transition Rules
+## Process
 
-### CONCEPT → UX/UI DESIGN
+1. Detect the current phase from `.agents/status.md`, or infer it from file states if that's missing.
+2. Validate that the current phase's prerequisites are met (see the phase-specific sections below) — required files exist, required sections are present, and the phase is marked "Approved by Bob". If validation fails, report exactly what's missing (see Error Handling) and stop.
+3. Show the completion summary and the approval prompt for the target phase, and wait for explicit approval — no transition happens automatically, regardless of phase.
+4. On approval: update `.agents/status.md`, mark the current phase's document as approved, invoke the next agent with the relevant prior documents, and append a row to Project History.
+5. On denial: stay in the current phase and suggest what to revise.
+
+## CONCEPT → UX/UI DESIGN
 
 **Prerequisites**:
-- `.agents/concept.md` exists and is complete
-- Concept includes all required sections:
-  - Vision
-  - Problem Statement
-  - User Stories
-  - Success Criteria
-  - Constraints
-  - Out of Scope
+- `.agents/concept.md` exists and includes all required sections: Vision, Problem Statement, User Stories, Success Criteria, Constraints, Out of Scope
 - Status marked as "Approved by Bob"
-- Project involves user interface (web, mobile, or desktop app)
+- Project involves a user interface (web, mobile, or desktop app) — otherwise see CONCEPT → ARCHITECTURE below
 
 **User Approval Prompt**:
 ```
@@ -87,16 +77,10 @@ Note: For CLI-only or API-only projects without UI, skip to Architecture.
 
 ---
 
-### UX/UI DESIGN → ARCHITECTURE
+## UX/UI DESIGN → ARCHITECTURE
 
 **Prerequisites**:
-- `.agents/design.md` exists and is complete
-- Design includes:
-  - User flows for key journeys
-  - Wireframes for main screens
-  - Design system (colors, typography, spacing)
-  - Component library specifications
-  - Accessibility considerations
+- `.agents/design.md` exists and includes: user flows for key journeys, wireframes for main screens, design system (colors, typography, spacing), component library specifications, accessibility considerations
 - Status marked as "Approved by Bob"
 
 **User Approval Prompt**:
@@ -129,7 +113,7 @@ Approve transition to Architecture? [Yes/No]
 
 ---
 
-### CONCEPT → ARCHITECTURE (Skip UX/UI Design)
+## CONCEPT → ARCHITECTURE (Skip UX/UI Design)
 
 **For projects without UI** (CLI tools, APIs, libraries, backend services):
 
@@ -156,17 +140,11 @@ If No: Moves to UX/UI Design phase
 
 ---
 
-### ARCHITECTURE → PLANNING
+## ARCHITECTURE → PLANNING
 
 **Prerequisites**:
-- `.agents/architecture.md` exists and is complete
-- Architecture includes:
-  - Tech stack decisions
-  - System components
-  - Data model
-  - API/Interface design
-  - Non-functional requirements
-  - At least one ADR in `.agents/decisions/`
+- `.agents/architecture.md` exists and includes: tech stack decisions, system components, data model, API/interface design, non-functional requirements
+- At least one ADR in `.agents/decisions/`
 - Status marked as "Approved by Bob"
 
 **User Approval Prompt**:
@@ -199,12 +177,11 @@ Approve transition to Planning? [Yes/No]
 
 ---
 
-### PLANNING → DEVELOPMENT
+## PLANNING → DEVELOPMENT
 
 **Prerequisites**:
-- `.agents/backlog.md` exists and is complete
-- At least one ticket file in `.agents/tickets/`
-- Tickets have clear acceptance criteria
+- `.agents/backlog.md` exists, with at least one ticket file in `.agents/tickets/`
+- Every ticket has clear acceptance criteria
 - Dependencies mapped
 - Status marked as "Ready for development"
 
@@ -241,11 +218,10 @@ Approve transition to Development? [Yes/No]
 
 ---
 
-### DEVELOPMENT → DELIVERY
+## DEVELOPMENT → DELIVERY
 
 **Prerequisites**:
-- All tickets in `.agents/tickets/` have status "QA Pass" or "Complete"
-- No tickets with status "Ready", "In Progress", "Dev Complete", "QA Fail", or "Blocked"
+- Every ticket in `.agents/tickets/` has status "QA Pass" or "Complete" — none remain "Ready", "In Progress", "Dev Complete", "QA Fail", or "Blocked"
 - All acceptance criteria met across all tickets
 
 **User Approval Prompt**:
@@ -277,160 +253,6 @@ Approve transition to Delivery? [Yes/No]
 - Suggest next steps (release checklist, deployment, etc.)
 
 ---
-
-## Process
-
-1. **Detect Current Phase**:
-   - Read `.agents/status.md`
-   - Or infer from file states
-
-2. **Validate Completion**:
-   - Check required files exist
-   - Verify content is complete
-   - Ensure approval marker present (if applicable)
-
-3. **Request User Approval**:
-   - Display completion summary
-   - Explain what next phase involves
-   - Ask for explicit approval
-
-4. **Execute Transition**:
-   - Update status.md
-   - Mark current phase document as approved
-   - Trigger next agent (if applicable)
-   - Update project history
-
-5. **Provide Guidance**:
-   - Show next steps
-   - Suggest relevant commands
-   - Link to next agent/skill
-
-## Validation Checks
-
-### Concept Phase Validation
-
-```python
-def validate_concept():
-    if not exists('.agents/concept.md'):
-        return False, "concept.md not found"
-
-    content = read('.agents/concept.md')
-
-    required_sections = [
-        "## Vision",
-        "## Problem Statement",
-        "## User Stories",
-        "## Success Criteria",
-        "## Constraints",
-        "## Out of Scope"
-    ]
-
-    missing = [s for s in required_sections if s not in content]
-    if missing:
-        return False, f"Missing sections: {missing}"
-
-    if "**Status**: ✅ Approved" not in content:
-        return False, "Concept not marked as approved"
-
-    return True, "Concept phase complete"
-```
-
-### UX/UI Design Phase Validation
-
-```python
-def validate_uxui_design():
-    if not exists('.agents/design.md'):
-        return False, "design.md not found"
-
-    content = read('.agents/design.md')
-
-    required_sections = [
-        "## User Flows",
-        "## Wireframes",
-        "## Design System",
-        "## Accessibility Compliance"
-    ]
-
-    missing = [s for s in required_sections if s not in content]
-    if missing:
-        return False, f"Missing sections: {missing}"
-
-    if "**Status**: ✅ Approved" not in content:
-        return False, "Design not marked as approved"
-
-    return True, "UX/UI Design phase complete"
-```
-
-### Architecture Phase Validation
-
-```python
-def validate_architecture():
-    if not exists('.agents/architecture.md'):
-        return False, "architecture.md not found"
-
-    content = read('.agents/architecture.md')
-
-    required_sections = [
-        "## Tech Stack",
-        "## System Components",
-        "## Data Model",
-        "## Non-Functional Requirements"
-    ]
-
-    missing = [s for s in required_sections if s not in content]
-    if missing:
-        return False, f"Missing sections: {missing}"
-
-    # Check for at least one ADR
-    adr_files = glob('.agents/decisions/*.md')
-    if not adr_files:
-        return False, "No ADRs created (expected at least one)"
-
-    if "**Status**: ✅ Approved" not in content:
-        return False, "Architecture not marked as approved"
-
-    return True, "Architecture phase complete"
-```
-
-### Planning Phase Validation
-
-```python
-def validate_planning():
-    if not exists('.agents/backlog.md'):
-        return False, "backlog.md not found"
-
-    ticket_files = glob('.agents/tickets/TICKET-*.md')
-    if not ticket_files:
-        return False, "No tickets created"
-
-    # Verify tickets have required fields
-    for ticket_file in ticket_files:
-        ticket = parse_ticket(ticket_file)
-        if not ticket.acceptance_criteria:
-            return False, f"{ticket.id} missing acceptance criteria"
-
-    return True, f"Planning complete ({len(ticket_files)} tickets created)"
-```
-
-### Development Phase Validation
-
-```python
-def validate_development():
-    ticket_files = glob('.agents/tickets/TICKET-*.md')
-    if not ticket_files:
-        return False, "No tickets found"
-
-    incomplete = []
-    for ticket_file in ticket_files:
-        ticket = parse_ticket(ticket_file)
-        if ticket.status not in ["QA Pass", "Complete"]:
-            incomplete.append(f"{ticket.id} ({ticket.status})")
-
-    if incomplete:
-        return False, f"Incomplete tickets: {', '.join(incomplete)}"
-
-    return True, f"All {len(ticket_files)} tickets complete"
-```
 
 ## Error Handling
 
@@ -471,15 +293,6 @@ Current project phase: [Current]
 To proceed: "Move to [Next Phase] phase"
 ```
 
-## Automatic vs. Manual Transitions
-
-**Automatic** (no user approval needed):
-- None (all transitions require explicit approval for safety)
-
-**Manual** (user approval required):
-- All phase transitions
-- Ensures Bob controls the workflow and can review before proceeding
-
 ## Project History
 
 Record each transition in `.agents/status.md`:
@@ -495,7 +308,3 @@ Record each transition in `.agents/status.md`:
 | 2026-02-23 | PLANNING      | DEVELOPMENT   | Bob         | 19 tickets created |
 | 2026-03-01 | DEVELOPMENT   | DELIVERY      | Bob         | All tickets QA pass |
 ```
-
----
-
-**Compatibility**: Works with both Claude Code and OpenCode (opencode compatible).
