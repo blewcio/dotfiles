@@ -297,15 +297,15 @@ ln -sf $DOTFILES_DIR/config/zsh/zsh_plugins.txt ~/.zsh_plugins.txt
 
 # Claude Code and Desktop use different config directories
 mkdir -p ~/.claude
-ln -sf $DOTFILES_DIR/agents/CLAUDE.md ~/.claude/CLAUDE.md
-ln -sf $DOTFILES_DIR/agents/agents ~/.claude/agents
+ln -sf $DOTFILES_DIR/ai/CLAUDE.md ~/.claude/CLAUDE.md
+ln -sf $DOTFILES_DIR/ai/agents ~/.claude/agents
 
 mkdir -p ~/.config/claude
 ln -sf $DOTFILES_DIR/config/claude_desktop/claude_desktop_config.json ~/.config/claude/claude_desktop_config.json
 
 mkdir -p ~/.config/opencode
 ln -sf $DOTFILES_DIR/config/opencode/opencode.json ~/.config/opencode/opencode.json
-ln -sf $DOTFILES_DIR/agents/CLAUDE.md ~/.config/opencode/AGENTS.md
+ln -sf $DOTFILES_DIR/ai/CLAUDE.md ~/.config/opencode/AGENTS.md
 bash $DOTFILES_DIR/bin/link-skills
 
 echo "Symlinks created successfully"

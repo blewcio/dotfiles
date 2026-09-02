@@ -95,13 +95,13 @@ The repo uses 7 git submodules — running `git submodule update --init --recurs
 
 ## Agents / Claude Code Integration
 
-The `agents/` directory is the source of truth for Claude Code / OpenCode configuration, deployed by `deploy.sh` and `bin/link-skills`:
+The `ai/` directory is the source of truth for Claude Code / OpenCode configuration, deployed by `deploy.sh` and `bin/link-skills`:
 
-- `agents/CLAUDE.md` → symlinked to `~/.claude/CLAUDE.md` and `~/.config/opencode/AGENTS.md` (single source, plain symlink — Bob's global instructions live here, not in this file).
-- `agents/agents/` → symlinked whole-directory to `~/.claude/agents` (agent definitions, including `agents/agents/product-team/`).
-- `agents/skills/` → individual skill directories are symlinked into `~/.claude/skills/` (and mirrored to `~/.config/opencode/skills/`) by `bin/link-skills`, which also merges in `private/skills/`. This is a separate script (not a plain `ln -sf` in `deploy.sh`) because skills need per-item merging from two sources; `CLAUDE.md`/`agents/` don't, since they only have one source. Run `bin/link-skills` manually to pick up newly added skills without a full `deploy.sh` run.
+- `ai/CLAUDE.md` → symlinked to `~/.claude/CLAUDE.md` and `~/.config/opencode/AGENTS.md` (single source, plain symlink — Bob's global instructions live here, not in this file).
+- `ai/agents/` → symlinked whole-directory to `~/.claude/agents` (agent definitions, including `ai/agents/product-team/`).
+- `ai/skills/` → individual skill directories are symlinked into `~/.claude/skills/` (and mirrored to `~/.config/opencode/skills/`) by `bin/link-skills`, which also merges in `private/skills/`. This is a separate script (not a plain `ln -sf` in `deploy.sh`) because skills need per-item merging from two sources; `CLAUDE.md`/`ai/` don't, since they only have one source. Run `bin/link-skills` manually to pick up newly added skills without a full `deploy.sh` run.
 
-**Product Team Workflow**: an autonomous 6-agent system for running full dev lifecycles (concept → design → architecture → planning → development → delivery), defined across `agents/agents/product-team/` and `agents/skills/product-team/`. Full docs: `agents/PRODUCT-TEAM.md`.
+**Product Team Workflow**: an autonomous 6-agent system for running full dev lifecycles (concept → design → architecture → planning → development → delivery), defined across `ai/agents/product-team/` and `ai/skills/product-team/`. Full docs: `ai/PRODUCT-TEAM.md`.
 
 ## macOS-Specific
 

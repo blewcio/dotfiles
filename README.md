@@ -110,7 +110,7 @@ dotfiles/
 │   ├── Brewfile           # Homebrew packages
 │   └── mac-install.sh     # macOS installation script
 ├── private/               # Private config submodule (optional)
-└── agents/                # Claude Code agents and skills
+└── ai/                     # Claude Code agents and skills
 ```
 
 ## Key Configuration Files

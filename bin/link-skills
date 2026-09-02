@@ -60,8 +60,8 @@ link_skills_from() {
 
 echo "Linking skills into $SKILLS_TARGET ..."
 echo ""
-echo "Tracked skills (agents/skills/):"
-link_skills_from "$DOTFILES_DIR/agents/skills" "tracked"
+echo "Tracked skills (ai/skills/):"
+link_skills_from "$DOTFILES_DIR/ai/skills" "tracked"
 
 echo ""
 echo "Private skills (private/skills/):"

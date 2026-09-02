@@ -561,20 +561,20 @@ This creates an audit trail of decisions.
 
 ## File Locations
 
-**Agent Definitions**: `~/dotfiles/agents/agents/product-team/`
+**Agent Definitions**: `~/dotfiles/ai/agents/product-team/`
 - product-designer.md
 - software-architect.md
 - product-manager.md
 - software-developer.md
 - qa-engineer.md
 
-**Skill Definitions**: `~/dotfiles/agents/skills/product-team/`
+**Skill Definitions**: `~/dotfiles/ai/skills/product-team/`
 - project-init/SKILL.md
 - project-status/SKILL.md
 - next-ticket/SKILL.md
 - transition-phase/SKILL.md
 
-**Documentation**: `~/dotfiles/agents/PRODUCT-TEAM.md` (this file)
+**Documentation**: `~/dotfiles/ai/PRODUCT-TEAM.md` (this file)
 
 ## Future Enhancements
 
@@ -592,4 +592,4 @@ Potential additions (not yet implemented):
 **Created**: 2026-02-20
 **Status**: Production Ready
 
-For questions or issues, refer to `~/dotfiles/agents/CLAUDE.md` for agent-specific guidance.
+For questions or issues, refer to `~/dotfiles/ai/CLAUDE.md` for agent-specific guidance.
