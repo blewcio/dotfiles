@@ -36,7 +36,7 @@ if [ -x "$(command -v dust)" ]; then
 fi
 
 # Default df to human readable
-alias df='df -h && echo "Dont forget duf!"' 
+alias df='df -h && echo -e "\nDont forget duf!"'
 
 # Shotcuts for ls
 alias la="ls --long --all --group" # -lAh
