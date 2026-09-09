@@ -68,7 +68,7 @@ fi
 
 # Display cool system info (only on initial shell startup, not on re-source)
 if [ -x "$(command -v fastfetch)" ] && [ -z "$SHELLRC_LOADED" ]; then
-  eval fastfetch
+  fastfetch
 fi
 
 # ZSH specific config
