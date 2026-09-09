@@ -5,7 +5,7 @@ case $- in
 esac
 
 # Define conditional helper for Antidote (used in zsh_plugins.txt)
-is-macos() { [[ "$OSTYPE" == darwin* ]] }
+is-macos() { [[ "$OSTYPE" == darwin* ]]; }
 
 # Add sbin and bin in $HOME to $PATH (only if not already present)
 _add_to_path() {
