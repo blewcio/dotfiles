@@ -1,15 +1,15 @@
 ---
 name: note-cleanup
-description: Review and polish Obsidian notes — fix typos/grammar, reflow paste artifacts, transcribe screenshots into Markdown/LaTeX, and verify clean rendering. Use when asked to review, clean up, polish, or proofread notes.
+description: Review and polish Obsidian notes — fix typos/grammar, reflow paste artifacts, reduce content duplication (including a final whole-document duplication sweep), transcribe screenshots into Markdown/LaTeX, append a short Key Learning to each section, and verify clean rendering. Use when asked to review, clean up, polish, or proofread notes.
 compatibility: opencode
 ---
 
 # Clean-up Notes — note quality review
 
 Workflow for raising the quality of dumped/pasted Obsidian notes: fixing
-typos and grammar, reflowing paste artifacts into prose, transcribing
-screenshots into real Markdown/LaTeX, and enforcing clean heading structure.
-Works on any vault — detect the vault root rather than assuming one.
+typos and grammar, reflowing paste artifacts into prose, reducing duplication
+transcribing screenshots into real Markdown/LaTeX, and enforcing clean heading
+structure. Works on any vault — detect the vault root rather than assuming one.
 
 ## Non-goals
 
@@ -17,7 +17,7 @@ Don't add content the source didn't have, don't reorder chronological journal
 entries, don't delete raw information (mark it as a flagged callout instead of
 guessing or dropping it), and don't correct facts or logic in the source —
 this is a *formatting and clarity* pass (typos, grammar, Markdown syntax,
-structure), not a rewrite or a fact-check.
+duplication, structure), not a rewrite or a fact-check.
 
 ## Step 0 — Scope
 
@@ -90,7 +90,10 @@ If the user says to use your own judgment rather than asking each time, apply
 these defaults: fix typos and grammar, reflow choppy lines into prose; keep
 images and add transcriptions alongside them; merge duplicate blocks into one
 clean copy; flag cut-offs and ambiguous source content with an Obsidian
-callout rather than guessing or dropping it:
+callout rather than guessing or dropping it; add a Key Learning to each
+section (Step 6) and run the final duplication sweep (Step 7) regardless of
+whether asking-per-decision or default-judgment mode is in effect — those two
+steps aren't judgment calls, they run every time:
 
 ```markdown
 > [!note] Source cut off
@@ -116,7 +119,61 @@ callout rather than guessing or dropping it:
 - Translate or gloss non-English fragments inline rather than leaving them
   opaque, unless the user prefers otherwise.
 
-## Step 6 — Verify
+## Step 6 — Add Key Learnings
+
+For each `##`-level section, end it with one bolded, one-sentence takeaway:
+
+```markdown
+**Key learning:** <the section's actionable takeaway, in one sentence>.
+```
+
+- Draw the sentence only from facts already in that section — this is a
+  distillation, not a place to introduce new claims, sources, or advice the
+  section didn't already support.
+- Skip a section if the user's own notes already end on an equivalent
+  one-line takeaway — don't add a second, redundant summary immediately
+  after an existing one.
+- Thin or fragmentary sections (e.g. ones flagged with a "Source cut off"
+  callout) can still get a Key learning if there's enough content to
+  distill; if there truly isn't, skip it rather than padding with filler.
+- Keep the phrasing consistent across sections (same bold lead-in, one
+  sentence, no sub-bullets) so the notes read as one system rather than a
+  patchwork of styles.
+
+## Step 7 — Final duplication sweep (whole document)
+
+Section-by-section editing (Steps 4–6) can still leave duplication that only
+shows up when the file is read top-to-bottom as a whole — including
+duplication the Key Learning pass itself can introduce. Before moving on to
+verification, re-scan the *entire* edited file, not just the sections you
+just touched:
+
+- **Repeated embeds** — the same image pasted in twice (including with
+  different `|size` suffixes counting as the same embed):
+  ```bash
+  grep -o 'Pasted image [0-9]*\.png' "<file>" | sed -E 's/\|[0-9]+//' | sort | uniq -c | sort -rn | awk '$1>1'
+  ```
+  Keep one instance; drop the extra unless the user has said not to touch
+  embeds at all.
+- **Repeated facts/quotes/stats across sections** — the same number, quote,
+  or definition restated almost verbatim in two places (common when a
+  section mixes an AI-generated summary paragraph with the user's own
+  bullets, or when two adjacent lecture sections cover overlapping ground).
+  Merge into the one location where it reads best; don't just delete the
+  second occurrence if it adds a nuance the first lacks — fold that nuance
+  in instead.
+- **Newly-introduced flow issues** — edits from earlier steps (especially
+  inserting a Key Learning line or a flag callout right before a heading)
+  can leave a missing blank line at a section boundary. Check across the
+  whole file, not just the spots you edited:
+  ```bash
+  awk 'NR>1 && /^## / && prev!="" {print "line " NR-1 ": missing blank line before heading -> " $0} {prev=$0}' "<file>"
+  ```
+- Don't reach for this sweep as an excuse to re-litigate content you already
+  decided to keep — it's for duplication and flow only, not a second editing
+  pass over settled prose.
+
+## Step 8 — Verify
 
 Render-test every edited file to catch broken Markdown before calling it done:
 
@@ -154,9 +211,10 @@ Also confirm every `![[embed]]` target actually exists in the expected
 attachments folder (filenames with parentheses or ` (1)` suffixes are worth
 double-checking).
 
-## Step 7 — Report
+## Step 9 — Report
 
-Summarize per file what changed, list the backup path created for each, and
+Summarize per file what changed, list the backup path created for each, note
+how many Key Learnings were added (and any sections skipped, with why), and
 call out anything left flagged (truncated content, unclear source cells,
 untranslated text, suspected factual/logical issues) rather than silently
 resolving it.
