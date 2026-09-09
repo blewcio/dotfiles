@@ -51,6 +51,11 @@ fi
 unset PRIVATE_SHELL_DIR
 
 # Track SSH nesting depth to prevent tmux auto-attach in nested SSH sessions
+# TODO: this most likely does not work across real SSH hops to a different host,
+# since exported vars aren't forwarded over SSH by default (would need SendEnv/
+# AcceptEnv on the remote, which isn't controlled by these dotfiles). See chat
+# history for a client-side fix idea (wrap ssh to inject SSH_DEPTH into the
+# remote command instead of relying on env forwarding).
 export SSH_DEPTH=${SSH_DEPTH:-0}
 export SSH_DEPTH=$((SSH_DEPTH + 1))
 
