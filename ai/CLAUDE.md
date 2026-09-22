@@ -37,6 +37,7 @@
 - If you spot we do a repetative task that could be a command or a skill, ask if I want to create one
 - When developing a new skill, first outline the functionality and expected behavior before writing any code.
 - For skill development, follow the standard structure for skills, including a clear README, well-defined input and output formats, and comprehensive tests.
+- Name every skill `<domain>-<action>` (e.g. `note-cleanup`, `project-init`) so related skills group together alphabetically and the name signals both subject and behavior. Avoid bare noun-phrases (`learning-notes`) and action-first names missing a domain prefix (`transition-phase` instead of `project-transition-phase`). The directory name must match the `name:` field in its `SKILL.md`.
 
 ## Product Team Workflow
 
