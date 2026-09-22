@@ -1,6 +1,6 @@
 ---
-name: note-cleanup
-description: Review and polish Obsidian notes — fix typos/grammar, reflow paste artifacts, reduce content duplication (including a final whole-document duplication sweep), transcribe screenshots into Markdown/LaTeX, append a short Key Learning to each section, and verify clean rendering. Use when asked to review, clean up, polish, or proofread notes.
+name: notes-cleanup
+description: Review and polish Obsidian notes — fix typos/grammar, reflow paste artifacts, reduce content duplication (including a final whole-document duplication sweep and a holistic coherence/readability review), transcribe screenshots into Markdown/LaTeX, append a short Key Learning to each section, add frontmatter + a Pro Tips — Quick Reference section + a Table of Contents, and verify clean rendering. Use when asked to review, clean up, polish, or proofread notes.
 compatibility: opencode
 ---
 
@@ -91,8 +91,9 @@ these defaults: fix typos and grammar, reflow choppy lines into prose; keep
 images and add transcriptions alongside them; merge duplicate blocks into one
 clean copy; flag cut-offs and ambiguous source content with an Obsidian
 callout rather than guessing or dropping it; add a Key Learning to each
-section (Step 6) and run the final duplication sweep (Step 7) regardless of
-whether asking-per-decision or default-judgment mode is in effect — those two
+section (Step 6), run the final duplication sweep (Step 8), and run the
+coherence and readability review (Step 9) regardless of whether
+asking-per-decision or default-judgment mode is in effect — those three
 steps aren't judgment calls, they run every time:
 
 ```markdown
@@ -140,7 +141,50 @@ For each `##`-level section, end it with one bolded, one-sentence takeaway:
   sentence, no sub-bullets) so the notes read as one system rather than a
   patchwork of styles.
 
-## Step 7 — Final duplication sweep (whole document)
+## Step 7 — Add document-level scaffolding (frontmatter, Pro Tips, Table of Contents)
+
+Once section-level edits (Steps 4–6) have settled the note's final heading
+structure, add three standing pieces at the top of the file. These run every
+time on any note this skill touches — they aren't a judgment call, and they
+apply regardless of whether you're in asking-per-decision or default-judgment
+mode.
+
+**Frontmatter.** Add or update YAML frontmatter. Check a couple of other
+notes in the same vault first for the schema already in use there, and match
+it rather than inventing a new one. A typical course-note schema:
+
+```yaml
+---
+course: <Course Name>
+provider: <School/Platform>
+status: in-progress | completed
+completed: <YYYY-MM-DD>   # omit this field while status is in-progress
+language: en
+tags: [ai, <topic>, course-notes]
+---
+```
+
+Only set `status: completed` (and the `completed:` date) when the user has
+told you the course/material is actually finished — don't infer this from
+the content alone, and ask if it's ambiguous.
+
+**Pro Tips — Quick Reference.** A `## Pro Tips — Quick Reference` section
+right after the frontmatter (after a one-sentence summary line of what the
+note covers, if it doesn't already have one). Like Key Learnings, this is a
+*distillation* — draw every bullet from facts already in the note, don't
+introduce new claims or advice. If nearby notes in the vault split tips into
+"My own notes:" vs. "From the course material:" subsections, match that
+split; only add a "My own notes:" subsection if the user actually has
+personal annotations to fold in — don't fabricate one to fill the shape.
+
+**Table of Contents.** A `## Table of Contents` section listing every
+`##`/`###` heading in reading order, grouped under its parent module/section
+(bold section label, indented bullets), using Obsidian internal links —
+`[[#Exact Heading Text]]`, copied verbatim from the heading. Close with a
+`**Reference**` group linking back to `[[#Pro Tips — Quick Reference]]` (and
+`[[#Course Glossary — Quick Reference]]` too, if the note has a glossary).
+
+## Step 8 — Final duplication sweep (whole document)
 
 Section-by-section editing (Steps 4–6) can still leave duplication that only
 shows up when the file is read top-to-bottom as a whole — including
@@ -173,35 +217,52 @@ just touched:
   decided to keep — it's for duplication and flow only, not a second editing
   pass over settled prose.
 
-## Step 8 — Verify
+## Step 9 — Coherence and readability review
 
-Render-test every edited file to catch broken Markdown before calling it done:
+The Step 8 sweep is mechanical — grep for near-verbatim repeats, missing
+blank lines. It won't catch the same concept explained several times in
+*different words* scattered across non-adjacent paragraphs, a section that
+doesn't logically follow from the one before it, or a Key Learning/Pro Tip
+that's quietly drifted from what its section actually says. This step is a
+holistic, human-style read-through of the *entire* edited file, front to
+back, asking three questions:
+
+- **Reads well:** Is there a paragraph, once you reach it, where you think
+  "wasn't this already explained"? Dense AI-generated video-summary sections
+  are the usual suspects — the same definition or example restated with new
+  phrasing two or three times across paragraphs that aren't adjacent enough
+  for Step 8's grep to catch.
+- **Logical:** Does the section order make sense to someone learning this
+  material for the first time? Do Key Learnings and Pro Tips bullets
+  accurately distill what their section says, with no invented claims and no
+  drift?
+- **Consistent:** Same term used the same way throughout (no silent
+  swap between synonyms the source itself didn't use interchangeably), no
+  section contradicting another.
+
+If this surfaces a fix, treat it exactly like a Step 4 judgment call —
+propose the merge/tightening and ask before applying, unless the user has
+already opted into default-judgment mode, in which case apply it directly
+using the same "merge duplicate blocks into one clean copy" default (fold in
+any nuance a repeated paragraph adds that the others lack; don't just delete
+it). If you do make edits here, re-run the Step 8 sweep and Step 10 verify
+afterward — this pass can itself introduce the kind of flow or duplication
+issues those steps catch.
+
+Don't use this step to re-litigate content you already deliberately kept —
+it's for redundancy, flow, and consistency the earlier steps couldn't see,
+not a second pass over settled prose.
+
+## Step 10 — Verify
+
+Render-test every edited file to catch broken Markdown before calling it done,
+using `scripts/verify_markdown.py` (bundled with this skill — checks for
+accidental unescaped tags, stray non-breaking spaces, and unexpected `<pre>`
+blocks):
 
 ```bash
 python3 -m venv /tmp/mdtest && /tmp/mdtest/bin/pip install --quiet markdown-it-py
-```
-
-```python
-from markdown_it import MarkdownIt
-from pathlib import Path
-import re
-
-md = MarkdownIt('commonmark')
-known_tags = {'<ul>','<li>','<ol>','<p>','<strong>','<em>','<code>','<a>',
-              '<br>','<hr>','<h1>','<h2>','<h3>','<h4>','<h5>','<h6>','<blockquote>'}
-
-for f in edited_files:  # list of Path objects
-    text = f.read_text(encoding='utf-8')
-    html = md.render(text)
-    # Expect <pre> only from deliberate ``` fenced blocks — check by eye which ones fired.
-    if '<pre>' in html:
-        print(f, '-> check: accidental code block, or an intentional fenced block?')
-    suspicious = [s for s in re.findall(r'<[a-zA-Z][a-zA-Z0-9_+-]*>(?!</)', html)
-                  if s.lower() not in known_tags]
-    if suspicious:
-        print(f, '-> unescaped tag-like content:', suspicious)
-    if '\xa0' in text:
-        print(f, '-> non-breaking spaces:', text.count('\xa0'))
+/tmp/mdtest/bin/python3 scripts/verify_markdown.py <file> [<file> ...]
 ```
 
 If the vault root has a `CLAUDE.md` with its own "how to verify" section
@@ -209,12 +270,20 @@ If the vault root has a `CLAUDE.md` with its own "how to verify" section
 
 Also confirm every `![[embed]]` target actually exists in the expected
 attachments folder (filenames with parentheses or ` (1)` suffixes are worth
-double-checking).
+double-checking), and that every `[[#Exact Heading Text]]` link added in the
+Table of Contents (Step 7) resolves to a real heading in the file:
 
-## Step 9 — Report
+```bash
+grep -oE '\[\[#[^]]+\]\]' "<file>" | sed -E 's/\[\[#(.*)\]\]/\1/' | while read -r h; do
+  grep -qF "$h" <(grep -E '^#{1,4} ' "<file>") || echo "MISSING: $h"
+done
+```
+
+## Step 11 — Report
 
 Summarize per file what changed, list the backup path created for each, note
-how many Key Learnings were added (and any sections skipped, with why), and
-call out anything left flagged (truncated content, unclear source cells,
-untranslated text, suspected factual/logical issues) rather than silently
-resolving it.
+how many Key Learnings were added (and any sections skipped, with why),
+confirm the frontmatter/Pro Tips/Table of Contents were added or updated,
+note anything the Step 9 coherence review fixed, and call out anything left
+flagged (truncated content, unclear source cells, untranslated text,
+suspected factual/logical issues) rather than silently resolving it.
