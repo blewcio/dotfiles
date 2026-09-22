@@ -1,5 +1,5 @@
 ---
-name: next-ticket
+name: project-next-ticket
 description: Find and assign the next available ticket for development (status Ready, no blocking dependencies)
 compatibility: opencode
 ---
@@ -135,4 +135,4 @@ Recommendations:
 
 - **After this skill**: Developer invokes software-developer agent with ticket ID
 - **Before this skill**: Check project-status to see overall state
-- **Related skills**: transition-phase (to move between workflow phases)
+- **Related skills**: project-transition-phase (to move between workflow phases)

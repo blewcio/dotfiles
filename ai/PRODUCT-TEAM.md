@@ -198,12 +198,12 @@ Display current phase, ticket progress, and next actions.
 
 **Usage**: `"Show project status"` or `"Where are we?"`
 
-### next-ticket
+### project-next-ticket
 Find the next available ticket ready for development.
 
 **Usage**: `"Get next ticket"` or `"What should I work on?"`
 
-### transition-phase
+### project-transition-phase
 Move between workflow phases with validation and approval.
 
 **Usage**: `"Move to architecture phase"` or `"Start development"`
@@ -566,8 +566,8 @@ This creates an audit trail of decisions.
 **Skill Definitions**: `~/dotfiles/ai/skills/product-team/`
 - project-init/SKILL.md
 - project-status/SKILL.md
-- next-ticket/SKILL.md
-- transition-phase/SKILL.md
+- project-next-ticket/SKILL.md
+- project-transition-phase/SKILL.md
 
 **Documentation**: `~/dotfiles/ai/PRODUCT-TEAM.md` (this file)
 

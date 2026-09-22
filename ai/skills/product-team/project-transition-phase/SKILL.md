@@ -1,5 +1,5 @@
 ---
-name: transition-phase
+name: project-transition-phase
 description: Move project to the next workflow phase after validating completion of current phase and getting user approval
 compatibility: opencode
 ---
