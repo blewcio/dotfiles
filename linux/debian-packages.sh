@@ -59,7 +59,6 @@ SEARCH_TOOLS=(
   zoxide               # Smarter cd (Rust-based)
   fd-find              # Easy find (installed as 'fdfind', symlink to 'fd')
   ripgrep              # Improved grep
-  broot                # Interactive file manager
 )
 
 # ===== Filesystem Tools =====
@@ -175,7 +174,6 @@ APT_PACKAGES=(
   zoxide
   fd-find
   ripgrep
-  broot
   bat
   eza
   lsd

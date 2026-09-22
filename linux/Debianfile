@@ -22,7 +22,6 @@ fasd                    # Quick file/directory access
 zoxide                  # Smarter cd command
 fd-find                 # Modern find replacement (fdfind → fd)
 ripgrep                 # Fast grep replacement
-broot                   # Interactive directory navigation
 
 # ===== Filesystem Tools =====
 bat                     # Cat with syntax highlighting (batcat → bat)

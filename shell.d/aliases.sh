@@ -47,11 +47,6 @@ fi
 alias l='ls -F'
 alias l.='ls -d .*'
 
-# Interactive-list with br
-if [ -x "$(command -v broot)" ]; then
-  alias lo="br -sdp"
-fi
-
 # fasd maintenance - remove stale entries (deleted files/dirs)
 if [ -x "$(command -v fasd)" ]; then
   alias fasd-cleanup='fasd -l | while read f; do [ ! -e "$f" ] && fasd -D "$f"; done && echo "Cleaned stale fasd entries"'

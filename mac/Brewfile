@@ -60,7 +60,6 @@ brew "age"                 # File encryption
 #brew "thefuck"             # Correction of misstyped commands
 #brew "midnight-commander"  # Midnight comander
 #brew "nnn"                 # Lighting fast file manager
-#brew "broot"               # Interactive file manager & search, incl. infile search
 #TODO vimv - vim style mass renamer of files
 #TODO brew "pigz"         # Parallel gzip (add alias) / Not used daily
 #TODO cask foremost/testdisk recovery # Data recovery tool

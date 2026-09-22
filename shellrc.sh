@@ -395,12 +395,6 @@ if [[ -x "$(command -v fasd)" ]]; then
  fi
 fi
 
-# Initiate broot (only once)
-if [ -x "$(command -v broot)" ] && [ -f ~/.config/broot/launcher/bash/br ] && [ -z "$BROOT_INITIALIZED" ]; then
-    source ~/.config/broot/launcher/bash/br
-    export BROOT_INITIALIZED=1
-fi
-
 # Initiate the fuck (only once)
 if [ -x "$(command -v thefuck)" ] && [ -z "$THEFUCK_INITIALIZED" ]; then
     eval $(thefuck --alias)

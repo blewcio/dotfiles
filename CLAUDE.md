@@ -109,7 +109,7 @@ The `ai/` directory is the source of truth for Claude Code / OpenCode configurat
   - Terminal tools: tmux, git, fzf, fasd, ripgrep, fd, bat, eza
   - Productivity apps: Arc, Raycast, Caffeine, SpaceLauncher, Claude Code
   - Development tools: neovim, lazygit, git-delta
-  - File management: yazi, nnn, mc, broot
+  - File management: yazi, nnn, mc
   - System monitoring: btop, bottom, glances, htop
   - Network utilities: nmap, bandwhich, iperf, httpie
   - Media tools: ffmpeg, exiftool, viu, phoenix-slides
