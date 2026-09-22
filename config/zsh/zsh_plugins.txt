@@ -94,7 +94,10 @@ catppuccin/zsh-fsh kind:clone
 
 # FZF-tab - replace zsh default completion with fzf
 # Enhances tab completion with fuzzy finder interface
-aloxaf/fzf-tab kind:defer
+# Not deferred: must load before fzf's own completion.zsh (sourced later in
+# shellrc.sh) so fzf-completion wraps fzf-tab as its Tab fallback, preserving
+# both fzf-tab's menu and fzf's own **<Tab> fuzzy-completion trigger.
+aloxaf/fzf-tab
 
 # Zsh-notify (macOS only) - desktop notifications for long-running commands
 # Shows notification when command takes longer than 30s
