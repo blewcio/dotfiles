@@ -31,24 +31,19 @@ if is-macos; then
   fi
 fi
 
-# Source all config files from shell config folder
-SHELL_CONFIG_DIR=$HOME/dotfiles/shell.d
-if [ -d "$SHELL_CONFIG_DIR" ]; then
-  for shellfile in ${SHELL_CONFIG_DIR}/*.sh; do
-    [ -r "$shellfile" ] && source "$shellfile"
-  done
-  unset shellfile
-fi
+# Source all *.sh files from a directory (used for shell.d and the private submodule)
+_source_shell_dir() {
+  local dir="$1"
+  if [ -d "$dir" ]; then
+    for shellfile in "$dir"/*.sh; do
+      [ -r "$shellfile" ] && source "$shellfile"
+    done
+    unset shellfile
+  fi
+}
 
-# Source private configuration (git submodule)
-PRIVATE_SHELL_DIR=$HOME/dotfiles/private/shell
-if [ -d "$PRIVATE_SHELL_DIR" ]; then
-  for shellfile in ${PRIVATE_SHELL_DIR}/*.sh; do
-    [ -r "$shellfile" ] && source "$shellfile"
-  done
-  unset shellfile
-fi
-unset PRIVATE_SHELL_DIR
+_source_shell_dir "$HOME/dotfiles/shell.d"
+_source_shell_dir "$HOME/dotfiles/private/shell"
 
 # Track SSH nesting depth to prevent tmux auto-attach in nested SSH sessions
 # TODO: this most likely does not work across real SSH hops to a different host,
@@ -235,13 +230,6 @@ if [[ "$SHELL" == *"zsh" ]]; then
     export FASD_INITIALIZED=1
   fi
 
-  # Initialize zoxide (only once)
-  unalias z 2>/dev/null || true  # Remove z alias if it exists
-  if [[ -x "$(command -v zoxide)" ]] && [ -z "$ZOXIDE_ZSH_INITIALIZED" ]; then
-    eval "$(zoxide init zsh)"
-    export ZOXIDE_ZSH_INITIALIZED=1
-  fi
-
   # Start fzf (only once)
   if [ -f ~/.fzf.zsh ] && [ -z "$FZF_ZSH_INITIALIZED" ]; then
     source ~/.fzf.zsh
@@ -335,11 +323,17 @@ if [[ "$SHELL" == *"bash" ]] || [[ "$SHELL" == *"/sh" ]]; then
     _fasd_bash_hook_cmd_complete
     export FASD_INITIALIZED=1
   fi
+fi
 
-  # Initialize zoxide (only once)
-  if [[ -x "$(command -v zoxide)" ]] && [ -z "$ZOXIDE_BASH_INITIALIZED" ]; then
+# Initialize zoxide (only once, shared between zsh and bash)
+unalias z 2>/dev/null || true  # Remove z alias if it exists
+if [[ -x "$(command -v zoxide)" ]] && [ -z "$ZOXIDE_INITIALIZED" ]; then
+  if [[ "$SHELL" == *"zsh" ]]; then
+    eval "$(zoxide init zsh)"
+    export ZOXIDE_INITIALIZED=1
+  elif [[ "$SHELL" == *"bash" ]] || [[ "$SHELL" == *"/sh" ]]; then
     eval "$(zoxide init bash)"
-    export ZOXIDE_BASH_INITIALIZED=1
+    export ZOXIDE_INITIALIZED=1
   fi
 fi
 
@@ -405,3 +399,4 @@ fi
 export SHELLRC_LOADED=1
 
 unset -f _add_to_path
+unset -f _source_shell_dir
