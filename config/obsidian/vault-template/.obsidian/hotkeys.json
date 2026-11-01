@@ -1,0 +1,38 @@
+{
+  "realclaudian:open-view": [
+    {
+      "modifiers": ["Mod", "Shift"],
+      "key": " "
+    }
+  ],
+  "global-search:open": [
+    {
+      "modifiers": ["Mod", "Shift"],
+      "key": "A"
+    }
+  ],
+  "app:toggle-left-sidebar": [
+    {
+      "modifiers": ["Mod", "Shift"],
+      "key": "S"
+    }
+  ],
+  "daily-notes": [
+    {
+      "modifiers": ["Mod", "Shift"],
+      "key": "D"
+    }
+  ],
+  "workspace:export-pdf": [
+    {
+      "modifiers": ["Mod", "Shift"],
+      "key": "E"
+    }
+  ],
+  "app:switch-vault": [
+    {
+      "modifiers": ["Mod", "Shift"],
+      "key": "O"
+    }
+  ]
+}
