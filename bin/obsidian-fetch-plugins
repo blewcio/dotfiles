@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+# ------------------------------------------------------------
+# Download Obsidian community plugin code (main.js, manifest.json,
+# styles.css) listed in config/obsidian/plugins.txt from GitHub
+# releases into a local cache, so plugin bundles never live in git.
+#
+# Cached plugins are reused as-is; nothing changes until you ask:
+#
+#   obsidian-fetch-plugins            fetch plugins missing from the cache
+#   obsidian-fetch-plugins --update   re-download all, show old -> new versions
+#   obsidian-fetch-plugins --ids      print plugin ids from plugins.txt
+#   obsidian-fetch-plugins --cache-dir   print the cache location
+#
+# Cache: ~/.cache/obsidian-plugins (override with OBSIDIAN_PLUGIN_CACHE).
+# Used by obsidian-new-vault and obsidian-sync-vault.
+# ------------------------------------------------------------
+set -euo pipefail
+
+MANIFEST="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/config/obsidian/plugins.txt"
+CACHE_DIR="${OBSIDIAN_PLUGIN_CACHE:-$HOME/.cache/obsidian-plugins}"
+
+# Print "<id> <repo> <version-or-empty>" for each manifest entry
+read_manifest() {
+    local id repo version _
+    while read -r id repo version _; do
+        [[ -z "$id" || "$id" == \#* ]] && continue
+        echo "$id $repo ${version:-}"
+    done < "$MANIFEST"
+}
+
+cached_version() {
+    jq -r '.version // empty' "$CACHE_DIR/$1/manifest.json" 2>/dev/null || true
+}
+
+fetch_plugin() {
+    local id="$1" repo="$2" pinned="$3" base tmp new old
+    if [[ -n "$pinned" ]]; then
+        base="https://github.com/$repo/releases/download/$pinned"
+    else
+        base="https://github.com/$repo/releases/latest/download"
+    fi
+
+    tmp="$(mktemp -d)"
+    if ! curl -fsSL --max-time 60 -o "$tmp/main.js" "$base/main.js" \
+        || ! curl -fsSL --max-time 60 -o "$tmp/manifest.json" "$base/manifest.json"; then
+        rm -rf "$tmp"
+        echo "  FAILED  $id ($repo): could not download release assets" >&2
+        return 1
+    fi
+    # styles.css is optional (some plugins ship none)
+    curl -fsSL --max-time 60 -o "$tmp/styles.css" "$base/styles.css" 2>/dev/null || rm -f "$tmp/styles.css"
+
+    # Guard against a wrong repo mapping in plugins.txt
+    if [[ "$(jq -r '.id // empty' "$tmp/manifest.json")" != "$id" ]]; then
+        rm -rf "$tmp"
+        echo "  FAILED  $id ($repo): release manifest id does not match" >&2
+        return 1
+    fi
+
+    old="$(cached_version "$id")"
+    new="$(jq -r '.version' "$tmp/manifest.json")"
+    mkdir -p "$CACHE_DIR"
+    rm -rf "${CACHE_DIR:?}/$id"
+    mv "$tmp" "$CACHE_DIR/$id"
+    if [[ -z "$old" ]]; then
+        echo "  fetched  $id $new"
+    elif [[ "$old" == "$new" ]]; then
+        echo "  current  $id $new"
+    else
+        echo "  updated  $id $old -> $new"
+    fi
+}
+
+MODE="${1:-}"
+case "$MODE" in
+    --cache-dir) echo "$CACHE_DIR"; exit 0 ;;
+    --ids) read_manifest | cut -d' ' -f1; exit 0 ;;
+    ""|--update) ;;
+    *) echo "Usage: $0 [--update|--ids|--cache-dir]" >&2; exit 1 ;;
+esac
+
+for tool in curl jq; do
+    command -v "$tool" >/dev/null 2>&1 || { echo "Error: $tool is required" >&2; exit 1; }
+done
+
+failed=0
+while read -r id repo version; do
+    if [[ "$MODE" != "--update" && -f "$CACHE_DIR/$id/main.js" && -f "$CACHE_DIR/$id/manifest.json" ]]; then
+        echo "  cached   $id $(cached_version "$id")"
+        continue
+    fi
+    fetch_plugin "$id" "$repo" "$version" || failed=1
+done < <(read_manifest)
+
+exit "$failed"

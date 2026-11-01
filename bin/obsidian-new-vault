@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+# ------------------------------------------------------------
+# Create a new Obsidian vault pre-configured with Bob's standard
+# settings and plugin set (see dotfiles/config/obsidian/README.md).
+# Plugin code comes from the local cache filled by obsidian-fetch-plugins.
+#
+# Files Obsidian/plugins rewrite at runtime are COPIED (symlinking
+# them risks corruption if two vaults are open at once, since
+# Obsidian overwrites them without checking if they changed on
+# disk). Files only ever hand-edited in the template are SYMLINKED
+# so edits to the template apply live to every vault.
+#
+#   obsidian-new-vault ~/path/to/new-vault
+# ------------------------------------------------------------
+set -euo pipefail
+
+BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TEMPLATE_DIR="$(cd "$BIN_DIR/.." && pwd)/config/obsidian/vault-template"
+FETCH="$BIN_DIR/obsidian-fetch-plugins"
+
+if [[ $# -ne 1 ]]; then
+    echo "Usage: $0 <path-to-new-vault>" >&2
+    exit 1
+fi
+
+VAULT="$1"
+
+if [[ -e "$VAULT" ]]; then
+    echo "Error: \"$VAULT\" already exists" >&2
+    exit 1
+fi
+
+if [[ ! -d "$TEMPLATE_DIR/.obsidian" ]]; then
+    echo "Error: template not found at $TEMPLATE_DIR" >&2
+    exit 1
+fi
+
+mkdir -p "$VAULT/.obsidian"
+
+echo "Copied (Obsidian rewrites these at runtime):"
+COPIED_FILES=(app.json core-plugins.json community-plugins.json appearance.json daily-notes.json hotkeys.json)
+for f in "${COPIED_FILES[@]}"; do
+    if [[ -f "$TEMPLATE_DIR/.obsidian/$f" ]]; then
+        cp "$TEMPLATE_DIR/.obsidian/$f" "$VAULT/.obsidian/$f"
+        echo "  .obsidian/$f"
+    fi
+done
+
+# Plugin code is not stored in git: make sure the cache is filled, then copy
+echo "Plugins (code from cache, default settings from template):"
+"$FETCH" >/dev/null
+PLUGIN_CACHE="$("$FETCH" --cache-dir)"
+for id in $("$FETCH" --ids); do
+    dest="$VAULT/.obsidian/plugins/$id"
+    mkdir -p "$dest"
+    for asset in main.js manifest.json styles.css; do
+        [[ -f "$PLUGIN_CACHE/$id/$asset" ]] && cp "$PLUGIN_CACHE/$id/$asset" "$dest/$asset"
+    done
+    # Per-plugin default settings kept in the template (if any)
+    if [[ -f "$TEMPLATE_DIR/.obsidian/plugins/$id/data.json" ]]; then
+        cp "$TEMPLATE_DIR/.obsidian/plugins/$id/data.json" "$dest/data.json"
+    fi
+    echo "  .obsidian/plugins/$id ($(jq -r .version "$dest/manifest.json"))"
+done
+
+echo "Symlinked (hand-edited only, so template edits apply live):"
+if [[ -f "$TEMPLATE_DIR/.obsidian.vimrc" ]]; then
+    ln -s "$TEMPLATE_DIR/.obsidian.vimrc" "$VAULT/.obsidian.vimrc"
+    echo "  .obsidian.vimrc -> $TEMPLATE_DIR/.obsidian.vimrc"
+fi
+
+if [[ -d "$TEMPLATE_DIR/.obsidian/snippets" ]]; then
+    ln -s "$TEMPLATE_DIR/.obsidian/snippets" "$VAULT/.obsidian/snippets"
+    echo "  .obsidian/snippets -> $TEMPLATE_DIR/.obsidian/snippets"
+fi
+
+echo
+echo "Created vault at \"$VAULT\" with template settings and plugins."
+echo "Open it in Obsidian, then approve community plugins when prompted (Settings > Community plugins > Turn on)."

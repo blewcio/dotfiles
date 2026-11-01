@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+# ------------------------------------------------------------
+# Sync an EXISTING Obsidian vault's config against Bob's standard
+# template (config/obsidian/vault-template) — see
+# dotfiles/config/obsidian/README.md for the copy/symlink rationale.
+#
+# Unlike obsidian-new-vault (which starts from an empty folder),
+# this targets a vault that already has its own notes and settings,
+# so it merges rather than overwrites:
+#   - JSON config files: template values win for keys it defines,
+#     but any vault-specific keys the template doesn't touch (extra
+#     hotkeys, extra enabled plugins, etc.) are preserved.
+#   - Plugins already installed: only code/manifest are refreshed (from
+#     the cache filled by obsidian-fetch-plugins, which only changes
+#     when you run it with --update);
+#     each plugin's own data.json (its per-vault settings) is left
+#     alone. A plugin newly added to the template is copied in full,
+#     including its template default data.json.
+#   - Symlinked files (.obsidian.vimrc, snippets/) simply get
+#     (re)pointed at the template.
+# The vault's current config is backed up first, since this can
+# still overwrite settings you changed only in this vault.
+#
+#   obsidian-sync-vault ~/path/to/existing-vault
+# ------------------------------------------------------------
+set -euo pipefail
+
+BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TEMPLATE_DIR="$(cd "$BIN_DIR/.." && pwd)/config/obsidian/vault-template"
+FETCH="$BIN_DIR/obsidian-fetch-plugins"
+
+if ! command -v jq >/dev/null 2>&1; then
+    echo "Error: jq is required (brew install jq)" >&2
+    exit 1
+fi
+
+if [[ $# -ne 1 ]]; then
+    echo "Usage: $0 <path-to-existing-vault>" >&2
+    exit 1
+fi
+
+VAULT="$1"
+
+if [[ ! -d "$VAULT/.obsidian" ]]; then
+    echo "Error: \"$VAULT/.obsidian\" not found — is this an Obsidian vault?" >&2
+    exit 1
+fi
+
+if [[ ! -d "$TEMPLATE_DIR/.obsidian" ]]; then
+    echo "Error: template not found at $TEMPLATE_DIR" >&2
+    exit 1
+fi
+
+BACKUP_DIR="$VAULT/.obsidian-sync-backup-$(date +%Y%m%d-%H%M%S)"
+mkdir -p "$BACKUP_DIR"
+
+MERGED_OBJECT_FILES=(app.json core-plugins.json appearance.json daily-notes.json hotkeys.json)
+
+echo "Backing up current config to $(basename "$BACKUP_DIR")/"
+for f in "${MERGED_OBJECT_FILES[@]}" community-plugins.json; do
+    if [[ -f "$VAULT/.obsidian/$f" ]]; then
+        cp "$VAULT/.obsidian/$f" "$BACKUP_DIR/$f"
+    fi
+done
+if [[ -f "$VAULT/.obsidian.vimrc" && ! -L "$VAULT/.obsidian.vimrc" ]]; then
+    cp "$VAULT/.obsidian.vimrc" "$BACKUP_DIR/.obsidian.vimrc"
+fi
+
+echo
+echo "Merged (template values win, vault-only keys kept):"
+for f in "${MERGED_OBJECT_FILES[@]}"; do
+    if [[ -f "$TEMPLATE_DIR/.obsidian/$f" ]]; then
+        if [[ -f "$VAULT/.obsidian/$f" ]]; then
+            jq -s '.[0] * .[1]' "$VAULT/.obsidian/$f" "$TEMPLATE_DIR/.obsidian/$f" \
+                > "$VAULT/.obsidian/$f.tmp"
+            mv "$VAULT/.obsidian/$f.tmp" "$VAULT/.obsidian/$f"
+        else
+            cp "$TEMPLATE_DIR/.obsidian/$f" "$VAULT/.obsidian/$f"
+        fi
+        echo "  .obsidian/$f"
+    fi
+done
+
+if [[ -f "$TEMPLATE_DIR/.obsidian/community-plugins.json" ]]; then
+    if [[ -f "$VAULT/.obsidian/community-plugins.json" ]]; then
+        jq -s '.[1] + (.[0] - .[1])' \
+            "$VAULT/.obsidian/community-plugins.json" \
+            "$TEMPLATE_DIR/.obsidian/community-plugins.json" \
+            > "$VAULT/.obsidian/community-plugins.json.tmp"
+        mv "$VAULT/.obsidian/community-plugins.json.tmp" "$VAULT/.obsidian/community-plugins.json"
+    else
+        cp "$TEMPLATE_DIR/.obsidian/community-plugins.json" "$VAULT/.obsidian/community-plugins.json"
+    fi
+    echo "  .obsidian/community-plugins.json (template plugins ∪ vault's existing ones)"
+fi
+
+"$FETCH" >/dev/null
+PLUGIN_CACHE="$("$FETCH" --cache-dir)"
+mkdir -p "$VAULT/.obsidian/plugins"
+for plugin_name in $("$FETCH" --ids); do
+    dest="$VAULT/.obsidian/plugins/$plugin_name"
+    template_data="$TEMPLATE_DIR/.obsidian/plugins/$plugin_name/data.json"
+    is_new=false
+    if [[ ! -d "$dest" ]]; then
+        is_new=true
+        mkdir -p "$dest"
+    fi
+    for asset in main.js manifest.json styles.css; do
+        if [[ -f "$PLUGIN_CACHE/$plugin_name/$asset" ]]; then
+            cp "$PLUGIN_CACHE/$plugin_name/$asset" "$dest/$asset"
+        fi
+    done
+    if [[ "$is_new" == true ]]; then
+        if [[ -f "$template_data" ]]; then
+            cp "$template_data" "$dest/data.json"
+        fi
+        echo "  .obsidian/plugins/$plugin_name/ (new — full copy incl. default settings)"
+    else
+        echo "  .obsidian/plugins/$plugin_name/ (code + manifest updated, data.json left untouched)"
+    fi
+done
+
+echo "Symlinked (repointed at the template):"
+if [[ -f "$TEMPLATE_DIR/.obsidian.vimrc" ]]; then
+    rm -f "$VAULT/.obsidian.vimrc"
+    ln -s "$TEMPLATE_DIR/.obsidian.vimrc" "$VAULT/.obsidian.vimrc"
+    echo "  .obsidian.vimrc -> $TEMPLATE_DIR/.obsidian.vimrc"
+fi
+
+if [[ -d "$TEMPLATE_DIR/.obsidian/snippets" ]]; then
+    rm -rf "$VAULT/.obsidian/snippets"
+    ln -s "$TEMPLATE_DIR/.obsidian/snippets" "$VAULT/.obsidian/snippets"
+    echo "  .obsidian/snippets -> $TEMPLATE_DIR/.obsidian/snippets"
+fi
+
+echo
+echo "Synced \"$VAULT\" with the template."
+echo "Previous config backed up to: $BACKUP_DIR"
+echo "Note: plugins present in the vault but not in the template are left as-is (never removed)."
+echo "Restart Obsidian (or reload the vault) to pick up the changes, then approve any new community plugins (Settings > Community plugins > Turn on)."

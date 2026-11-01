@@ -1,0 +1,16 @@
+# Community plugins installed into every vault by obsidian-new-vault /
+# obsidian-sync-vault (code is fetched from GitHub releases, not stored here).
+#
+# Format: <plugin-id> <github-owner/repo> [pinned-version]
+#
+# Without a version the newest GitHub release is used. Pin one only where
+# "latest" is unwanted (e.g. calendar: newest release is a 2.0 beta).
+# Manage the cache with: obsidian-fetch-plugins [--update]
+
+calendar                    liamcain/obsidian-calendar-plugin        1.5.10
+dataview                    blacksmithgu/obsidian-dataview
+obsidian-excalidraw-plugin  zsviczian/obsidian-excalidraw-plugin
+obsidian-kanban             community-archive/obsidian-kanban
+obsidian-tasks-plugin       obsidian-tasks-group/obsidian-tasks
+obsidian-vimrc-support      esm7/obsidian-vimrc-support
+realclaudian                YishenTu/claudian
