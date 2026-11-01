@@ -89,7 +89,7 @@ Modern CLI tools are preferred and aliased as replacements:
 
 The repo uses 7 git submodules — running `git submodule update --init --recursive` (or `./deploy.sh`, which now initializes all of them) after cloning is required before things work correctly:
 
-- `private`: private/sensitive shell config (`private/shell/*.sh`, sourced by `shellrc.sh`) and private Claude Code skills (`private/skills/`, merged in by `bin/link-skills`). May not be accessible to everyone who clones this repo — `deploy.sh` skips it gracefully if so.
+- `private`: private/sensitive shell config (`private/shell.d/*.sh`, sourced by `shellrc.sh`) and private Claude Code skills (`private/skills/`, merged in by `bin/link-skills`). May not be accessible to everyone who clones this repo — `deploy.sh` skips it gracefully if so.
 - `vim-config`: full Neovim/Vim config with Vundle, symlinked to `~/.vimrc`/`~/.config/nvim`.
 - `config/{bat,btop,delta,lsd,yazi}/themes`: upstream Catppuccin theme repos, symlinked into each tool's config directory by `deploy.sh`.
 

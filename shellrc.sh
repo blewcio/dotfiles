@@ -43,7 +43,7 @@ _source_shell_dir() {
 }
 
 _source_shell_dir "$HOME/dotfiles/shell.d"
-_source_shell_dir "$HOME/dotfiles/private/shell"
+_source_shell_dir "$HOME/dotfiles/private/shell.d"
 
 # Track SSH nesting depth to prevent tmux auto-attach in nested SSH sessions
 # TODO: this most likely does not work across real SSH hops to a different host,

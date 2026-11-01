@@ -218,7 +218,7 @@ Run `:Mason` in Neovim to install LSP servers.
 The repository supports a private git submodule for sensitive configurations:
 - Location: `~/dotfiles/private/`
 - Auto-initialized by deploy script if accessible
-- Place private shell configs in `private/shell/`
+- Place private shell configs in `private/shell.d/`
 - Alternatively use `shell.d/private.sh` (gitignored)
 
 ## Notes

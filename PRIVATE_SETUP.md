@@ -179,6 +179,6 @@ git push origin --force --all
 ## Migration Notes
 
 - The old `shell.d/private.sh` is now gitignored but kept for backward compatibility
-- New private configs should go in `private/shell/private.sh`
+- New private configs should go in `private/shell.d/private.sh`
 - Both locations are sourced by `shellrc.sh`, so both work
 - Eventually, you can delete `shell.d/private.sh` once migration is complete
