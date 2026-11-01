@@ -85,3 +85,6 @@ fi
 export AI_BACKEND="${AI_BACKEND:-claude}"
 export AI_MODEL_OPENCODE="${AI_MODEL_OPENCODE:-github-copilot/claude-sonnet-4.6}"
 export AI_MODEL_CLAUDE="${AI_MODEL_CLAUDE:-sonnet}"
+
+# GitHub Copilot CLI: load custom instructions (CLAUDE.md/AGENTS.md) from dotfiles
+export COPILOT_CUSTOM_INSTRUCTIONS_DIRS="$HOME/dotfiles/ai"
