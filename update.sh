@@ -107,7 +107,7 @@ if [ "$(uname)" = "Darwin" ]; then
   # Update iTerm2 Catppuccin theme
   if [ -f "$DOTFILES_DIR/config/iterm/catppuccin-mocha.itermcolors" ]; then
     echo "Updating Catppuccin Mocha theme for iTerm2..."
-    if curl -L https://github.com/catppuccin/iterm2/raw/main/colors/catppuccin-mocha.itermcolors \
+    if curl -fL https://github.com/catppuccin/iterm/raw/main/colors/catppuccin-mocha.itermcolors \
         -o $DOTFILES_DIR/config/iterm/catppuccin-mocha.itermcolors.new 2>/dev/null; then
       mv $DOTFILES_DIR/config/iterm/catppuccin-mocha.itermcolors.new \
          $DOTFILES_DIR/config/iterm/catppuccin-mocha.itermcolors

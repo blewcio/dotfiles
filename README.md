@@ -210,7 +210,7 @@ Run `:Mason` in Neovim to install LSP servers.
 1. Open iTerm2 → Preferences (Cmd+,)
 2. Go to Profiles → Colors
 3. Click 'Color Presets' → Import
-4. Select: `~/dotfiles/config/iTerm2/catppuccin-mocha.itermcolors`
+4. Select: `~/dotfiles/config/iterm/catppuccin-mocha.itermcolors`
 5. Choose 'Catppuccin Mocha' from presets
 
 ## Private Configuration

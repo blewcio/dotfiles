@@ -5,7 +5,6 @@ shell.d/private.sh
 .claude/
 exported-defaults
 mac/defaults-backup-*
-config/iterm/catp*
 .stow*
 .crush/
 bin/fasd
