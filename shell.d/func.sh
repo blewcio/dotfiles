@@ -540,3 +540,19 @@ describe_function() {
   echo "$result" | sed 's/.*shell.d\///' | grep -v '^--$'
 }
 alias fhelp=describe_function
+
+# List all currently loaded aliases, with fzf search if available
+# (zsh prints "name=value", bash "alias name='value'" - normalised below)
+# Usage: aliases [initial search query]
+list_aliases() {
+  local all
+  all=$(alias | sed 's/^alias //' | sort)
+  if [[ -x "$(command -v fzf)" ]]; then
+    printf '%s\n' "$all" | fzf --height=60% --reverse --query "$*" \
+      --header 'Loaded aliases (enter = print definition)' \
+      --preview 'echo {}' --preview-window=down:3:wrap
+  else
+    printf '%s\n' "$all" | grep -i -- "$*"
+  fi
+}
+alias aliases=list_aliases
