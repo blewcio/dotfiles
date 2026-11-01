@@ -193,9 +193,14 @@ if [ "$(uname)" = "Darwin" ]; then
   mkdir -p $DOTFILES_DIR/config/iterm
   if [ ! -f "$DOTFILES_DIR/config/iterm/catppuccin-mocha.itermcolors" ]; then
     echo "Downloading Catppuccin Mocha theme for iTerm2..."
-    curl -L https://github.com/catppuccin/iterm2/raw/main/colors/catppuccin-mocha.itermcolors \
-      -o $DOTFILES_DIR/config/iterm/catppuccin-mocha.itermcolors
-    echo "Catppuccin theme downloaded to config/iterm/"
+    # -f: fail on HTTP errors instead of saving GitHub's 404 page as the theme
+    if curl -fL https://github.com/catppuccin/iterm/raw/main/colors/catppuccin-mocha.itermcolors \
+      -o $DOTFILES_DIR/config/iterm/catppuccin-mocha.itermcolors; then
+      echo "Catppuccin theme downloaded to config/iterm/"
+    else
+      rm -f $DOTFILES_DIR/config/iterm/catppuccin-mocha.itermcolors
+      echo "Failed to download Catppuccin theme - skipping"
+    fi
   else
     echo "Catppuccin theme already downloaded - skipping"
   fi
