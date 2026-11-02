@@ -139,7 +139,8 @@ When modifying configurations:
    - Add to appropriate file in `shell.d/`
    - They'll be automatically sourced on next shell start or reload
    - Always document them in the code, because `bin/cmd-index` builds `cmds`/`aliases`/`funcs` and `docs/COMMANDS.md` from the comments: a function gets a `# One-line description` directly above it (`## Heading` only marks a section), an alias a trailing `# description` (a bare alias of a function or script inherits that target's description), a `bin/` script a summary sentence in its header. Start a description with `Internal` to keep an entry out of the listings
-   - Check for gaps with `cmd-index --missing --list`, then refresh the cheat sheet with `cmd-index --markdown > docs/COMMANDS.md` (public only, never includes `private/`)
+   - Check for gaps with `cmd-index --missing --list`
+   - **Refresh the cheat sheet**: `docs/COMMANDS.md` is generated and is *not* updated automatically (there is no git hook). After adding, renaming, removing or re-describing an alias, function or script, run `cmd-index --markdown > docs/COMMANDS.md` from `~/dotfiles` and commit the result together with the change. It only contains public commands, never anything from `private/`
 
 3. **Adding new config files**:
    - Place in `config/<app-name>/`

@@ -162,7 +162,8 @@ definition and discovered with these commands:
 | `fhelp <name>` | Show a function's or script's comment and usage |
 
 A generated cheat sheet is also available as [`docs/COMMANDS.md`](docs/COMMANDS.md)
-(public commands only; regenerate with `cmd-index --markdown > docs/COMMANDS.md`).
+(public commands only). It is not updated automatically: after changing aliases, functions or
+scripts, regenerate it with `cmd-index --markdown > docs/COMMANDS.md` and commit it with the change.
 
 Some highlights:
 - `v`, `j`, `jf`, `o` - fasd + fzf: edit recent files, jump to recent directories, open recent files
@@ -211,7 +212,7 @@ reload
 **Shell functions/aliases:**
 1. Add to appropriate file in `shell.d/`, with a description comment (see "Documenting a new alias, function or script")
 2. Run `reload` or restart shell
-3. Refresh the cheat sheet: `cmd-index --markdown > docs/COMMANDS.md`
+3. Refresh the cheat sheet and commit it with the change: `cmd-index --markdown > docs/COMMANDS.md`
 
 **Application configs:**
 1. Place in `config/<app-name>/`
