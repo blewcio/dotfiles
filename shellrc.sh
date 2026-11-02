@@ -32,17 +32,27 @@ if is-macos; then
 fi
 
 # Source all *.sh files from a directory (used for shell.d and the private submodule)
+# Usage: _source_shell_dir <dir> [file names to skip...]
 _source_shell_dir() {
   local dir="$1"
+  shift
+  local skip=" $* "
   if [ -d "$dir" ]; then
     for shellfile in "$dir"/*.sh; do
+      case "$skip" in *" ${shellfile##*/} "*) continue ;; esac
       [ -r "$shellfile" ] && source "$shellfile"
     done
     unset shellfile
   fi
 }
 
-_source_shell_dir "$HOME/dotfiles/shell.d"
+# In zsh, aliases.sh and func.sh are loaded after the plugins instead (see the zsh
+# section below), because Oh-My-Zsh redefines some of our aliases (ls, l, la, gco, glog)
+if [[ "$SHELL" == *"zsh" ]]; then
+  _source_shell_dir "$HOME/dotfiles/shell.d" aliases.sh func.sh
+else
+  _source_shell_dir "$HOME/dotfiles/shell.d"
+fi
 _source_shell_dir "$HOME/dotfiles/private/shell.d"
 
 # Track SSH nesting depth to prevent tmux auto-attach in nested SSH sessions
@@ -158,6 +168,13 @@ if [[ "$SHELL" == *"zsh" ]]; then
       bindkey -M menuselect '^M' .accept-line
     } 2>/dev/null
   fi
+
+  # Load the alias files only now, after Oh-My-Zsh (above) has defined its own aliases,
+  # so the dotfiles definitions win (skipped in the first pass, see _source_shell_dir)
+  for alias_file in aliases.sh func.sh; do
+    [ -r "$HOME/dotfiles/shell.d/$alias_file" ] && source "$HOME/dotfiles/shell.d/$alias_file"
+  done
+  unset alias_file
 
   # Custom widgets for visual selection with Shift+arrows
 
