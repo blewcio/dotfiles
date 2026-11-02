@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # ------------------------------------------------------------
-# Create a new Obsidian vault pre-configured with Bob's standard
-# settings and plugin set (see dotfiles/config/obsidian/README.md).
+# Create a new Obsidian vault from Bob's standard template.
+#
+# Applies the standard settings and plugin set (see
+# dotfiles/config/obsidian/README.md).
 # Plugin code comes from the local cache filled by obsidian-fetch-plugins.
 #
 # Files Obsidian/plugins rewrite at runtime are COPIED (symlinking

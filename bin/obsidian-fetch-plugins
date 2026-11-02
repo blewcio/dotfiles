@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # ------------------------------------------------------------
-# Download Obsidian community plugin code (main.js, manifest.json,
-# styles.css) listed in config/obsidian/plugins.txt from GitHub
-# releases into a local cache, so plugin bundles never live in git.
+# Download Obsidian community plugins into a local cache.
+#
+# Fetches the code (main.js, manifest.json, styles.css) of each plugin in
+# config/obsidian/plugins.txt from GitHub releases, so bundles never live in git.
 #
 # Cached plugins are reused as-is; nothing changes until you ask:
 #

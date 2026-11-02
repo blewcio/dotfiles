@@ -60,7 +60,7 @@ pic_diff_createdate () {
   datediff -f "%Y:%m:%d %H:%M:%S" -i "%Y:%m:%d %H:%M:%S" "$d1" "$d2"
 }
 
-# Set picture location
+# Get picture location
 pic_get_location() {
   exiftool -T -GPSPosition -c '%.9f' $@
 }
@@ -98,7 +98,7 @@ pic_set_location() {
    exiftool -gpslatitude=$LAT -gpslongitude=$LON -gpslatituderef=N -gpslongituderef=E $@
 }
 
-# Scan dupliates, but strip exif metadata
+# Scan for duplicate pictures, ignoring exif metadata
 # Note: it displays all files grouped by checksum
 pic_scan_dupes_no_metadata() {
   if ! [ -x "$(command -v fclones)" ]; then "fclones not installed"; return -1; fi
@@ -107,7 +107,7 @@ pic_scan_dupes_no_metadata() {
   fclones group $@ -i --transform 'exiv2 -d a $IN' --in-place 
 }
 
-# Scan duplicates (no preprocessing
+# Scan for duplicate pictures (no preprocessing)
 pic_scan_dupes() {
   if ! [ -x "$(command -v fclones)" ]; then "fclones not installed"; return -1; fi
 

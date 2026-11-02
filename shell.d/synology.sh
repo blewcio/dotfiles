@@ -7,10 +7,10 @@ PS1="\[\033[38;5;225m\]\u@\h\[\033[0m\]:\[\033[38;5;081m\]\w\[\033[0m\]\$ "
 # Add path to basic but hidden Synology tools
 PATH=$PATH:/var/packages/DiagnosisTool/target/tool
 # But alias tmux to the newer version
-alias tmux='$HOME/bin/tmux'
+alias tmux='$HOME/bin/tmux' # Use the newer tmux from ~/bin
 
-alias gs="cd /volume1/storage"
-alias gp="cd /volume1/photos"
+alias gs="cd /volume1/storage" # Go to the storage volume
+alias gp="cd /volume1/photos" # Go to the photos volume
 
 echo "
 ### Custom commands on Synology:

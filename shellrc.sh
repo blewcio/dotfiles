@@ -4,7 +4,7 @@ case $- in
       *) return;;
 esac
 
-# Define conditional helper for Antidote (used in zsh_plugins.txt)
+# Internal: conditional helper for Antidote (used in zsh_plugins.txt)
 is-macos() { [[ "$OSTYPE" == darwin* ]]; }
 
 # Add sbin and bin in $HOME to $PATH (only if not already present)
@@ -98,8 +98,7 @@ if [[ "$SHELL" == *"zsh" ]]; then
   [[ -r "$catppuccin_fzf" ]] && source "$catppuccin_fzf"
   unset catppuccin_fzf
 
-  # Define zvm_after_init hook for zsh-vi-mode
-  # This function runs after zsh-vi-mode initializes to set up other plugin keybindings
+  # Internal: hook run after zsh-vi-mode initializes, sets up other plugin keybindings
   # that would otherwise be overridden by vi-mode
   zvm_after_init() {
     # Bind up/down arrows for zsh-history-substring-search
@@ -162,21 +161,21 @@ if [[ "$SHELL" == *"zsh" ]]; then
 
   # Custom widgets for visual selection with Shift+arrows
 
-  # Shift+Left: select backward by character
+  # Internal: Shift+Left key widget, select backward by character
   select-backward-char() {
     ((REGION_ACTIVE)) || zle set-mark-command
     zle backward-char
   }
   zle -N select-backward-char
 
-  # Shift+Right: select forward by character
+  # Internal: Shift+Right key widget, select forward by character
   select-forward-char() {
     ((REGION_ACTIVE)) || zle set-mark-command
     zle forward-char
   }
   zle -N select-forward-char
 
-  # Shift+Up: select entire line
+  # Internal: Shift+Up key widget, select entire line
   select-entire-line() {
     zle beginning-of-line
     zle set-mark-command
@@ -184,7 +183,7 @@ if [[ "$SHELL" == *"zsh" ]]; then
   }
   zle -N select-entire-line
 
-  # Shift+Down: deselect and move to end of line
+  # Internal: Shift+Down key widget, deselect and move to end of line
   deselect-region() {
     # Exit visual mode by toggling mark off
     if ((REGION_ACTIVE)); then
@@ -195,14 +194,14 @@ if [[ "$SHELL" == *"zsh" ]]; then
   }
   zle -N deselect-region
 
-  # Shift+Alt+Left: select backward by word
+  # Internal: Shift+Alt+Left key widget, select backward by word
   select-backward-word() {
     ((REGION_ACTIVE)) || zle set-mark-command
     zle backward-word
   }
   zle -N select-backward-word
 
-  # Shift+Alt+Right: select forward by word
+  # Internal: Shift+Alt+Right key widget, select forward by word
   select-forward-word() {
     ((REGION_ACTIVE)) || zle set-mark-command
     zle forward-word
@@ -318,8 +317,8 @@ if [[ "$SHELL" == *"bash" ]] || [[ "$SHELL" == *"/sh" ]]; then
   # Initialize fasd (only once)
   if [[ -x "$(command -v fasd)" ]] && [ -z "$FASD_INITIALIZED" ]; then
     eval "$(fasd --init auto)"
-    alias j='fasd_cd -d'
-    alias v='f -e vim'
+    alias j='fasd_cd -d' # cd to a recently used directory (fasd; bash fallback without fzf)
+    alias v='f -e vim' # Edit a recently used file in vim (fasd; bash fallback without fzf)
     _fasd_bash_hook_cmd_complete
     export FASD_INITIALIZED=1
   fi
@@ -349,7 +348,7 @@ if [[ -x "$(command -v fasd)" ]]; then
    unalias j 2>/dev/null || true
    unalias o 2>/dev/null || true
 
-  # edit given file or search in recently used files
+  # Edit the given file, or search recently used files with fasd + fzf (alias: v)
   function fzf_fasd_edit {
     local file
     # if arg1 is a path to existing file then simply open it in the editor
@@ -359,7 +358,7 @@ if [[ -x "$(command -v fasd)" ]]; then
   }
   alias v=fzf_fasd_edit
 
-  # open given file or search in recently used files (cross-platform)
+  # Open the given file, or search recently used files with fasd + fzf (alias: o)
   function fzf_fasd_open {
     local file opener
     # Use open on macOS, xdg-open on Linux
@@ -371,7 +370,7 @@ if [[ -x "$(command -v fasd)" ]]; then
   }
   alias o=fzf_fasd_open
 
-  # cd into the directory containing a recently used file
+  # cd into the directory of a recently used file picked with fasd + fzf (alias: jf)
   function fzf_fasd_last_file_dir {
     local dir
     local file
@@ -379,7 +378,7 @@ if [[ -x "$(command -v fasd)" ]]; then
   }
   alias jf=fzf_fasd_last_file_dir
 
-  # cd into given dir or search in recently used dirs
+  # cd into the given dir, or search recently used dirs with fasd + fzf (alias: j)
   function fzf_fasd_recent_dir {
     [ $# -eq 1 ] && test -d "$1" && cd "$1" && return
     local dir

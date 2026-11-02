@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Video conversion script to H.264, AAC, MP4 with metadata preservation
+# Convert videos to H.264/AAC MP4, preserving metadata.
 # Usage: ./convert_video.sh [file or pattern]
 # Examples:
 #   ./convert_video.sh video.avi

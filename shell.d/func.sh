@@ -84,6 +84,7 @@ mkcd() {
 # Use ripgrep and fzf to search file content
 # Find in files
 if [[ -x "$(command -v fzf)" ]] && [[ -x "$(command -v rg)" ]]; then
+  # Search file contents with ripgrep and fzf (alias: fif); enter opens the match in vim
   find_in_files() {
    rg --column --line-number --no-heading --color=always --smart-case "${*:-}" |
    fzf --ansi -d ':' --preview 'bat --style=numbers --color=always --highlight-line {2} {1}' --preview-window='50%' --preview-window '~3:+{2}+3/2' \
@@ -95,6 +96,7 @@ fi
 
 # Interactive git branch checkout with fzf
 if [[ -x "$(command -v fzf)" ]] && [[ -x "$(command -v git)" ]]; then
+  # Check out a local or remote git branch picked with fzf (alias: gco)
   fzf_git_checkout() {
     local branch
     branch=$(git branch -a --color=always | grep -v '/HEAD\s' | \
@@ -119,6 +121,7 @@ fi
 
 # Interactive process killer with fzf
 if [[ -x "$(command -v fzf)" ]]; then
+  # Pick processes with fzf and kill them, signal 9 unless given (alias: fkill)
   fzf_kill_process() {
     local pid
     if [[ "$(uname)" == "Darwin" ]]; then
@@ -141,6 +144,7 @@ fi
 # `less` with options to preserve color and line numbers, unless the output is
 # small enough for one screen.
 if [[ -x "$(command -v tree)" ]]; then
+ # tree with hidden files, colors and no .git/node_modules, paged with less
  tree2() {
    tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
  }
@@ -148,13 +152,14 @@ fi
 
 # Change working directory to the top-most Finder window location
 if [[ "$(uname)" == "Darwin"  ]]; then
+  # cd to the folder of the front Finder window (alias: cdf)
   open_finder_directory() {
     cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
   }
-  alias cdf=open_finder_directory  # Shorter alias
+  alias cdf=open_finder_directory
 fi
 
-# Time now
+# Print the current time and date
 time_now() {
   echo -n "Now is "
   date +"%X, %A, %B %-d, %Y"
@@ -173,6 +178,7 @@ net_status() {
 
 # Remove all installed brew packages
 if [[ "$(uname)" == "Darwin"  ]]; then
+  # Uninstall every Homebrew package (asks for confirmation first)
   brew_uninstall_all() {
     echo "Purging all installed brew packages"
     printf "Continue? (Y/N): "
@@ -194,6 +200,7 @@ fi
 
 # nnn wrapper to stay in directory after exit
 if [ -x "$(command -v nnn)" ]; then
+  # nnn file manager that cd's to the last visited directory on quit
   n () {
     # Block nesting of nnn in subshells
     [ "${NNNLVL:-0}" -eq 0 ] || {
@@ -226,6 +233,7 @@ if [ -x "$(command -v nnn)" ]; then
 fi
 
 if [ -x "$(command -v yazi)" ]; then
+  # yazi file manager that cd's to the last visited directory on quit
   y() {
     local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
     yazi "$@" --cwd-file="$tmp"

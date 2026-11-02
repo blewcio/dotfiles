@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Start the "dev" tmux session with a three-pane layout (git status, vim, shell).
 
 SESSION="dev"
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Links agent skills from tracked and private sources into ~/.claude/skills/
+# Link agent skills from tracked and private sources into ~/.claude/skills/.
 # Works for both OpenCode (~/.config/opencode/skills/) and Claude Code (~/.claude/skills/)
 # Run manually to pick up new skills, or called automatically by deploy.sh
 

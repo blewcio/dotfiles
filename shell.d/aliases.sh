@@ -1,17 +1,17 @@
 # Directory shortcuts
-alias h="cd $HOME" # tilde does not work properly in Germany
+alias h="cd $HOME" # Go to the home directory (tilde is awkward to type on a German layout)
 if [[ "$(uname)" == "Darwin"  ]]; then
-  alias dl="cd ~/Downloads"
+  alias dl="cd ~/Downloads" # Go to ~/Downloads
 fi
 
 # Use vim by default
 if [ -x "$(command -v vim)" ]; then
-  alias vi="vim"
+  alias vi="vim" # Use vim for vi
 fi
 
 # Replace cat with bat
 if [ -x "$(command -v bat)" ]; then
-  alias cat="bat -p"
+  alias cat="bat -p" # Syntax-highlighted cat via bat (plain style)
   export MANPAGER="sh -c 'col -bx | bat -l man -p'" # Man pages
   help() { # Colorized help command, e.g. help eza
     "$@" --help 2>&1 | bat --plain --language=help
@@ -20,53 +20,53 @@ fi
 
 # Replace ls with eza (exa is unmaintained)
 if [ -x "$(command -v eza)" ]; then
-  alias ls="eza --group-directories-first"
+  alias ls="eza --group-directories-first" # ls via eza, directories first
 fi
 
 # Add more ls commands with lsd (for symbols)
 if [ -x "$(command -v lsd)" ]; then
-  alias ls-size="lsd -1l -S -a"
-  alias ls-mod="lsd -1l -t -a"
-  alias ls-git="lsd -1l -Gg -a"
+  alias ls-size="lsd -1l -S -a" # List all files, largest first (lsd)
+  alias ls-mod="lsd -1l -t -a" # List all files, newest first (lsd)
+  alias ls-git="lsd -1l -Gg -a" # List all files with git status (lsd)
 fi
   
 # Reverse dust by default, like tree
 if [ -x "$(command -v dust)" ]; then
-  alias dust="dust -r"
+  alias dust="dust -r" # Disk usage with the largest entries at the bottom, like tree (dust)
 fi
 
 # Default df to human readable
-alias df='df -h && echo -e "\nDont forget duf!"'
+alias df='df -h && echo -e "\nDont forget duf!"' # Human-readable df, with a reminder about duf
 
 # Shotcuts for ls
-alias la="ls --long --all --group" # -lAh
+alias la="ls --long --all --group" # Long listing incl. hidden files and group (like ls -lAh)
 if [ -x "$(command -v tree)" ]; then
   # alias lt="ls --tree --level=3"
-  alias lt="tree"
+  alias lt="tree" # Directory tree
 fi
-alias l='ls -F'
-alias l.='ls -d .*'
+alias l='ls -F' # ls with type indicators (/ for dirs)
+alias l.='ls -d .*' # List only dotfiles and dot-directories
 
 # fasd maintenance - remove stale entries (deleted files/dirs)
 if [ -x "$(command -v fasd)" ]; then
-  alias fasd-cleanup='fasd -l | while read f; do [ ! -e "$f" ] && fasd -D "$f"; done && echo "Cleaned stale fasd entries"'
+  alias fasd-cleanup='fasd -l | while read f; do [ ! -e "$f" ] && fasd -D "$f"; done && echo "Cleaned stale fasd entries"' # Remove deleted files and dirs from the fasd database
 fi
 
 # Process shortcuts
-alias pgrep2="ps aux | grep -v grep | grep -i -e VSZ -e"
+alias pgrep2="ps aux | grep -v grep | grep -i -e VSZ -e" # Find processes by name with ps and grep (keeps the ps header)
 # Replace procs with ps
 if [ -x "$(command -v procs)" ]; then
-  alias pgrep="procs" # with input param
-  alias ptree="procs --tree" # with input param
+  alias pgrep="procs" # Find processes by name or keyword (procs)
+  alias ptree="procs --tree" # Show the process tree (procs)
 fi
 
 # Additional fzf shortcusts
-alias ch="chrome-history"
-alias cb="chrome-bookmark-browser"
+alias ch="chrome-history" # Browse Chrome history with fzf
+alias cb="chrome-bookmark-browser" # Browse Chrome bookmarks with fzf
 
 # Tmux shortcuts
 if [ -x "$(command -v tmux)" ]; then
-  # ta [name] - attach/switch to session, fzf select if no name given
+  # ta [name] - Attach or switch to a tmux session; fzf select if no name given
   ta() {
     local sessions
     sessions=$(tmux list-sessions -F "#{session_name}" 2>/dev/null)
@@ -109,7 +109,7 @@ if [ -x "$(command -v tmux)" ]; then
     unset -f _tmux_goto
   }
 
-  # tn [name] - create session with dir basename (or given name), attach if exists
+  # tn [name] - Create a tmux session named after the current dir (or given name), attach if it exists
   tn() {
     local session_name
     if [[ $# -eq 0 ]]; then
@@ -131,72 +131,69 @@ if [ -x "$(command -v tmux)" ]; then
     fi
   }
 
-  # tp - project selector, browse project dirs and create/attach session
-  alias tp='tmux-sessionizer'
+  alias tp='tmux-sessionizer' # Project selector: pick a project dir, create or attach its tmux session
 
-  # tm-dev - start dev layout
-  alias tm-dev='tmux-dev'
+  alias tm-dev='tmux-dev' # Start the tmux dev layout
 fi
 
 # Get easy to digest help
 if [ -x "$(command -v tldr)" ] && [ -x "$(command -v fzf)" ]; then
-  alias thelp='tldr --list | fzf | xargs tldr'
+  alias thelp='tldr --list | fzf | xargs tldr' # Pick a tldr page with fzf
 fi
 
 if [ -x "$(command -v tmux)" ] && [ -x "$(command -v tmux-cht)" ]; then
-  alias chelp=tmux-cht
+  alias chelp=tmux-cht # Query cheat.sh in a new tmux window
 fi
 
 
 # File system operations
 # Ask before overwriting
-alias mv="mv -i"
+alias mv="mv -i" # Ask before overwriting
 # mkdir incl. parent dirs if necessary
-alias mkdir="mkdir -pv"
+alias mkdir="mkdir -pv" # Create parent dirs as needed, verbose
 #Copy files and show progress
-alias rcp="rsync -P"
+alias rcp="rsync -P" # Copy with rsync and show progress
 # Don't remove files directly, but move to trash
-alias del="/bin/rm" # Keep the ultimate rm option as del
-alias rm=copy_to_trash # Call a function instead
+alias del="/bin/rm" # The real rm, bypassing the trash
+alias rm=copy_to_trash # Move to trash instead of deleting
 
 # Network related shortcuts
 # My external IP
-alias myip="curl http://ipecho.net/plain; echo"
+alias myip="curl http://ipecho.net/plain; echo" # Print the external IP address
 # Serve current directory tree at http://$HOSTNAME:8000/
-alias http-server="python3 -m http.server"
+alias http-server="python3 -m http.server" # Serve the current directory on port 8000
 
 # Keep current location after exiting mc
 MC_WRAPPER='/usr/lib/mc/mc-wrapper.sh'
 if [ -x $MC_WRAPPER ]; then
-     alias mc=". $MC_WRAPPER";
+     alias mc=". $MC_WRAPPER"; # Midnight Commander that keeps the cwd after exit
 fi
 
 # View pictures in terminal
 if [ -x "$(command -v viu)" ]; then
-  alias viu="viu -n -h 20"
+  alias viu="viu -n -h 20" # Show pictures in the terminal, 20 rows high
 fi
 
 #Packet management
 # List installed packages
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  alias installed-packages="brew leaves"
+  alias installed-packages="brew leaves" # List manually installed packages (brew leaves)
 else
-  alias installed-packages="comm -23 <(apt-mark showmanual | sort -u) <(gzip -dc /var/log/installer/initial-status.gz | sed -n 's/^Package: //p' | sort -u)"
+  alias installed-packages="comm -23 <(apt-mark showmanual | sort -u) <(gzip -dc /var/log/installer/initial-status.gz | sed -n 's/^Package: //p' | sort -u)" # List manually installed apt packages
 fi
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  # Bulk update action
-  alias update='sudo softwareupdate -i -a; brew update; brew upgrade; brew cleanup'
-  # Hide/show all desktop icons (useful when presenting) from https://github.com/mathiasbynens/dotfiles
-  alias desktop-hide="defaults write com.apple.finder CreateDesktop -bool false && killall Finder"
-  alias desktop-show="defaults write com.apple.finder CreateDesktop -bool true && killall Finder"
+  alias update='sudo softwareupdate -i -a; brew update; brew upgrade; brew cleanup' # Update macOS and Homebrew, then clean up
+  # Hide/show all desktop icons (useful when presenting), from https://github.com/mathiasbynens/dotfiles
+  alias desktop-hide="defaults write com.apple.finder CreateDesktop -bool false && killall Finder" # Hide all desktop icons (e.g. when presenting)
+  alias desktop-show="defaults write com.apple.finder CreateDesktop -bool true && killall Finder" # Show the desktop icons again
 fi
 
 # Print each PATH entry on a separate line
-alias path='echo -e ${PATH//:/\\n}'
+alias path='echo -e ${PATH//:/\\n}' # Print each PATH entry on a separate line
 
 # Reload the shell (i.e. invoke as a login shell)
-alias reload="exec ${SHELL} -l"
+alias reload="exec ${SHELL} -l" # Restart the shell as a login shell
 
 # Web search and LLM shortcuts (see func.sh for implementations)
 alias s='search'

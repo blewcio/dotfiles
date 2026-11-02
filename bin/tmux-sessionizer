@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Browse project directories and create/attach to tmux session based on selection
+# Pick a project directory with fzf and create or attach its tmux session.
 # Uses fzf-tmux popup for selection, creates session with directory name
 
 set -e

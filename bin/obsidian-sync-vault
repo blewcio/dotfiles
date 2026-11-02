@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # ------------------------------------------------------------
-# Sync an EXISTING Obsidian vault's config against Bob's standard
-# template (config/obsidian/vault-template) — see
+# Sync an existing Obsidian vault's config with Bob's standard template.
+#
+# Template: config/obsidian/vault-template; see
 # dotfiles/config/obsidian/README.md for the copy/symlink rationale.
 #
 # Unlike obsidian-new-vault (which starts from an empty folder),

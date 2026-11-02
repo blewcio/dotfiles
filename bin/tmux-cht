@@ -1,4 +1,5 @@
 #!/bin/bash
+# Prompt for a query and show its cheat.sh answer in a new tmux window.
 read -p "Help query (e.g. bash print): " query
 
 query=$selected/$(echo $query | tr ' ' '+')

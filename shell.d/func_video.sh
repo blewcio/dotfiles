@@ -38,7 +38,7 @@ _vid_transcode () {
   eval $cmd
 }
 
-# Convert file to 1080 mts_to_1080 
+# Convert a video file to 1080p
 # Usage: filename [optional_new_name]
 vid_to_1080 () {
   if [ $# -lt 1 ]; then echo "Usage: command ARGUMENT"; return -1; fi
@@ -52,7 +52,7 @@ vid_to_1080 () {
   _vid_transcode $in_file $res $fps $crf $preset
 }
 
-# Convert file to 720 mts_to_720 
+# Convert a video file to 720p
 # Usage: filename [optional_new_name]
 vid_to_720 () {
   if [ $# -lt 1 ]; then echo "Usage: command ARGUMENT"; return -1; fi
@@ -66,7 +66,7 @@ vid_to_720 () {
   _vid_transcode $in_file $res $fps $crf $preset
 }
 
-# Convert file to 540 mts_to_540 
+# Convert a video file to 540p
 vid_to_540 () {
   if [ $# -lt 1 ]; then echo "Usage: command ARGUMENT"; return -1; fi
   local in_file=$1
@@ -81,6 +81,7 @@ vid_to_540 () {
   _vid_transcode $in_file $res $fps $crf $preset $max_rate $buf_size
 }
 
+# Re-encode the audio to AAC stereo 192k, copying the video stream
 vid_to_aac () {
   if [ $# -lt 1 ]; then echo "Usage: command ARGUMENT"; return -1; fi
   ffmpeg -i $1 -c:v copy -c:a aac -ac 2 -b:a 192k $1_192aac.mp4
@@ -118,12 +119,12 @@ vid_make_playlist() {
   echo "Playlist created as '$default_file'"
 }
 
-# Set location, reuse exif implementation for pic_
+# Set the GPS location of a video, reusing the exif implementation of pic_set_location
 vid_set_location() {
   pic_set_location $@
 }
 
-# Set location, reuse exif implementation for pic_
+# Get the GPS location of a video, reusing the exif implementation of pic_get_location
 vid_get_location() {
   pic_get_location $@
 }

@@ -1,5 +1,6 @@
 #!/bin/bash
-# From ChatGPT
+# Back up a Docker container and its volumes into ~/docker_backups.
+# Originally generated with ChatGPT.
 
 # === CONFIGURATION ===
 CONTAINER_NAME="mc"  # Set your container name here

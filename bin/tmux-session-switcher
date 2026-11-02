@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Quick switch between existing tmux sessions using fzf popup
+# Quick switch between existing tmux sessions using an fzf popup.
 # Bound to Prefix+C-f in tmux.conf
 
 set -e
