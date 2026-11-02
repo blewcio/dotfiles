@@ -4,9 +4,14 @@
 
 set -e
 
-# Source private.sh if TMUX_PROJECT_DIRS not set (e.g., when called from tmux run-shell)
-if [[ -z "$TMUX_PROJECT_DIRS" ]] && [[ -f "$HOME/dotfiles/shell.d/private.sh" ]]; then
-    source "$HOME/dotfiles/shell.d/private.sh"
+# Read TMUX_PROJECT_DIRS from the private config if not set (e.g., when called from
+# tmux run-shell). Only that one line is evaluated: sourcing the whole file would
+# also run its keychain lookups and export unrelated secrets into this popup.
+if [[ -z "${TMUX_PROJECT_DIRS:-}" ]]; then
+    for private_file in "$HOME/dotfiles/private/shell.d/private.sh" "$HOME/dotfiles/shell.d/private.sh"; do
+        [[ -f "$private_file" ]] && eval "$(grep -E '^export TMUX_PROJECT_DIRS=' "$private_file")"
+    done
+    unset private_file
 fi
 
 # TMUX_PROJECT_DIRS should be space-separated list of directories
