@@ -108,23 +108,46 @@ if [[ "$SHELL" == *"zsh" ]]; then
   [[ -r "$catppuccin_fzf" ]] && source "$catppuccin_fzf"
   unset catppuccin_fzf
 
-  # Internal: hook run after zsh-vi-mode initializes, sets up other plugin keybindings
-  # that would otherwise be overridden by vi-mode
-  zvm_after_init() {
+  # Edit the current command line in $EDITOR (same as C-x C-e in bash)
+  autoload -Uz edit-command-line
+  zle -N edit-command-line
+
+  # Internal: Alt-- widget, runs cd - and redraws the prompt (bash gets it from shell.d/inputrc.sh)
+  _cd_previous_widget() { builtin cd - >/dev/null && zle reset-prompt; }
+  zle -N _cd_previous_widget
+
+  # Internal: C-x C-v widget, switch between emacs (default) and vi key bindings for this shell
+  _toggle_vi_mode() {
+    if [[ "$(bindkey -lL main)" == *viins* ]]; then
+      bindkey -e; _bind_plugin_keys; zle -K emacs
+    else
+      bindkey -v; _bind_plugin_keys; zle -K viins
+    fi
+    zle reset-prompt
+  }
+  zle -N _toggle_vi_mode
+
+  # Internal: bind the custom and plugin keys in the current main keymap; runs once after the plugins
+  # and fzf are loaded, and again whenever _toggle_vi_mode switches keymaps
+  _bind_plugin_keys() {
     # Bind up/down arrows for zsh-history-substring-search
     bindkey '^[[A' history-substring-search-up      # Up arrow
     bindkey '^[[B' history-substring-search-down    # Down arrow
     bindkey "$terminfo[kcuu1]" history-substring-search-up    # Up arrow (terminfo)
     bindkey "$terminfo[kcud1]" history-substring-search-down  # Down arrow (terminfo)
 
-    # In vi mode, also bind k/j in command mode for history search
+    # In vi mode (after C-x C-v), also bind k/j in command mode for history search
     bindkey -M vicmd 'k' history-substring-search-up
     bindkey -M vicmd 'j' history-substring-search-down
 
-    # Restore fzf keybindings (overridden by zsh-vi-mode)
     bindkey '^R' fzf-history-widget      # Ctrl-R: fzf history search
     bindkey '^T' fzf-file-widget         # Ctrl-T: fzf file search
     bindkey '^[c' fzf-cd-widget          # Alt-C: fzf directory search
+    bindkey '^X^E' edit-command-line     # C-x C-e: edit command in $EDITOR (vim)
+    bindkey '^X^V' _toggle_vi_mode       # C-x C-v: toggle vi key bindings on/off
+    _bind_selection_keys
+    _bind_custom_keys
+    bindkey '^[-' _cd_previous_widget    # Alt--: cd - (previous directory)
   }
 
   # Load Antidote plugin manager
@@ -225,15 +248,18 @@ if [[ "$SHELL" == *"zsh" ]]; then
   }
   zle -N select-forward-word
 
-  # Key bindings for text selection
-  bindkey '^[[1;2D'    select-backward-char      # Shift+Left: select left by char
-  bindkey '^[[1;2C'    select-forward-char       # Shift+Right: select right by char
-  bindkey '^[[1;2A'    select-entire-line        # Shift+Up: select entire line
-  bindkey '^[[1;2B'    deselect-region           # Shift+Down: deselect
-  bindkey '^[[1;4D'    select-backward-word      # Shift+Alt+Left: select left by word
-  bindkey '^[[1;4C'    select-forward-word       # Shift+Alt+Right: select right by word
-  bindkey '^[[1;4A'    select-entire-line        # Shift+Alt+Up: select entire line
-  bindkey '^[[1;4B'    select-entire-line        # Shift+Alt+Down: select entire line
+  # Internal: bind the Shift/Alt selection keys (re-run when C-x C-v switches keymaps)
+  _bind_selection_keys() {
+    bindkey '^[[1;2D'    select-backward-char      # Shift+Left: select left by char
+    bindkey '^[[1;2C'    select-forward-char       # Shift+Right: select right by char
+    bindkey '^[[1;2A'    select-entire-line        # Shift+Up: select entire line
+    bindkey '^[[1;2B'    deselect-region           # Shift+Down: deselect
+    bindkey '^[[1;4D'    select-backward-word      # Shift+Alt+Left: select left by word
+    bindkey '^[[1;4C'    select-forward-word       # Shift+Alt+Right: select right by word
+    bindkey '^[[1;4A'    select-entire-line        # Shift+Alt+Up: select entire line
+    bindkey '^[[1;4B'    select-entire-line        # Shift+Alt+Down: select entire line
+  }
+  _bind_selection_keys
 
   # Keybindings for zsh-autocomplete and completion
   # Tab/Shift+Tab left to fzf-tab (aloxaf/fzf-tab) instead of menu-complete
@@ -256,6 +282,10 @@ if [[ "$SHELL" == *"zsh" ]]; then
       export FZF_ZSH_INITIALIZED=1
     fi
   fi
+
+  # Standard emacs key bindings by default; vi bindings only on demand (C-x C-v)
+  bindkey -e
+  _bind_plugin_keys
 fi
 
 # Bash specific config

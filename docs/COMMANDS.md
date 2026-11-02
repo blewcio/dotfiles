@@ -184,7 +184,6 @@ Browse interactively in the shell: `cmds` (everything), `aliases` (own aliases),
 | `select-entire-line` | Internal: Shift+Up key widget, select entire line |
 | `select-forward-char` | Internal: Shift+Right key widget, select forward by character |
 | `select-forward-word` | Internal: Shift+Alt+Right key widget, select forward by word |
-| `zvm_after_init` | Internal: hook run after zsh-vi-mode initializes, sets up other plugin keybindings |
 
 ## Scripts (bin/)
 

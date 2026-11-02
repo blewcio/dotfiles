@@ -2,11 +2,6 @@
 # This file defines all zsh plugins to be loaded by Antidote
 # Plugins are loaded in the order they appear
 
-# Vi mode plugin - comprehensive vim emulation in zsh
-# Shortcuts: ESC for normal mode, i/a/o for insert, v for visual, ciw/di"/yy etc.
-# Better cursor behavior, surround operations, and closer to native vim
-jeffreytse/zsh-vi-mode
-
 # Benchmarking tool for zsh startup performance
 # Usage: zsh-bench to measure shell startup time
 # romkatv/zsh-bench kind:path
