@@ -1,0 +1,250 @@
+#!/usr/bin/env bash
+# ------------------------------------------------------------
+# Index own aliases, shell functions and bin/ scripts from their comments.
+#
+# Parses the dotfiles sources (not the running shell) and takes each
+# description from the comment next to the definition. Feeds the funcs /
+# aliases / cmds shell commands (shell.d/func_docs.sh) and docs/COMMANDS.md.
+#
+# Comment convention:
+#   function  "# description" on the line directly above it, or trailing
+#             the "name() {" line ("## Heading" comments mark sections only)
+#   alias     trailing "# description"; a bare alias of a function or script
+#             inherits that target's description
+#   script    first sentence of the header comment under the shebang
+#   hidden    a description starting with "Internal" keeps the entry out of
+#             the listings (key widgets, hooks, helpers)
+#
+#   cmd-index [--kind alias|function|script]... [--no-private] [--missing]
+#             [--tsv | --list | --markdown]
+#
+#   --tsv       kind, name, description, file, line, definition (default)
+#   --list      grouped plain text
+#   --markdown  cheat sheet for docs/COMMANDS.md (never includes private/)
+#   --no-private  skip the private submodule and shell.d/private.sh
+#   --missing   only entries that have no description yet
+# ------------------------------------------------------------
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+kinds=""
+private=1
+missing=0
+mode=tsv
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --kind)
+            [[ $# -ge 2 && "$2" =~ ^(alias|function|script)$ ]] || { echo "Error: --kind needs alias, function or script" >&2; exit 1; }
+            kinds="$kinds $2"; shift 2 ;;
+        --no-private) private=0; shift ;;
+        --missing) missing=1; shift ;;
+        --tsv|--list|--markdown) mode="${1#--}"; shift ;;
+        -h|--help) sed -n '2,27p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        *) echo "Unknown option: $1 (see --help)" >&2; exit 1 ;;
+    esac
+done
+[[ "$mode" == markdown ]] && private=0
+[[ -z "$kinds" ]] && kinds="alias function script"
+
+files=("$ROOT/shellrc.sh")
+for f in "$ROOT"/shell.d/*.sh; do
+    [[ -f "$f" ]] || continue
+    [[ "$private" -eq 0 && "$(basename "$f")" == private.sh ]] && continue
+    files+=("$f")
+done
+if [[ "$private" -eq 1 ]]; then
+    for f in "$ROOT"/private/shell.d/*.sh; do
+        [[ -f "$f" ]] && files+=("$f")
+    done
+fi
+for f in "$ROOT"/bin/*; do
+    # fasd is vendored third-party code, documented upstream
+    [[ -f "$f" && "$(basename "$f")" != fasd ]] && files+=("$f")
+done
+
+read -r -d '' AWK_PROG <<'AWK' || true
+function trim(s) { sub(/^[[:space:]]+/, "", s); sub(/[[:space:]]+$/, "", s); return s }
+function base(p,   a, k) { k = split(p, a, "/"); return a[k] }
+
+# Position of the first unquoted "#" that starts a comment, 0 if none
+function comment_pos(s,   i, c, q, len) {
+    len = length(s); q = ""
+    for (i = 1; i <= len; i++) {
+        c = substr(s, i, 1)
+        if (q != "") {
+            if (c == "\\" && q == "\"") i++
+            else if (c == q) q = ""
+            continue
+        }
+        if (c == "\047" || c == "\"") { q = c; continue }
+        if (c == "\\") { i++; continue }
+        if (c == "#" && (i == 1 || substr(s, i - 1, 1) ~ /[[:space:]]/)) return i
+    }
+    return 0
+}
+
+# Comments often start with the usage form ("ta [name] - attach..."): drop it
+function clean(name, d,   p) {
+    d = trim(d)
+    if (name != "" && substr(d, 1, length(name)) == name) {
+        p = index(d, " - ")
+        if (p > 0 && p <= 40) d = trim(substr(d, p + 3))
+    }
+    return d
+}
+
+function add(kind, name, desc, file, line, def, tgt) {
+    n++; K[n] = kind; N[n] = name; D[n] = desc; F[n] = file; L[n] = line; DEF[n] = def; T[n] = tgt
+}
+
+# Close the header scan of the current bin/ script: first sentence only
+function finish_script(   d, p) {
+    if (!isbin || badded) return
+    d = bacc
+    p = index(d, ". "); if (p > 0) d = substr(d, 1, p - 1)
+    sub(/[.:]$/, "", d)
+    d = clean(base(curfile), d)
+    if (length(d) > 110) d = substr(d, 1, 107) "..."
+    add("script", base(curfile), d, curfile, 1, "", "")
+    badded = 1
+}
+
+function group(i) { return K[i] == "script" ? "bin/" : substr(F[i], length(root) + 2) }
+function rank(i) {
+    if (mode == "tsv") return (K[i] == "alias") ? 1 : (K[i] == "function") ? 2 : 3
+    return (K[i] == "function") ? 1 : (K[i] == "alias") ? 2 : 3
+}
+function wanted(k) { return index(" " kinds " ", " " k " ") > 0 }
+function show(i) { return wanted(K[i]) && (!missing || D[i] == "") && D[i] !~ /^[Ii]nternal/ }
+function esc(s) { gsub(/\|/, "\\|", s); return s }
+
+FNR == 1 {
+    finish_script()
+    curfile = FILENAME
+    isbin = (index(FILENAME, bindir) == 1)
+    incomment = 0; pcfirst = ""; bacc = ""; badded = 0
+}
+
+# bin/ scripts: description from the header comment under the shebang
+isbin {
+    if (FNR > 1 && !badded) {
+        if ($0 ~ /^#!/) { }
+        else if ($0 ~ /^#/) {
+            t = $0; sub(/^#+[[:space:]]*/, "", t)
+            if (t ~ /^Usage/) finish_script()
+            else if (t !~ /[A-Za-z]/) { if (bacc != "") finish_script() }
+            else {
+                bacc = (bacc == "" ? "" : bacc " ") t
+                if (bacc ~ /[.:]$/ || index(bacc, ". ") > 0) finish_script()
+            }
+        } else if ($0 !~ /^[[:space:]]*$/) finish_script()
+    }
+    next
+}
+
+# shell functions: name() / function name()
+$0 ~ /^[[:space:]]*(function[[:space:]]+[A-Za-z0-9_.-]+|[A-Za-z0-9_.-]+[[:space:]]*\(\))/ {
+    line = $0
+    sub(/^[[:space:]]*(function[[:space:]]+)?/, "", line)
+    name = line; sub(/[[:space:]]*(\(\)|\{).*/, "", name); sub(/[[:space:]].*/, "", name)
+    if (name !~ /^_/) {
+        desc = pcfirst
+        if (desc == "") { cp = comment_pos(line); if (cp > 0) desc = substr(line, cp + 1) }
+        add("function", name, clean(name, desc), FILENAME, FNR, name "()", "")
+    }
+}
+
+# aliases: alias name=value  # description
+$0 ~ /^[[:space:]]*alias[[:space:]]+[^=[:space:]]+=/ {
+    line = $0
+    sub(/^[[:space:]]*alias[[:space:]]+/, "", line)
+    eq = index(line, "=")
+    name = substr(line, 1, eq - 1); val = substr(line, eq + 1)
+    desc = ""
+    cp = comment_pos(val)
+    if (cp > 0) { desc = trim(substr(val, cp + 1)); val = substr(val, 1, cp - 1) }
+    val = trim(val); sub(/;$/, "", val); val = trim(val)
+    if (val ~ /^".*"$/ || val ~ /^\047.*\047$/) val = substr(val, 2, length(val) - 2)
+    split(val, w, " "); tgt = w[1]
+    add("alias", name, clean(name, desc), FILENAME, FNR, val, tgt)
+}
+
+# remember the comment block directly above the next line
+{
+    if ($0 ~ /^[[:space:]]*##/) { incomment = 0; pcfirst = "" }
+    else if ($0 ~ /^[[:space:]]*#/) {
+        t = $0; sub(/^[[:space:]]*#+[[:space:]]?/, "", t); t = trim(t)
+        if (!incomment) { pcfirst = t; incomment = 1 }
+    } else { incomment = 0; pcfirst = "" }
+}
+
+END {
+    finish_script()
+    for (i = 1; i <= n; i++) if (K[i] == "function" || K[i] == "script") fdesc[N[i]] = D[i]
+    for (i = 1; i <= n; i++) if (K[i] == "alias" && D[i] == "" && (T[i] in fdesc)) { D[i] = fdesc[T[i]]; sub(/ \(alias: [^)]*\)/, "", D[i]) }
+
+    # sort (insertion sort: the index holds a few hundred entries at most)
+    for (i = 1; i <= n; i++) {
+        ord[i] = i
+        if (mode == "tsv") key[i] = rank(i) "|" tolower(N[i]) "|" F[i]
+        else key[i] = group(i) "|" rank(i) "|" tolower(N[i])
+    }
+    for (i = 2; i <= n; i++) {
+        v = ord[i]; j = i - 1
+        while (j >= 1 && key[ord[j]] > key[v]) { ord[j + 1] = ord[j]; j-- }
+        ord[j + 1] = v
+    }
+
+    if (mode == "tsv") {
+        for (o = 1; o <= n; o++) { i = ord[o]; if (show(i)) print K[i] "\t" N[i] "\t" D[i] "\t" F[i] "\t" L[i] "\t" DEF[i] }
+    } else if (mode == "list") {
+        nk = split(kinds, kk, " ")
+        last = ""
+        for (o = 1; o <= n; o++) {
+            i = ord[o]; if (!show(i)) continue
+            g = group(i)
+            if (g != last) {
+                if (last != "") print ""
+                print (g == "bin/" ? "Scripts (bin/)" : g) ":"
+                last = g
+            }
+            if (nk > 1 && wanted("alias")) printf "  %-24s %-6s %s\n", N[i], (K[i] == "function" ? "func" : K[i] == "alias" ? "alias" : "script"), D[i]
+            else printf "  %-24s %s\n", N[i], D[i]
+        }
+    } else {
+        print "# Commands cheat sheet"
+        print ""
+        print "Generated by `cmd-index --markdown` from the comments next to each alias, function and script. Do not edit by hand; regenerate with:"
+        print ""
+        print "```sh"
+        print "cmd-index --markdown > docs/COMMANDS.md"
+        print "```"
+        print ""
+        print "Browse interactively in the shell: `cmds` (everything), `aliases` (own aliases), `funcs`, `fhelp <name>`."
+        print ""
+        print "## Aliases"
+        print ""
+        print "| Alias | Expands to | Description | Defined in |"
+        print "| --- | --- | --- | --- |"
+        for (o = 1; o <= n; o++) { i = ord[o]; if (K[i] == "alias") print "| `" N[i] "` | `" esc(DEF[i]) "` | " esc(D[i]) " | " substr(F[i], length(root) + 2) " |" }
+        print ""
+        print "## Functions"
+        last = ""
+        for (o = 1; o <= n; o++) {
+            i = ord[o]; if (K[i] != "function") continue
+            g = group(i)
+            if (g != last) { print ""; print "### " g; print ""; print "| Function | Description |"; print "| --- | --- |"; last = g }
+            print "| `" N[i] "` | " esc(D[i]) " |"
+        }
+        print ""
+        print "## Scripts (bin/)"
+        print ""
+        print "| Script | Description |"
+        print "| --- | --- |"
+        for (o = 1; o <= n; o++) { i = ord[o]; if (K[i] == "script") print "| `" N[i] "` | " esc(D[i]) " |" }
+    }
+}
+AWK
+
+awk -v root="$ROOT" -v bindir="$ROOT/bin/" -v kinds="$kinds" -v mode="$mode" -v missing="$missing" "$AWK_PROG" "${files[@]}"
