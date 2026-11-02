@@ -204,5 +204,5 @@ Browse interactively in the shell: `cmds` (everything), `aliases` (own aliases),
 | `tmux-sessionizer` | Pick a project directory with fzf and create or attach its tmux session |
 | `vid-conv-to-mp4` | Convert videos to H.264/AAC MP4, preserving metadata |
 | `vid-name-to-ts` | Preview renaming videos in the current dir to creation_time timestamps (dry run, mv is commented out) |
-| `vid-name-to-ts-tag` | Rename video files to |
+| `vid-name-to-ts-tag` | Rename video files to a creation_time timestamp name with an optional tag |
 | `vid-sort-by-date` | Move video files to YEAR/MONTH directories based on the video's internal creation_time tag |

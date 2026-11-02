@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # ------------------------------------------------------------
-# Rename video files to:
-#   YYYYMMDDHHMMSSmmm[_CUSTOM_TAG].<extension>
-# using the embedded creation_time tag.
+# Rename video files to a creation_time timestamp name with an optional tag.
+#
+# Target pattern: YYYYMMDDHHMMSSmmm[_CUSTOM_TAG].<extension>, using the
+# embedded creation_time tag.
 # ------------------------------------------------------------
 # Usage:
 #   ./vid-name-to-ts-tag *.mp4                    # → 20231116123045123.mp4
