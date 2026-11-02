@@ -40,6 +40,7 @@ The shell configuration uses a modular architecture with three layers:
    - `aliases.sh`: Command aliases and replacements (bat for cat, eza for ls, etc.)
    - `exports.sh`: Environment variables
    - `func.sh`: General utility functions
+   - `func_docs.sh`: Command discovery (`cmds`, `aliases`, `funcs`, `fhelp`), driven by `bin/cmd-index`
    - `func_pictures.sh`: Image manipulation utilities
    - `func_video.sh`: Video processing utilities
    - `history.sh`: Shell history configuration (config-style file, like `exports.sh`/`inputrc.sh` — not a functions file)
@@ -122,7 +123,7 @@ The `ai/` directory is the source of truth for Claude Code / OpenCode configurat
 Located in `bin/`, added to `PATH` by `shellrc.sh`.
 
 - **Naming convention**: `kebab-case`, no file extension (e.g. `tmux-cht`, `pic-sort-by-date`) — they're meant to be typed like ordinary commands. Exception: `fasd`, a vendored third-party script kept under its upstream name because other integrations look it up by that exact name.
-- Every script should have a short header comment explaining what it does — that's the source of truth for what each one does; run `funcs` (or `describe_function <name>` / `fhelp <name>`) to list and inspect them rather than looking here, since this file won't be kept in sync with additions.
+- Every script should have a short header comment explaining what it does — that's the source of truth for what each one does; run `cmds`, `funcs` or `fhelp <name>` to list and inspect them rather than looking here, since this file won't be kept in sync with additions. The first sentence of the header is the description shown in the listings.
 - `link-skills` is the one script called from `deploy.sh` itself (symlinks skills into `~/.claude/skills/` and `~/.config/opencode/skills/` — see Agents / Claude Code Integration below).
 
 ## Development Workflow
@@ -137,6 +138,8 @@ When modifying configurations:
 2. **Adding new shell functions/aliases**:
    - Add to appropriate file in `shell.d/`
    - They'll be automatically sourced on next shell start or reload
+   - Always document them in the code, because `bin/cmd-index` builds `cmds`/`aliases`/`funcs` and `docs/COMMANDS.md` from the comments: a function gets a `# One-line description` directly above it (`## Heading` only marks a section), an alias a trailing `# description` (a bare alias of a function or script inherits that target's description), a `bin/` script a summary sentence in its header. Start a description with `Internal` to keep an entry out of the listings
+   - Check for gaps with `cmd-index --missing --list`, then refresh the cheat sheet with `cmd-index --markdown > docs/COMMANDS.md` (public only, never includes `private/`)
 
 3. **Adding new config files**:
    - Place in `config/<app-name>/`

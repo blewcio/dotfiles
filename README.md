@@ -97,15 +97,20 @@ dotfiles/
 │   ├── aliases.sh         # Command aliases
 │   ├── exports.sh         # Environment variables
 │   ├── func.sh            # Utility functions
+│   ├── func_docs.sh       # Command discovery: cmds, aliases, funcs, fhelp
+│   ├── func_pictures.sh   # Picture/EXIF helpers
+│   ├── func_video.sh      # Video helpers
 │   ├── keys.sh            # Key bindings
-│   └── private.sh         # Private overrides (gitignored)
+│   └── private.sh         # Local-only overrides (gitignored)
 ├── config/                # Application configurations
 │   ├── git/               # Git config with delta pager
 │   ├── tmux/              # Tmux with vim bindings
 │   ├── bat/               # Syntax highlighting themes
 │   ├── zsh/               # Zsh plugins and themes
 │   └── ...                # fd, ripgrep, btop, lazygit, etc.
-├── bin/                   # Custom scripts
+├── bin/                   # Custom scripts (on PATH)
+├── docs/
+│   └── COMMANDS.md        # Generated cheat sheet of all aliases/functions/scripts
 ├── mac/
 │   ├── Brewfile           # Homebrew packages
 │   └── mac-install.sh     # macOS installation script
@@ -143,17 +148,38 @@ The following modern alternatives are configured and aliased:
 - `duf` → `df`
 - `zoxide` → `cd` (smart directory jumping)
 
-## Custom Functions
+## Custom Commands
 
-### FZF + fasd Integration
-- `v` - Edit recent files with fuzzy finder
-- `j` - Jump to recent directories
-- `jf` - Jump to directory containing recent file
-- `o` - Open recent files in default application
+The dotfiles define many aliases, shell functions and scripts. Instead of a
+hand-written list here, each one is documented by a comment next to its
+definition and discovered with these commands:
 
-### Utilities
-- `reload` - Reload shell configuration
-- `copy_to_trash` - Safe file deletion (aliased to `rm`)
+| Command | What it does |
+| --- | --- |
+| `cmds [query]` | Browse all own aliases, functions and scripts with descriptions (fzf; `ctrl-e` edits the source) |
+| `aliases [query]` | Browse own aliases as defined in the dotfiles; `✓` marks those loaded in the current shell. `aliases --all` shows every alias loaded in the shell, including other scripts' |
+| `funcs` | List own functions and scripts with descriptions, grouped by source file |
+| `fhelp <name>` | Show a function's or script's comment and usage |
+
+A generated cheat sheet is also available as [`docs/COMMANDS.md`](docs/COMMANDS.md)
+(public commands only; regenerate with `cmd-index --markdown > docs/COMMANDS.md`).
+
+Some highlights:
+- `v`, `j`, `jf`, `o` - fasd + fzf: edit recent files, jump to recent directories, open recent files
+- `fif`, `gco`, `glog`, `fkill` - fzf search in files, git branch checkout, git log browser, process killer
+- `ta`, `tn`, `tp` - tmux: attach, new session, project selector
+- `rm` - moves to trash (`del` is the real rm)
+
+### Documenting a new alias, function or script
+
+`bin/cmd-index` builds the lists above by parsing the sources, so the comment
+is the documentation:
+
+- **Function:** a `# One-line description` directly above it (a `## Heading` comment only marks a section).
+- **Alias:** a trailing `# description` on the same line. A bare alias of a function or script (`alias gco=fzf_git_checkout`) inherits that target's description.
+- **Script in `bin/`:** a short summary sentence in the header comment under the shebang.
+
+Check for gaps with `cmd-index --missing --list`.
 
 ## Platform-Specific
 
@@ -183,8 +209,9 @@ reload
 ### Adding New Configurations
 
 **Shell functions/aliases:**
-1. Add to appropriate file in `shell.d/`
+1. Add to appropriate file in `shell.d/`, with a description comment (see "Documenting a new alias, function or script")
 2. Run `reload` or restart shell
+3. Refresh the cheat sheet: `cmd-index --markdown > docs/COMMANDS.md`
 
 **Application configs:**
 1. Place in `config/<app-name>/`
