@@ -7,7 +7,7 @@
 | Key | Action |
 |-----|--------|
 | `Prefix+S` | Reload tmux configuration |
-| `Prefix+b` | Session selector (sessionx plugin) |
+| `Prefix+C-s` | Save session (resurrect plugin) |
 | `Prefix+R` | Restore saved session (resurrect plugin) |
 | `Prefix+I` | Install new plugins |
 | `Prefix+U` | Update plugins |
@@ -18,7 +18,7 @@
 | Key | Action |
 |-----|--------|
 | `Prefix+i` | Enter copy mode |
-| `Prefix+p` | Paste buffer |
+| `Prefix+]` | Paste buffer (tmux default) |
 | `Prefix+C-r` | Choose buffer (clipboard history) |
 | `v` (in copy mode) | Begin selection |
 | `y` (in copy mode) | Copy selection and exit |
@@ -27,7 +27,7 @@
 | `0` (in copy mode) | Jump to start of line |
 | `$` (in copy mode) | Jump to end of line |
 
-## Screen Scrolling (outside copy mode)
+## Screen Scrolling (in copy mode)
 
 | Key | Action |
 |-----|--------|
@@ -38,32 +38,31 @@
 
 | Key | Action |
 |-----|--------|
-| `Prefix+n` | New window |
-| `Prefix+l` | Last window |
-| `Prefix+C-w` | Choose tree (window/session selector) |
-| `Prefix+C-h` | Previous window |
-| `Prefix+C-l` | Next window |
-| `Prefix+C-^` or `Prefix+C-6` | Toggle between last active windows |
+| `Prefix+c` | New window (in the current directory) |
+| `Prefix+n` / `Prefix+p` | Next / previous window (tmux defaults) |
+| `Prefix+C-h` / `Prefix+C-l` | Previous / next window (repeatable) |
+| `Prefix+C-^` | Toggle between last active windows |
+| `Prefix+w` or `Prefix+C-w` | Choose tree (window/session selector) |
 | `Prefix+D` | Open TODO.md in new window |
 
 ## Pane Management
 
 | Key | Action |
 |-----|--------|
-| `Prefix+v` | Split window horizontally |
-| `Prefix+s` | Split window vertically |
-| `Prefix+o` | Toggle pane zoom (full screen) |
-| `Prefix+c` | Close/kill current pane |
-| `Prefix+C-c` | Close all other panes (keep current) |
+| `Prefix+v` or `Prefix+%` | Split side by side (current directory) |
+| `Prefix+V` or `Prefix+"` | Split stacked (current directory) |
+| `Prefix+o` | Next pane (tmux default) |
+| `Prefix+z` | Toggle pane zoom (tmux default) |
+| `Prefix+x` | Kill current pane, asks first (tmux default) |
+| `Prefix+X` | Kill all other panes, asks first |
+| `Prefix+s` | Session list (tmux default) |
 
-## Pane Navigation (Vim-aware)
+## Pane Navigation (vim-aware)
 
 | Key | Action | Notes |
 |-----|--------|-------|
-| `C-h` | Select left pane | Sends to vim if in vim |
-| `C-j` | Select down pane | Sends to vim if in vim |
-| `C-k` | Select up pane | Sends to vim if in vim |
-| `C-l` | Select right pane | Sends to vim if in vim |
+| `Prefix+h/j/k/l` | Select left / down / up / right pane | Repeatable |
+| `C-h/C-j/C-k/C-l` | Move between vim/nvim splits, then into the neighbour tmux pane | Only inside vim/nvim (vim-tmux-navigator); in a shell these keys keep their normal meaning |
 
 ## Pane Resizing
 
@@ -80,5 +79,7 @@
 |-----|--------|--------|
 | `Prefix+e` | Open cheat sheet | Custom script |
 | `Prefix+f` | Jump to text (easymotion-like) | tmux-jump |
+| `Prefix+C-f` | Session switcher (fzf popup) | Custom script |
+| `Prefix+C-p` | Project sessionizer | Custom script |
 | `Prefix+C-t` | Fuzzy search tmux commands | tmux-fzf |
 | `Prefix+Tab` | Extract text/path/url from screen | extrakto |
