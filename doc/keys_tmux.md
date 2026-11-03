@@ -7,8 +7,6 @@
 | Key | Action |
 |-----|--------|
 | `Prefix+S` | Reload tmux configuration |
-| `Prefix+C-s` | Save session (resurrect plugin) |
-| `Prefix+R` | Restore saved session (resurrect plugin) |
 | `Prefix+I` | Install new plugins |
 | `Prefix+U` | Update plugins |
 | `Prefix+Alt+u` | Uninstall plugins not in config |
@@ -33,6 +31,27 @@
 |-----|--------|
 | `Shift+Up` | Scroll half page up |
 | `Shift+Down` | Scroll half page down |
+
+## Sessions
+
+| Key / command | Action |
+|---------------|--------|
+| `Prefix+C-p` or `tp` | Project sessionizer: pick a project directory, create or switch to its session |
+| `tmux-sessionizer <dir>` | Same, for a given directory without the picker |
+| `Prefix+C-f` | Switch between running sessions (fzf popup) |
+| `Prefix+b` | Back to the previous session |
+| `Prefix+(` / `Prefix+)` | Previous / next session (tmux defaults) |
+| `Prefix+s` | Session list (tmux default) |
+| `Prefix+w` or `Prefix+C-w` | Tree of sessions and windows |
+| `Prefix+$` | Rename session (tmux default) |
+| `Prefix+d` | Detach (tmux default) |
+| `Prefix+C-s` / `Prefix+R` | Save / restore all sessions (resurrect; continuum also saves automatically) |
+| `Prefix+C-t` | tmux-fzf menu, including session actions such as kill |
+| `ta [name]` | Attach or switch to a session from the shell (fzf pick without a name) |
+| `tn [name]` | Create a session named after the current directory or the given name |
+| `tm-dev` | Start the "dev" layout (git status, vim, shell) |
+
+Project directories come from `TMUX_PROJECT_DIRS` in `private/shell.d/private.sh` (append `:N` for N levels deep).
 
 ## Window Management
 
