@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # Pick a project directory with fzf and create or attach its tmux session.
 # Uses fzf-tmux popup for selection, creates session with directory name
+#
+# TMUX_PROJECT_DIRS: space-separated list of directories whose subdirectories are
+# the projects. Append :N to look N levels down instead of 1 (e.g. "$HOME/work:2").
+# Directories that do not exist are skipped silently.
 
 set -e
 
@@ -14,18 +18,20 @@ if [[ -z "${TMUX_PROJECT_DIRS:-}" ]]; then
     unset private_file
 fi
 
-# TMUX_PROJECT_DIRS should be space-separated list of directories
 PROJECT_DIRS="${TMUX_PROJECT_DIRS:-$HOME}"
 
 # If argument provided, use it directly instead of fzf
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
-    # Find directories (depth 1) in all project directories
+    # Find directories exactly N levels below each project directory (N defaults to 1)
     selected=$(
-        for dir in $PROJECT_DIRS; do
+        for entry in $PROJECT_DIRS; do
+            dir="${entry%:*}"
+            depth=1
+            [[ "$entry" == *:[0-9]* ]] && depth="${entry##*:}"
             if [[ -d "$dir" ]]; then
-                find "$dir" -mindepth 1 -maxdepth 1 -type d 2>/dev/null
+                find "$dir" -mindepth "$depth" -maxdepth "$depth" -type d 2>/dev/null
             fi
         done | fzf-tmux -p 80%,60% --reverse --prompt="Project: "
     )
@@ -36,14 +42,24 @@ if [[ -z $selected ]]; then
     exit 0
 fi
 
-# Create session name from directory basename (replace dots with underscores for tmux)
-selected_name=$(basename "$selected" | tr '.' '_')
+# Session names cannot contain dots or colons, so replace them with underscores
+session_name() { basename "$1" | tr '.:' '__'; }
 
-# Check if tmux is running
-tmux_running=$(pgrep tmux || true)
+# Directory a session was created for ("=name:" matches the session name exactly)
+session_dir() { tmux display-message -p -t "=$1:" '#{session_path}' 2>/dev/null || true; }
 
-# If not in tmux and tmux is not running, start new session
-if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
+# Session name from the directory basename; if another directory already owns that
+# name, prefix the parent directory, and as a last resort append a short checksum
+selected_name=$(session_name "$selected")
+for candidate in "$selected_name" "$(session_name "$(dirname "$selected")")_$selected_name" \
+                 "${selected_name}_$(printf '%s' "$selected" | cksum | cut -d' ' -f1)"; do
+    selected_name=$candidate
+    tmux has-session -t="$candidate" 2>/dev/null || break              # free name
+    [[ "$(session_dir "$candidate")" == "$selected" ]] && break        # already this directory
+done
+
+# If not in tmux and no tmux server is running, start a new session
+if [[ -z $TMUX ]] && ! tmux list-sessions &>/dev/null; then
     tmux new-session -s "$selected_name" -c "$selected"
     exit 0
 fi
