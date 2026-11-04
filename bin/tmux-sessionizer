@@ -1,12 +1,27 @@
 #!/usr/bin/env bash
 # Pick a project directory with fzf and create or attach its tmux session.
-# Uses fzf-tmux popup for selection, creates session with directory name
+# Uses an fzf-tmux popup: running sessions are marked and listed first, then the
+# most recently used directories (zoxide), with a git/README preview.
+#
+# Usage: tmux-sessionizer [dir]   (dir: skip the picker; inside a git repo the
+#                                  repository root is used, "." works too)
+#        tmux-sessionizer --list  (print the picker entries, used by the picker itself)
+#
+# Picker keys: enter = open the project, ctrl-x = kill the highlighted session.
 #
 # TMUX_PROJECT_DIRS: space-separated list of directories whose subdirectories are
-# the projects. Append :N to look N levels down instead of 1 (e.g. "$HOME/work:2").
+# the projects. Append :N to look exactly N levels down instead of 1 (e.g.
+# "$HOME/work:2"); :0 lists the directory itself ("$HOME/dotfiles:0").
 # Directories that do not exist are skipped silently.
+#
+# Layouts: when a script <project>.sh (or default.sh) exists in
+# ~/dotfiles/private/tmux-sessions/ or ~/dotfiles/config/tmux/sessions/ it runs once
+# after a new session is created, with SESSION and DIR set (see that README).
+# They live outside the projects on purpose, so a cloned repo cannot run code here.
 
 set -e
+
+self="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 
 # Read TMUX_PROJECT_DIRS from the private config if not set (e.g., when called from
 # tmux run-shell). Only that one line is evaluated: sourcing the whole file would
@@ -20,20 +35,76 @@ fi
 
 PROJECT_DIRS="${TMUX_PROJECT_DIRS:-$HOME}"
 
-# If argument provided, use it directly instead of fzf
-if [[ $# -eq 1 ]]; then
-    selected=$1
-else
-    # Find directories exactly N levels below each project directory (N defaults to 1)
-    selected=$(
+# Session names cannot contain dots or colons, so replace them with underscores
+session_name() { basename "$1" | tr '.:' '__'; }
+
+# Directory a session was created for ("=name:" matches the session name exactly)
+session_dir() { tmux display-message -p -t "=$1:" '#{session_path}' 2>/dev/null || true; }
+
+# Picker entries, one per line: display text, directory, running session name (tab separated).
+# Running sessions come first (most recently attached first), then by zoxide score.
+list_projects() {
+    local entry dir depth
+    {
+        tmux list-sessions -F $'S\t#{session_last_attached}\t#{session_name}\t#{session_path}' 2>/dev/null || true
+        if command -v zoxide >/dev/null 2>&1; then
+            zoxide query -ls 2>/dev/null | sed -E 's/^ *([0-9.]+) +/Z\t\1\t/' || true
+        fi
         for entry in $PROJECT_DIRS; do
             dir="${entry%:*}"
             depth=1
             [[ "$entry" == *:[0-9]* ]] && depth="${entry##*:}"
             if [[ -d "$dir" ]]; then
-                find "$dir" -mindepth "$depth" -maxdepth "$depth" -type d 2>/dev/null
+                find "$dir" -mindepth "$depth" -maxdepth "$depth" -type d 2>/dev/null | sed 's/^/D\t/'
             fi
-        done | fzf-tmux -p 80%,60% --reverse --prompt="Project: "
+        done
+    } | awk -F'\t' -v home="$HOME" '
+        $1 == "S" { sname[$4] = $3; last[$4] = $2; next }
+        $1 == "Z" { score[$3] = $2; next }
+        $1 == "D" { if (!($2 in seen)) { seen[$2] = 1; order[++n] = $2 } next }
+        END {
+            for (i = 1; i <= n; i++) {
+                p = order[i]
+                run = (p in sname)
+                rank = run ? 1000000000000 + last[p] : ((p in score) ? score[p] : 0)
+                d = p
+                if (index(d, home) == 1) d = "~" substr(d, length(home) + 1)
+                printf "%.4f\t%s\t%s %-22s %s\t%s\t%s\n", rank, p, (run ? "●" : " "), (run ? sname[p] : ""), d, p, (run ? sname[p] : "")
+            }
+        }' | sort -t$'\t' -k1,1gr -k2,2 | cut -f3-
+}
+
+if [[ "${1:-}" == "--list" ]]; then
+    list_projects
+    exit 0
+fi
+
+# If argument provided, use it directly instead of fzf
+if [[ $# -eq 1 ]]; then
+    if [[ ! -d "$1" ]]; then
+        echo "tmux-sessionizer: not a directory: $1" >&2
+        exit 1
+    fi
+    selected=$(cd "$1" && pwd)
+    # Inside a git repository use its root, so "." from a subfolder opens the project
+    if repo_root=$(git -C "$selected" rev-parse --show-toplevel 2>/dev/null); then
+        selected=$repo_root
+    fi
+else
+    preview='d={2}
+        if git -C "$d" rev-parse --git-dir >/dev/null 2>&1; then
+            git -C "$d" -c color.ui=always log --oneline -8; echo
+            git -C "$d" -c color.ui=always status -sb | head -12; echo
+        fi
+        readme=$(ls "$d" | grep -i -m1 "^readme")
+        if [ -n "$readme" ]; then head -15 "$d/$readme"; else ls -1 "$d" | head -20; fi'
+    selected=$(
+        list_projects | fzf-tmux -p 80%,60% --reverse --prompt="Project: " \
+            --delimiter=$'\t' --with-nth=1 \
+            --header='● running session   ctrl-x kill session' \
+            --preview "$preview" --preview-window='right:45%' \
+            --bind "ctrl-x:execute-silent([ -n {3} ] && tmux kill-session -t ={3})+reload('$self' --list)" \
+            | cut -f2
     )
 fi
 
@@ -41,12 +112,6 @@ fi
 if [[ -z $selected ]]; then
     exit 0
 fi
-
-# Session names cannot contain dots or colons, so replace them with underscores
-session_name() { basename "$1" | tr '.:' '__'; }
-
-# Directory a session was created for ("=name:" matches the session name exactly)
-session_dir() { tmux display-message -p -t "=$1:" '#{session_path}' 2>/dev/null || true; }
 
 # Session name from the directory basename; if another directory already owns that
 # name, prefix the parent directory, and as a last resort append a short checksum
@@ -58,15 +123,20 @@ for candidate in "$selected_name" "$(session_name "$(dirname "$selected")")_$sel
     [[ "$(session_dir "$candidate")" == "$selected" ]] && break        # already this directory
 done
 
-# If not in tmux and no tmux server is running, start a new session
-if [[ -z $TMUX ]] && ! tmux list-sessions &>/dev/null; then
-    tmux new-session -s "$selected_name" -c "$selected"
-    exit 0
-fi
-
-# Create session if it doesn't exist
+# Create the session if it doesn't exist (this also starts the server if none is running)
 if ! tmux has-session -t="$selected_name" 2>/dev/null; then
     tmux new-session -ds "$selected_name" -c "$selected"
+
+    # Optional per-project layout; kept outside the project so it is never untrusted code
+    project=$(session_name "$selected")
+    for dir in "$HOME/dotfiles/private/tmux-sessions" "$HOME/dotfiles/config/tmux/sessions"; do
+        for layout in "$dir/$project.sh" "$dir/default.sh"; do
+            if [[ -f "$layout" ]]; then
+                SESSION="$selected_name" DIR="$selected" bash "$layout" || true
+                break 2
+            fi
+        done
+    done
 fi
 
 # Switch to session (or attach if outside tmux)
