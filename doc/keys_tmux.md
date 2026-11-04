@@ -37,7 +37,8 @@
 | Key / command | Action |
 |---------------|--------|
 | `Prefix+C-p` or `tp` | Project sessionizer: pick a project directory, create or switch to its session |
-| `tmux-sessionizer <dir>` | Same, for a given directory without the picker |
+| `tmux-sessionizer <dir>` | Same, for a given directory without the picker (`tp .` opens the git root of the current directory) |
+| `ctrl-x` in the picker | Kill the highlighted session |
 | `Prefix+C-f` | Switch between running sessions (fzf popup) |
 | `Prefix+b` | Back to the previous session |
 | `Prefix+(` / `Prefix+)` | Previous / next session (tmux defaults) |
@@ -51,7 +52,16 @@
 | `tn [name]` | Create a session named after the current directory or the given name |
 | `tm-dev` | Start the "dev" layout (git status, vim, shell) |
 
-Project directories come from `TMUX_PROJECT_DIRS` in `private/shell.d/private.sh` (append `:N` for N levels deep).
+Picker: `●` marks running sessions (listed first, then by zoxide score), preview shows git log/status or the README. Project directories come from `TMUX_PROJECT_DIRS` in `private/shell.d/private.sh` (`:N` = N levels deep, `:0` = the directory itself). New sessions can get a layout from `config/tmux/sessions/` (see its README).
+
+## Nested tmux (remote sessions)
+
+| Key | Action |
+|-----|--------|
+| `F12` | Toggle this tmux off: the prefix and all other keys go to the program in the pane, e.g. a remote tmux. The status bar shows `KEYS OFF (F12)`. Press `F12` again to get local control back (may need `Fn+F12` on a Mac keyboard) |
+| `Prefix+Prefix` (`C-Space C-Space`) | Send one prefix to the inner tmux without switching off, only if it uses the same prefix |
+
+Use a different prefix in the remote `~/.tmux.conf` (for example `C-b`), or skip nesting with iTerm2's `ssh -t host 'tmux -CC new-session -A -s ssh_tmux'`.
 
 ## Window Management
 
