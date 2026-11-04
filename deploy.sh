@@ -277,6 +277,9 @@ ln -sf $DOTFILES_DIR/config/mc/mc.keymap ~/.config/mc/mc.keymap
 mkdir -p ~/.config/pet
 ln -sf $DOTFILES_DIR/config/pet/snippet.toml ~/.config/pet/snippet.toml
 
+mkdir -p ~/.config/herdr
+ln -sf $DOTFILES_DIR/config/herdr/config.toml ~/.config/herdr/config.toml
+
 mkdir -p ~/.config/delta/themes
 ln -sf $DOTFILES_DIR/config/delta/themes/catppuccin.gitconfig ~/.config/delta/themes/catppuccin.gitconfig
 

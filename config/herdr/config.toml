@@ -1,0 +1,17 @@
+# herdr config, deployed to ~/.config/herdr/config.toml by deploy.sh.
+# Mirrors config/tmux/tmux.conf where herdr has an equivalent; list every key with
+# prefix+? inside herdr or in https://herdr.dev/docs/config-reference/
+onboarding = false
+
+[keys]
+# Same prefix as tmux (C-Space)
+prefix = "ctrl+space"
+# Same split keys as tmux: v = side by side, V = stacked
+split_vertical = "prefix+v"
+split_horizontal = "prefix+shift+v"
+# tmux uses Prefix+i for copy mode
+copy_mode = "prefix+i"
+
+[ui]
+# Lines scrolled per mouse wheel notch (touchpads send many small notches)
+mouse_scroll_lines = 3
