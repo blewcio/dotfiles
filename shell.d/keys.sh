@@ -36,4 +36,14 @@ keys_tmux() {
   fi
 }
 
+# Show the herdr key bindings cheat sheet (scroll, / to search)
+keys_herdr() {
+  local keys_file="$HOME/dotfiles/doc/keys_herdr.md"
 
+  if [ -f "$keys_file" ]; then
+    _show_doc "$keys_file"
+  else
+    echo "Error: herdr keybindings file not found at $keys_file"
+    return 1
+  fi
+}

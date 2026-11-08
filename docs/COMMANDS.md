@@ -167,6 +167,7 @@ Browse interactively in the shell: `cmds` (everything), `aliases` (own aliases),
 | Function | Description |
 | --- | --- |
 | `keys` | Show the terminal key bindings cheat sheet (scroll, / to search) |
+| `keys_herdr` | Show the herdr key bindings cheat sheet (scroll, / to search) |
 | `keys_tmux` | Show the tmux key bindings cheat sheet (scroll, / to search) |
 
 ### shellrc.sh
