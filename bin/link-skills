@@ -20,6 +20,10 @@ mkdir -p "$SKILLS_TARGET"
 mkdir -p "$HOME/.config/opencode"
 ln -sfn "$SKILLS_TARGET" "$HOME/.config/opencode/skills"
 
+# ── Same for GitHub Copilot CLI (~/.copilot/skills/) ───────────────────────────
+mkdir -p "$HOME/.copilot"
+ln -sfn "$SKILLS_TARGET" "$HOME/.copilot/skills"
+
 # ── Symlink individual skills from a source directory ─────────────────────────
 link_skills_from() {
     local source_dir="$1"

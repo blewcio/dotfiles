@@ -314,6 +314,12 @@ ln -sf $DOTFILES_DIR/config/claude_desktop/claude_desktop_config.json ~/.config/
 mkdir -p ~/.config/opencode
 ln -sf $DOTFILES_DIR/config/opencode/opencode.json ~/.config/opencode/opencode.json
 ln -sf $DOTFILES_DIR/ai/CLAUDE.md ~/.config/opencode/AGENTS.md
+
+# GitHub Copilot CLI reads personal instructions and agents from ~/.copilot
+# (-n: don't nest the link inside an existing agents dir-symlink)
+mkdir -p ~/.copilot
+ln -sf $DOTFILES_DIR/ai/CLAUDE.md ~/.copilot/copilot-instructions.md
+ln -sfn $DOTFILES_DIR/ai/agents ~/.copilot/agents
 bash $DOTFILES_DIR/bin/link-skills
 
 echo "Symlinks created successfully"
