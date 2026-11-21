@@ -7,40 +7,36 @@
 ## Personalization
 - Be my personal assistant like in `~/dotfiles/private/ai/PERSONALIZATION.md`
 
-## Instruction for git 
-- Inform if I try to commit sensitive information or data, such as tokens or credentials
+## Instruction for git
 - Keep commits focused; if a task touches two unrelated features, split it into two commits.
-- Keep commit messages concise and imperative (“Fix bug” not “Fixed a bug”).
+- Keep commit messages concise and imperative ("Fix bug" not "Fixed a bug").
 - Don't mention Co-Authored or Claude in git commits
-- Present commit scope and description for approval before commiting
-- Always propose branches before creating them — for new features, bug fixes, and refactors/experiments alike — and merge back to main via pull request
-- Document significant changes with reasoning and migration notes inside commit descriptions
-- Suggest using tags for major releases or milestones, ask for approval before tagging
-- Prefer rebasing feature branches before merging to keep history clean
+- Present commit scope and description for approval before committing
+- Document significant changes with reasoning and migration notes in the commit description; for changes affecting data integrity, add a data validation strategy and backup plan
+- Always propose branches before creating them (features, fixes, refactors, experiments); rebase onto main, then merge locally — no pull requests (I develop alone on private repos)
+- Suggest tags (`v1.2.0`) for releases or milestones; ask before tagging
 - Don't add any license information to repositories, if not explicitly requested
 
 ## Instructions for software development
 - Validate preconditions before destructive actions (migrations, refactors, file operations)
 - Never assume the code is executed on the same machine
 - Suggest inline comments for non-obvious logic
-- Never log, echo, or store API keys, passwords, or secrets in code or comments
+- Never log, echo, store or commit API keys, passwords, tokens or secrets; warn me if I try to
 - Don't run tests after minor changes, but after larger refactors (to save tokens)
 - For refactors, ensure the same functionality is preserved and provide tests if necessary to validate this
-- For any change that affects data integrity, provide a data validation strategy and backup plan in the commit description
+
+## Changelog and versioning (apps with users/releases — not dotfiles or scripts)
+- Record every user-visible change under "Unreleased" in `public/changelog.html` in the same change, and update the docs covering that behaviour
+- Keep one version constant (e.g. `APP_VERSION`) in sync with the latest changelog entry; for releases use the `project-release` skill
 
 ## MCP Servers
-- For MCP server management, use `claude mcp` commands to list, add, or remove servers. Always verify the server configuration after changes.
-- Use Context7 to lookup docs of external software libraries or ducumentation
-- API keys stored in `~/dotfiles/private/`
+- Use Context7 to look up docs of external libraries and software
+- API keys are stored in `~/dotfiles/private/`
 
 ## Skill development
-- If you spot we do a repetative task that could be a command or a skill, ask if I want to create one
-- When developing a new skill, first outline the functionality and expected behavior before writing any code.
-- For skill development, follow the standard structure for skills, including a clear README, well-defined input and output formats, and comprehensive tests.
-- Name every skill `<domain>-<action>` (e.g. `note-cleanup`, `project-init`) so related skills group together alphabetically and the name signals both subject and behavior. Avoid bare noun-phrases (`learning-notes`) and action-first names missing a domain prefix (`transition-phase` instead of `project-transition-phase`). The directory name must match the `name:` field in its `SKILL.md`.
+- If you spot a repetitive task that could be a command or a skill, ask if I want to create one
+- Outline functionality and expected behaviour before writing a skill; include clear input/output formats and tests
+- Name every skill `<domain>-<action>` (e.g. `note-cleanup`, `project-init`), not bare nouns (`learning-notes`) or action-first (`transition-phase`); the directory name must match `name:` in `SKILL.md`
 
 ## Product Team Workflow
-
-- If I ask to develop a new product, ask if we need the product multi-agent team workflow
-- Autonomous multi-agent system (6 agents) that runs full software dev lifecycles: concept → UX/UI design → architecture → planning → development → delivery. Bob approves each phase transition. Agents in `~/dotfiles/ai/agents/product-team/`, workflow skills in `~/dotfiles/ai/skills/product-team/`, state lives in the project's `.agents/` directory.
-- Full docs of the multi-agent product team (agent details, phase artifacts, ticket workflow, quick-start examples, best practices, troubleshooting): `~/dotfiles/ai/PRODUCT-TEAM.md`.
+- If I ask to develop a new product, ask if we need the multi-agent product team workflow (docs: `~/dotfiles/ai/PRODUCT-TEAM.md`)
